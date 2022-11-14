@@ -2,7 +2,7 @@ package com.protone.common.context
 
 import android.app.Application
 
-object SApplication {
+object MApplication {
 
     val app: Application get() = application
 
@@ -12,6 +12,6 @@ object SApplication {
     private lateinit var application: Application
 
     fun init(application: Application) {
-        SApplication.application = application
+        MApplication.application = application
     }
 }

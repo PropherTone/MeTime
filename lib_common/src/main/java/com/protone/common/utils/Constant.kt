@@ -3,7 +3,7 @@ package com.protone.common.utils
 import android.net.Uri
 import android.provider.MediaStore
 
-const val TAG = "TAG"
+const val TAG = "MeTimeLogTAG"
 
 val imageContent: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 

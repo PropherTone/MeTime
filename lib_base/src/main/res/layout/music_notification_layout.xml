@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notify_music_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/notify_music_icon"
+        android:layout_width="@dimen/user_icon"
+        android:layout_height="@dimen/user_icon"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/icon_margin"
+        android:background="@color/gray_1"
+        android:contentDescription="@string/icon"
+        android:padding="@dimen/icon_padding"
+        android:src="@drawable/ic_baseline_music_note_24" />
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/notify_music_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:letterSpacing="0.02"
+            android:lines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:padding="@dimen/texts_padding"
+            android:text="@string/no_music_is_playing"
+            android:textSize="@dimen/sub_text"
+            android:textStyle="bold" />
+
+
+        <LinearLayout
+            android:id="@+id/notify_music_controller"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_margin"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/notify_music_previous"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_next_24" />
+
+            <ImageView
+                android:id="@+id/notify_music_control"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_baseline_play_arrow_24" />
+
+            <ImageView
+                android:id="@+id/notify_music_next"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_forward_24" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/notify_music_close"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:contentDescription="@string/action"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_baseline_close_24"
+        android:layout_width="@dimen/smaller_Icon"
+        android:layout_height="@dimen/user_icon"/>
+
+</LinearLayout>

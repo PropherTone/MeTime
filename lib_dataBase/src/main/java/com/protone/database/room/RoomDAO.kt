@@ -5,45 +5,45 @@ import com.protone.database.room.dao.*
 import com.wajahatkarim3.roomexplorer.RoomExplorer
 
 fun getGalleryDAO(): SignedGalleryDAO {
-    return SeennDataBase.database.getGalleryDAO()
+    return DataBase.database.getGalleryDAO()
 }
 
 fun getNoteDAO(): NoteDAO {
-    return SeennDataBase.database.getNoteDAO()
+    return DataBase.database.getNoteDAO()
 }
 
 fun getNoteTypeDAO(): NoteTypeDAO {
-    return SeennDataBase.database.getNoteTypeDAO()
+    return DataBase.database.getNoteTypeDAO()
 }
 
 fun getMusicBucketDAO(): MusicBucketDAO {
-    return SeennDataBase.database.getMusicBucketDAO()
+    return DataBase.database.getMusicBucketDAO()
 }
 
 fun getMusicDAO(): MusicDAO {
-    return SeennDataBase.database.getMusicDAO()
+    return DataBase.database.getMusicDAO()
 }
 
 fun getGalleryBucketDAO(): GalleryBucketDAO {
-    return SeennDataBase.database.getGalleryBucketDAO()
+    return DataBase.database.getGalleryBucketDAO()
 }
 
 fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO {
-    return SeennDataBase.database.getGalleriesWithNotesDAO()
+    return DataBase.database.getGalleriesWithNotesDAO()
 }
 
 fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO {
-    return SeennDataBase.database.getNoteDirWithNoteDAO()
+    return DataBase.database.getNoteDirWithNoteDAO()
 }
 
 fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
-    return SeennDataBase.database.getMusicWithMusicBucketDAO()
+    return DataBase.database.getMusicWithMusicBucketDAO()
 }
 
 fun shutdownDataBase(){
-    SeennDataBase.database.close()
+    DataBase.database.close()
 }
 
 fun showRoomDB(context: Context){
-    RoomExplorer.show(context,SeennDataBase::class.java,"SeennDB")
+    RoomExplorer.show(context,DataBase::class.java,"SeennDB")
 }

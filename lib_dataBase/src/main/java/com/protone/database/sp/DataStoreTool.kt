@@ -2,7 +2,7 @@ package com.protone.database.sp
 
 import kotlin.reflect.KProperty
 
-class DataTool(val dataDelegate: DataDelegate){
+class DataStoreTool(val dataDelegate: DataDelegate){
 
     fun int(key: String,defValue: Int): Delegate<Int> {
         return object : Delegate<Int>{

@@ -19,7 +19,7 @@ import com.protone.common.baseType.toast
 import com.protone.common.utils.isInDebug
 
 val activityOperationBroadcast: LocalBroadcastManager =
-    LocalBroadcastManager.getInstance(SApplication.app)
+    LocalBroadcastManager.getInstance(MApplication.app)
 
 fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
     var name = ""

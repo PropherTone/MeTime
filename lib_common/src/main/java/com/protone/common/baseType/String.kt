@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.Editable
 import android.widget.Toast
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 import com.protone.common.context.onUiThread
 import java.io.File
 import java.io.FileNotFoundException
@@ -93,8 +93,8 @@ fun String.getParentPath(): String {
 }
 
 fun String.toast() {
-    SApplication.app.onUiThread {
-        Toast.makeText(SApplication.app, this, Toast.LENGTH_SHORT).show()
+    MApplication.app.onUiThread {
+        Toast.makeText(MApplication.app, this, Toast.LENGTH_SHORT).show()
     }
 }
 

@@ -2,14 +2,14 @@ package com.protone.common.baseType
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 import com.protone.common.utils.isInDebug
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
 fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
-    return SApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(fileName, dir,
+    return MApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(fileName, dir,
         onExists = { file ->
             if (file.getSHA() == this.getSHA()) {
                 file.path

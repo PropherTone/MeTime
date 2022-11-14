@@ -50,4 +50,4 @@ val appIntentFilter: IntentFilter
     }
 
 val KClass<*>.intent
-    get() = Intent(SApplication.app, this.java)
+    get() = Intent(MApplication.app, this.java)

@@ -2,18 +2,18 @@ package com.protone.common.baseType
 
 import android.graphics.drawable.Drawable
 import androidx.core.content.res.ResourcesCompat
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 
 fun Int.getString(): String {
-    return SApplication.app.getString(this)
+    return MApplication.app.getString(this)
 }
 
 fun Int.getDrawable(): Drawable? {
-    return ResourcesCompat.getDrawable(SApplication.app.resources, this, null)
+    return ResourcesCompat.getDrawable(MApplication.app.resources, this, null)
 }
 
 fun Int.getColor(): Int {
-    return ResourcesCompat.getColor(SApplication.app.resources, this, null)
+    return ResourcesCompat.getColor(MApplication.app.resources, this, null)
 }
 
 fun Int.toHexColor(): String {

@@ -3,7 +3,7 @@ package com.protone.database.room
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 import com.protone.common.entity.*
 import com.protone.database.room.dao.*
 import java.lang.ref.WeakReference
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
     version = 1,
     exportSchema = false
 )
-internal abstract class SeennDataBase : RoomDatabase() {
+internal abstract class DataBase : RoomDatabase() {
     internal abstract fun getGalleryDAO(): SignedGalleryDAO
     internal abstract fun getNoteDAO(): NoteDAO
     internal abstract fun getNoteTypeDAO(): NoteTypeDAO
@@ -36,19 +36,19 @@ internal abstract class SeennDataBase : RoomDatabase() {
 
     companion object {
         @JvmStatic
-        val database: SeennDataBase
+        val database: DataBase
             @Synchronized get() {
                 return databaseImpl?.get() ?: init().apply {
                     databaseImpl = WeakReference(this)
                 }
             }
 
-        private var databaseImpl: WeakReference<SeennDataBase>? = null
+        private var databaseImpl: WeakReference<DataBase>? = null
 
-        private fun init(): SeennDataBase {
+        private fun init(): DataBase {
             return Room.databaseBuilder(
-                SApplication.app,
-                SeennDataBase::class.java,
+                MApplication.app,
+                DataBase::class.java,
                 "SeennDB"
             ).build()
         }

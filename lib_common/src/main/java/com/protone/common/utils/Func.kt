@@ -5,14 +5,14 @@ import android.os.Looper
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 fun isInDebug(): Boolean {
     return try {
-        val info: ApplicationInfo = SApplication.app.applicationInfo
+        val info: ApplicationInfo = MApplication.app.applicationInfo
         (info.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
     } catch (e: java.lang.Exception) {
         false

@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 import com.protone.common.utils.isInDebug
 import com.protone.common.utils.onResult
 import java.io.ByteArrayOutputStream
@@ -41,11 +41,11 @@ suspend fun Uri.imageSaveToDisk(
     var exists = false
     var mimeType = ""
     return onResult {
-        val bytes = SApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
+        val bytes = MApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
             ?.use { inputStream -> inputStream.readBytes() } ?: toBitmapByteArray()
         it.resumeWith(Result.success(if (bytes == null) {
             null
-        } else SApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(
+        } else MApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(
             bytes.getMediaMimeType().let { mime ->
                 mimeType = mime
                 "$fileName.$mimeType"
@@ -107,7 +107,7 @@ suspend fun Uri.toBitmap(
 fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {
     if (this == Uri.EMPTY) return null
     var ois = try {
-        SApplication.app.contentResolver.openInputStream(this)
+        MApplication.app.contentResolver.openInputStream(this)
     } catch (e: FileNotFoundException) {
         return null
     }
@@ -120,7 +120,7 @@ fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {
             options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, w, h)
             bitmap?.recycle()
             ois?.close()
-            ois = SApplication.app.contentResolver.openInputStream(this)
+            ois = MApplication.app.contentResolver.openInputStream(this)
             options.inJustDecodeBounds = false
         }
         BitmapFactory.decodeStream(ois, null, options)
@@ -138,7 +138,7 @@ fun Uri.toBitmapByteArray(): ByteArray? {
     val mediaMetadataRetriever = MediaMetadataRetriever()
     return try {
         mediaMetadataRetriever.run {
-            setDataSource(SApplication.app, this@toBitmapByteArray)
+            setDataSource(MApplication.app, this@toBitmapByteArray)
             embeddedPicture
         }
     } catch (e: IllegalArgumentException) {

@@ -1,7 +1,7 @@
 package com.protone.common.baseType
 
 import android.util.TypedValue
-import com.protone.common.context.SApplication
+import com.protone.common.context.MApplication
 import kotlin.math.roundToInt
 
 var DPI = 0
@@ -35,13 +35,13 @@ fun Int.px2Pt() = (this * 72f / DPI).roundToInt()
 fun Int.pt2Px() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_PT,
     this.toFloat(),
-    SApplication.app.resources.displayMetrics
+    MApplication.app.resources.displayMetrics
 ).roundToInt()
 
 fun Int.sp2Px() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_SP,
     this.toFloat(),
-    SApplication.app.resources.displayMetrics
+    MApplication.app.resources.displayMetrics
 ).roundToInt()
 
-fun Int.px2Sp() = (this / SApplication.app.resources.displayMetrics.scaledDensity).roundToInt()
+fun Int.px2Sp() = (this / MApplication.app.resources.displayMetrics.scaledDensity).roundToInt()
