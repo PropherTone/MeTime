@@ -1,0 +1,63 @@
+pluginManagement {
+
+    enableFeaturePreview('VERSION_CATALOGS')
+
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+
+    versionCatalogs {
+        libs {
+            version('compileSdk', '32')
+            version('minSdk', '24')
+            version('targetSdk', '32')
+            version('versionCode', '1')
+            version('versionName', '1.0')
+            version('testInstrumentationRunner', 'androidx.test.runner.AndroidJUnitRunner')
+
+            alias('ktx-core').to('androidx.core:core-ktx:1.8.0')
+            alias('appcompat').to('androidx.appcompat:appcompat:1.5.0')
+            alias('material').to('com.google.android.material:material:1.6.1')
+            bundle('baseLibs', ['ktx-core', 'appcompat', 'material'])
+
+            alias('viewmodel').to('androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1')
+            alias('lifecycle-runtime-ktx').to('androidx.lifecycle:lifecycle-runtime-ktx:2.4.1')
+            alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.3.5')
+            alias('constraintlayout').to('androidx.constraintlayout:constraintlayout:2.1.4')
+
+            version('roomVersion', '2.3.0')
+            //JitPack的DataStore本地持久化库,替代SP
+            alias('datastore').to('androidx.datastore:datastore-preferences:1.0.0')
+            //ROOM数据库
+            alias('room-compiler').to('androidx.room', 'room-compiler').versionRef('roomVersion')
+            alias('room-ktx').to('androidx.room', 'room-ktx').versionRef('roomVersion')
+            alias('room-runtime').to('androidx.room', 'room-runtime').versionRef('roomVersion')
+            //捆绑ROOM的引用
+            bundle('roomLibs', ['room-ktx', 'room-runtime'])
+            //ROOM数据库浏览组件
+            alias('roomExplorer').to('com.wajahatkarim:roomexplorer:1.0.1')
+
+            alias('gson').to('com.google.code.gson:gson:2.8.8')
+
+        }
+    }
+
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "MeTime"
+include ':app'
+include ':module_gallery'
+include ':module_music'
+include ':module_note'
+include ':lib_common'
+include ':lib_dataBase'
+include ':lib_base'

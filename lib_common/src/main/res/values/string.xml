@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unknown_error">未知错误</string>
+    <string name="failed_msg">操作失败</string>
+</resources>

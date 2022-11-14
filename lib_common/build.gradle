@@ -1,0 +1,10 @@
+apply from:'../lib_build.gradle'
+
+dependencies {
+
+    kapt libs.room.compiler
+    implementation libs.bundles.roomLibs
+
+    implementation libs.gson
+
+}

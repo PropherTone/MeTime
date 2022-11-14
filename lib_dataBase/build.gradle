@@ -1,0 +1,12 @@
+apply from:'../lib_build.gradle'
+
+dependencies {
+
+    implementation project(path: ':lib_common')
+
+    implementation libs.datastore
+    kapt libs.room.compiler
+    implementation libs.bundles.roomLibs
+    implementation libs.roomExplorer
+
+}
