@@ -1,0 +1,44 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/user_container"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/main_padding">
+
+        <TextView
+            android:id="@+id/user_welcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello,Eqi"
+            android:textSize="@dimen/hug_title_text"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/user_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jan,21"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintStart_toStartOf="@id/user_welcome"
+            app:layout_constraintTop_toBottomOf="@+id/user_welcome" />
+
+        <ImageView
+            android:layout_marginTop="@dimen/main_margin"
+            android:id="@+id/user_icon"
+            android:layout_width="@dimen/user_icon"
+            android:layout_height="@dimen/user_icon"
+            android:contentDescription="@string/icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/user_welcome"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

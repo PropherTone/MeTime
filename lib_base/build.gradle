@@ -1,5 +1,10 @@
 apply from: '../lib_build.gradle'
 
 dependencies {
+
     implementation project(path: ':lib_common')
+
+    implementation libs.glide
+    annotationProcessor libs.glide.compiler
+
 }

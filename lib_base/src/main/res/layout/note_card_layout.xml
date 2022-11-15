@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/transparent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/noteCard_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/user_icon"
+        android:background="@color/transparent_white"
+        android:gravity="center"
+        android:lines="1"
+        android:padding="@dimen/title_texts_padding"
+        android:textSize="@dimen/title_text"
+        android:textStyle="bold"
+        android:elevation="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/noteCard_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_white"
+        android:gravity="center"
+        android:lines="1"
+        android:padding="@dimen/texts_padding"
+        android:textSize="@dimen/sub_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noteCard_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

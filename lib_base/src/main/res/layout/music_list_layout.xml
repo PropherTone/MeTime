@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="isLoad"
+            type="Boolean"
+            android:value="false"/>
+
+    </data>
+
+    <LinearLayout
+        android:id="@+id/musicList_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:paddingTop="@dimen/texts_padding"
+        android:paddingBottom="@dimen/texts_padding">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/musicList_inContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_margin">
+
+            <TextView
+                android:id="@+id/musicList_name"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/icon"
+                android:gravity="center_vertical"
+                android:letterSpacing="0.02"
+                android:paddingStart="@dimen/icon_padding"
+                android:paddingEnd="@dimen/main_padding"
+                android:maxLines="1"
+                android:textColor="@color/black_1"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@id/musicList_detail"
+                app:layout_constraintEnd_toStartOf="@id/musicList_time"
+                app:layout_constraintStart_toEndOf="@+id/musicList_playState"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/musicList_playState"
+                android:layout_width="@dimen/icon"
+                android:layout_height="@dimen/icon"
+                android:contentDescription="@string/icon"
+                android:maxLength="1"
+                android:paddingStart="@dimen/icon_padding"
+                android:paddingTop="@dimen/icon_padding"
+                android:src="@{isLoad ? @drawable/ic_load_animation : @drawable/ic_baseline_playing_24 }"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/musicList_detail"
+                app:layout_constraintEnd_toStartOf="@id/musicList_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/musicList_detail"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:letterSpacing="0.02"
+                android:maxLines="1"
+                android:paddingStart="@dimen/icon_padding"
+                android:paddingTop="@dimen/icon_padding"
+                android:paddingEnd="@dimen/main_padding"
+                android:textColor="@color/black_1"
+                android:textSize="@dimen/sub_text"
+                app:layout_constraintEnd_toStartOf="@id/musicList_time"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/musicList_playState" />
+
+            <TextView
+                android:id="@+id/musicList_time"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sub_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</layout>

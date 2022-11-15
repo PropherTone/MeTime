@@ -3,8 +3,31 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_data_usage_24_white.xml" value="0.152" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_error_outline_24_black.xml" value="0.125" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_music_note_24.xml" value="0.1185" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_pause_24.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_refresh_24.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_pause.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_play.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_play_arrow_white.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_refresh.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_round_paused_white_24.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_round_playlist_play_24_white.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/load_animation.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/main_background.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/oval.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/oval_back_white.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/oval_background.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/oval_fore_ripple_dark.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/drawable/round_background_fore_dark.xml" value="0.125" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/layout/auto_music_player_layout_full.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/layout/login_pop_layout.xml" value="0.1" />
         <entry key="..\:/MeTime/lib_base/src/main/res/layout/music_notification_layout.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/lib_base/src/main/res/layout/reg_pop_layout.xml" value="0.1" />
       </map>
     </option>
   </component>

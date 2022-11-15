@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/playList_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:lines="1"
+            android:ellipsize="end"
+            android:layout_margin="@dimen/main_margin"
+            android:textColor="@color/white"
+            app:layout_constraintWidth_percent="0.96"
+            android:padding="@dimen/texts_padding"
+            android:background="@drawable/round_background_fore_dark"
+            android:textSize="@dimen/small_title_text"
+            android:gravity="center_vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

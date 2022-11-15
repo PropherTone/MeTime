@@ -44,6 +44,11 @@ dependencyResolutionManagement {
 
             alias('gson').to('com.google.code.gson:gson:2.8.8')
 
+            //Glide和Glide注解器
+            version('glideVersion','4.12.0')
+            alias('glide').to('com.github.bumptech.glide','glide').versionRef('glideVersion')
+            alias('glide-compiler').to('com.github.bumptech.glide','compiler').versionRef('glideVersion')
+
         }
     }
 

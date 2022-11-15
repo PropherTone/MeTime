@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_ripple_white"
+        android:elevation="@dimen/small_elevation">
+
+        <ImageView
+            android:id="@+id/note_back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/icon"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/note_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/foreDark_1"
+            android:letterSpacing="0.2"
+            android:lines="1"
+            android:padding="@dimen/title_texts_padding"
+            android:text="@string/none"
+            android:textColor="@color/white"
+            android:textSize="@dimen/small_title_text"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/note_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lists_margin"
+            android:layout_marginBottom="@dimen/lists_margin"
+            android:background="@color/foreDark_1"
+            android:letterSpacing="0.06"
+            android:padding="@dimen/texts_padding"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/note_title" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

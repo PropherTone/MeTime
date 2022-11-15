@@ -1,4 +1,4 @@
-package com.protone.common.utils.renderUtils
+package com.protone.common.utils.displayUtils
 
 import android.graphics.Color
 

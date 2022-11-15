@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="roundCornerImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">15dp</item>
+    </style>
+
+    <style name="ovalImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="TransparentAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="background">@color/transparent</item>
+        <item name="android:windowBackground">@color/transparent</item>
+    </style>
+
+</resources>

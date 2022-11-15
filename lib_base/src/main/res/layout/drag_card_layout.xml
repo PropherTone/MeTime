@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:id="@+id/main_icon"
+        android:layout_gravity="center"
+        android:contentDescription="@string/model_account"
+        android:layout_width="@dimen/model_icon_dimen"
+        android:layout_height="@dimen/model_icon_dimen"/>
+</layout>

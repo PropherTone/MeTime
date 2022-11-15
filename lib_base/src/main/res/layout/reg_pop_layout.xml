@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/oval_white">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/user_name_layout"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/list_item_height"
+            android:layout_marginTop="@dimen/main_margin"
+            android:textColorHint="@color/black"
+            app:boxStrokeColor="@color/black"
+            app:errorTextColor="@color/red"
+            app:layout_constraintBottom_toTopOf="@id/user_password_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:placeholderTextColor="@color/black">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/transparent"
+                android:hint="@string/user_name"
+                android:maxLength="15"
+                android:padding="@dimen/main_padding"
+                android:textColor="@color/black"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/sub_text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/user_password_layout"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/list_item_height"
+            android:gravity="center_vertical"
+            android:textColorHint="@color/black"
+            app:errorTextColor="@color/red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user_name_layout"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/user_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/transparent"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:padding="@dimen/main_padding"
+                android:textColor="@color/black"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/sub_text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/main_margin"
+            android:backgroundTint="@color/blue_1"
+            android:text="@string/confirm"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_password_layout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="StateImageView">
+        <attr name="ActiveDrawable" format="reference" />
+        <attr name="NegativeDrawable" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="RefreshCover">
+        <attr name="refresh_icon_size" format="dimension" />
+        <attr name="refresh_margin_top" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="GradientRelative">
+        <attr name="color1" format="color" />
+        <attr name="color2" format="color" />
+        <attr name="length" format="float" />
+        <attr name="y1" format="float" />
+        <attr name="GradientSteep" format="float" />
+    </declare-styleable>
+
+    <attr name="GradientRLTheme" format="reference" />
+
+    <declare-styleable name="GradientView">
+        <attr name="GradientView_duration" format="integer" />
+        <attr name="GradientView_color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="DragBar">
+        <attr name="barHeight" format="dimension" />
+        <attr name="paddingTop" format="integer" />
+        <attr name="paddingBottom" format="integer" />
+        <attr name="steep" format="integer" />
+        <attr name="scrollingSpeed" format="integer" />
+        <attr name="roundStyle" format="boolean" />
+        <attr name="blurRadius" format="float" />
+        <attr name="barStrokeWidth" format="integer" />
+        <attr name="barAnimator" format="boolean" />
+        <attr name="barColor" format="color" />
+        <attr name="shadowRadius" format="float" />
+        <attr name="buttonElevation" format="float" />
+    </declare-styleable>
+
+</resources>

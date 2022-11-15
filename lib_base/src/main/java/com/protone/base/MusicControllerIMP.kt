@@ -4,15 +4,14 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
-import com.protone.api.baseType.getString
-import com.protone.api.context.*
-import com.protone.api.entity.Music
-import com.protone.seenn.broadcast.musicBroadCastManager
-import com.protone.seenn.service.MusicBinder
-import com.protone.ui.R
-import com.protone.ui.customView.Bubble
-import com.protone.ui.customView.ColorfulProgressBar
-import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
+import com.protone.base.broadcast.musicBroadCastManager
+import com.protone.base.service.MusicBinder
+import com.protone.common.baseType.getString
+import com.protone.common.context.*
+import com.protone.common.entity.Music
+import com.protone.base.view.customView.Bubble
+import com.protone.base.view.customView.ColorfulProgressBar
+import com.protone.base.view.customView.musicPlayer.BaseMusicPlayer
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     var binder: MusicBinder? = null
@@ -103,23 +102,23 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         loop = mode
         when (mode) {
             LOOP_LIST -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_repeat_24_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_repeat_white)
                 showToast(targetView, R.string.loop_list.getString())
             }
             LOOP_SINGLE -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_repeat_one_24_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_repeat_one_white)
                 showToast(targetView, R.string.loop_single.getString())
             }
             PLAY_LIST -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_playlist_play_24_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_playlist_play_white)
                 showToast(targetView, R.string.play_list.getString())
             }
             NO_LOOP -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_block_24_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_block_white)
                 showToast(targetView, R.string.no_loop.getString())
             }
             RANDOM -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_loop_24_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_loop_white)
                 showToast(targetView, R.string.random.getString())
             }
         }
