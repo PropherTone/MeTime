@@ -18,7 +18,7 @@ import java.io.File
 class GlideLoaderEngine : AbstractLoaderEngine() {
 
     override fun into(context: Context, target: ImageView) {
-        Glide.with(context).asDrawable().load().let {
+        Glide.with(context).asDrawable().load().config().let {
             if (requestFactory.requestInterceptor != null) {
                 it.addListener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
@@ -69,27 +69,21 @@ class GlideLoaderEngine : AbstractLoaderEngine() {
             }
             ImageType.Bitmap -> {
                 load(requestFactory.path as Bitmap?)
-
             }
             ImageType.Drawable -> {
                 load(requestFactory.path as Drawable?)
-
             }
             ImageType.Uri -> {
                 load(requestFactory.path as Uri?)
-
             }
             ImageType.File -> {
                 load(requestFactory.path as File?)
-
             }
             ImageType.Int -> {
                 load(requestFactory.path as Int?)
-
             }
             ImageType.Any -> {
                 load(requestFactory.path)
-
             }
             ImageType.ByteArray -> {
                 load(requestFactory.path as ByteArray?)
@@ -98,7 +92,7 @@ class GlideLoaderEngine : AbstractLoaderEngine() {
     }
 
     private fun RequestBuilder<Drawable>.config(): RequestBuilder<Drawable> {
-        if (requestFactory.size != null) {
+        if (requestFactory.configMap != null) {
 
         }
     }

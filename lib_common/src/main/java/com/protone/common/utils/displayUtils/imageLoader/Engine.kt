@@ -23,8 +23,7 @@ interface LoaderEngine {
 }
 
 interface RequestEngine {
-    fun setInterceptor(requestInterceptor: RequestInterceptor<LoadSuccessResult, LoadFailedResult>): RequestEngine
-    fun setSize(width: Int, height: Int): RequestEngine
+    fun setInterceptor(requestInterceptor: RequestInterceptor): RequestEngine
     fun enableDiskCache(enable: Boolean): RequestEngine
     fun enableMemoryCache(enable: Boolean): RequestEngine
     fun onTrimMemoryLevel(level: Int): RequestEngine

@@ -57,11 +57,6 @@ abstract class AbstractLoaderEngine : ImageEngine {
         return this
     }
 
-    override fun setSize(width: Int, height: Int): RequestEngine {
-        requestFactory.size = ImageSize(width, height)
-        return this
-    }
-
     override fun enableDiskCache(enable: Boolean): RequestEngine {
         requestFactory.enableDiskCache = enable
         return this
@@ -72,7 +67,7 @@ abstract class AbstractLoaderEngine : ImageEngine {
         return this
     }
 
-    override fun setInterceptor(requestInterceptor: RequestInterceptor<LoadSuccessResult, LoadFailedResult>): RequestEngine {
+    override fun setInterceptor(requestInterceptor: RequestInterceptor): RequestEngine {
         requestFactory.requestInterceptor = requestInterceptor
         return this
     }
