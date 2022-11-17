@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/MeTime/app/src/main/res/layout/main_activity.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/splash_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.125" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.125" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_data_usage_24_white.xml" value="0.152" />

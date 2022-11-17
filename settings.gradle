@@ -29,6 +29,7 @@ dependencyResolutionManagement {
             alias('lifecycle-runtime-ktx').to('androidx.lifecycle:lifecycle-runtime-ktx:2.4.1')
             alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.3.5')
             alias('constraintlayout').to('androidx.constraintlayout:constraintlayout:2.1.4')
+            bundle('componentLibs', ['viewmodel', 'lifecycle-runtime-ktx', 'fragment-ktx', 'constraintlayout'])
 
             version('roomVersion', '2.3.0')
             //JitPack的DataStore本地持久化库,替代SP
@@ -45,10 +46,14 @@ dependencyResolutionManagement {
             alias('gson').to('com.google.code.gson:gson:2.8.8')
 
             //Glide和Glide注解器
-            version('glideVersion','4.12.0')
-            alias('glide').to('com.github.bumptech.glide','glide').versionRef('glideVersion')
-            alias('glide-compiler').to('com.github.bumptech.glide','compiler').versionRef('glideVersion')
+            version('glideVersion', '4.12.0')
+            alias('glide').to('com.github.bumptech.glide', 'glide').versionRef('glideVersion')
+            alias('glide-compiler').to('com.github.bumptech.glide', 'compiler').versionRef('glideVersion')
 
+            //阿里路由框架
+            version('arouterVersion', '1.5.2')
+            alias('arouter-api').to('com.alibaba','arouter-api').versionRef('arouterVersion')
+            alias('arouter-compiler').to('com.alibaba','arouter-compiler').versionRef('arouterVersion')
         }
     }
 
@@ -65,4 +70,5 @@ include ':module_music'
 include ':module_note'
 include ':lib_common'
 include ':lib_dataBase'
-include ':lib_base'
+include ':lib_ui'
+include ':lib_worker'

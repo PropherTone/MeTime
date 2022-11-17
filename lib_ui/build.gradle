@@ -1,0 +1,7 @@
+apply from: '../lib_build.gradle'
+
+dependencies {
+
+    implementation project(path: ':lib_common')
+
+}

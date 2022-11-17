@@ -9,4 +9,6 @@ dependencies {
 
     implementation libs.glide
     annotationProcessor libs.glide.compiler
+
+    api libs.arouter.api
 }

@@ -1,6 +1,6 @@
 package com.protone.common.utils.displayUtils.imageLoader
 
-enum class ImageType {
+internal enum class ImageType {
     String,
     Bitmap,
     Drawable,

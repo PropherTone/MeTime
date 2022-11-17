@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.protone.ui.view.customView.video.MyVideoPlayer
+            android:id="@+id/videoPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/video_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="10dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/start"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_gravity="center"
+            android:background="@drawable/oval_fore_ripple_dark"
+            android:contentDescription="@string/action"
+            android:elevation="10dp"
+            android:src="@drawable/ic_round_arrow_right_white_24" />
+
+    </FrameLayout>
+</layout>
