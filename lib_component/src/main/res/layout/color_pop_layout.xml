@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.protone.component.customView.colorPicker.MyColorPicker xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pop_Color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barHeight="@dimen/smaller_Icon"
+        app:blurRadius="1"
+        app:buttonElevation="1" />
+
+</layout>

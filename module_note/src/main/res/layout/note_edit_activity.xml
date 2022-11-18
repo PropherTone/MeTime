@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.protone.seenn.activity.NoteEditActivity" />
+
+        <import type="com.protone.worker.viewModel.NoteEditViewModel.NoteEvent" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="0dp">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/noteEdit_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="@dimen/small_elevation">
+
+            <androidx.constraintlayout.motion.widget.MotionLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/small_elevation"
+                android:minHeight="@dimen/list_icon"
+                app:layoutDescription="@xml/note_edit_layout_scene"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
+
+                <ImageView
+                    android:id="@+id/noteEdit_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/huge_icon"
+                    android:background="@drawable/main_background"
+                    android:contentDescription="@string/icon"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickIcon.INSTANCE)}"
+                    android:scaleType="centerCrop"
+                    app:layout_collapseMode="parallax" />
+
+                <ImageView
+                    android:id="@+id/noteEdit_progress"
+                    android:layout_width="@dimen/icon"
+                    android:layout_height="@dimen/icon"
+                    android:contentDescription="@string/action"
+                    android:src="@drawable/load_animation"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@id/noteEdit_icon"
+                    app:layout_constraintEnd_toEndOf="@id/noteEdit_icon"
+                    app:layout_constraintStart_toStartOf="@id/noteEdit_icon"
+                    app:layout_constraintTop_toTopOf="@id/noteEdit_icon" />
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar_action"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:paddingTop="@dimen/icon_padding_lite"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/toolbar_back"
+                        android:layout_width="@dimen/small_Icon"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:background="@drawable/background_ripple_transparent_white"
+                        android:contentDescription="@string/action"
+                        android:onClick="@{()->activity.finish()}"
+                        android:paddingTop="@dimen/main_margin"
+                        android:paddingBottom="@dimen/main_margin"
+                        android:src="@drawable/ic_baseline_arrow_back_24_white" />
+
+                    <EditText
+                        android:id="@+id/noteEdit_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@color/transparent"
+                        android:gravity="center"
+                        android:hint="@string/enter"
+                        android:importantForAutofill="no"
+                        android:inputType="textNoSuggestions"
+                        android:letterSpacing="0.06"
+                        android:maxLength="15"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/white"
+                        android:textSize="@dimen/title_text"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/toolbar_confirm"
+                        android:layout_width="@dimen/small_Icon"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:contentDescription="@string/action"
+                        android:onClick="@{()->activity.sendViewEvent(NoteEvent.Confirm.INSTANCE)}"
+                        android:paddingStart="0dp"
+                        android:paddingTop="@dimen/main_margin"
+                        android:paddingEnd="@dimen/main_padding"
+                        android:paddingBottom="@dimen/main_margin"
+                        android:src="@drawable/ic_baseline_check_24_white" />
+
+                </androidx.appcompat.widget.Toolbar>
+
+            </androidx.constraintlayout.motion.widget.MotionLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/noteEdit_richView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="60dp"
+            android:background="@color/white"
+            android:elevation="0dp"
+            app:layout_anchor="@id/noteEdit_toolbar"
+            app:layout_anchorGravity="bottom"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+            <com.protone.ui.customView.richText.RichNoteView
+                android:id="@+id/noteEdit_richNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="0dp" />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <HorizontalScrollView
+            android:id="@+id/noteEdit_tool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/glass"
+            android:clickable="true"
+            android:elevation="@dimen/small_elevation"
+            android:focusable="true"
+            android:paddingTop="@dimen/main_padding"
+            android:paddingBottom="@dimen/main_padding"
+            android:scrollbars="none"
+            app:layout_anchor="@id/noteEdit_richView"
+            app:layout_anchorGravity="bottom"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setBold()}"
+                    android:src="@drawable/ic_baseline_format_bold_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setItalic()}"
+                    android:src="@drawable/ic_baseline_format_italic_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setSize()}"
+                    android:src="@drawable/ic_baseline_format_size_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setUnderlined()}"
+                    android:src="@drawable/ic_baseline_format_underlined_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setStrikethrough()}"
+                    android:src="@drawable/ic_baseline_strikethrough_s_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setBullet()}"
+                    android:src="@drawable/ic_baseline_format_list_bulleted_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setQuote()}"
+                    android:src="@drawable/ic_baseline_format_quote_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setParagraph()}"
+                    android:src="@drawable/ic_baseline_format_align_justify_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setColor(false)}"
+                    android:padding="@dimen/main_padding"
+                    android:src="@color/black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setColor(true)}"
+                    android:padding="@dimen/main_padding"
+                    android:background="@color/black"
+                    android:src="@drawable/ic_baseline_text_fields_24_white" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickImage.INSTANCE)}"
+                    android:padding="@dimen/texts_padding"
+                    android:src="@drawable/ic_baseline_image_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickMusic.INSTANCE)}"
+                    android:padding="@dimen/texts_padding"
+                    android:src="@drawable/ic_baseline_music_note_24" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickVideo.INSTANCE)}"
+                    android:padding="@dimen/texts_padding"
+                    android:src="@drawable/ic_baseline_play_circle_filled_24_black" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

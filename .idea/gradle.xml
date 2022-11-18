@@ -12,9 +12,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/lib_common" />
+            <option value="$PROJECT_DIR$/lib_component" />
             <option value="$PROJECT_DIR$/lib_dataBase" />
-            <option value="$PROJECT_DIR$/lib_ui" />
-            <option value="$PROJECT_DIR$/lib_worker" />
             <option value="$PROJECT_DIR$/module_gallery" />
             <option value="$PROJECT_DIR$/module_music" />
             <option value="$PROJECT_DIR$/module_note" />

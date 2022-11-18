@@ -8,9 +8,9 @@ import com.protone.common.context.*
 import com.protone.metime.databinding.SplashActivityBinding
 import com.protone.metime.viewModel.SplashViewModel
 import com.protone.seenn.service.WorkService
-import com.protone.ui.BaseActivity
-import com.protone.ui.broadcast.workLocalBroadCast
-import com.protone.ui.service.MusicService
+import com.protone.component.BaseActivity
+import com.protone.component.broadcast.workLocalBroadCast
+import com.protone.component.service.MusicService
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity :

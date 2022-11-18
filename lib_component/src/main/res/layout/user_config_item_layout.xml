@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/user_icon">
+
+    <com.protone.component.view.customView.AnimateGradientView
+        android:id="@+id/item_back"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <Button
+        android:background="@drawable/trans_ripple"
+        android:id="@+id/item_name"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:letterSpacing="0.2"
+        android:textSize="@dimen/title_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

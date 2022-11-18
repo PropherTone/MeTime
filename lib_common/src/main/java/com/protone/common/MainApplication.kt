@@ -16,6 +16,10 @@ class MainApplication : Application() {
         super.attachBaseContext(base)
         Blur.init(this)
         MApplication.init(this)
+        if (BuildConfig.DEBUG) {
+            ARouter.openLog()
+            ARouter.openDebug()
+        }
         ARouter.init(base as Application?)
         DPI = MApplication.app.resources.displayMetrics.densityDpi
         val file = File("${base?.externalCacheDir?.path}/CrashLog")

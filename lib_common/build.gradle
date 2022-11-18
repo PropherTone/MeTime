@@ -2,12 +2,10 @@ apply from:'../lib_build.gradle'
 
 dependencies {
 
-    kapt libs.room.compiler
-    implementation libs.bundles.roomLibs
-
     implementation libs.gson
 
     implementation libs.glide
+    implementation project(path: ':lib_dataBase')
     annotationProcessor libs.glide.compiler
 
     api libs.arouter.api

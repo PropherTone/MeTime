@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.protone.gallery.activity.GalleryActivity" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/gallery_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/back_margin"
+                android:layout_marginTop="@dimen/back_margin"
+                android:background="@drawable/background_ripple_transparent_white"
+                android:contentDescription="@string/back"
+                android:onClick="@{()->activity.finish()}"
+                android:src="@drawable/ic_round_arrow_left__white_24" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/gallery_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                app:tabIndicatorColor="@color/white"
+                app:tabRippleColor="@color/glass"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColor="@color/white"/>
+
+            <ImageView
+                android:id="@+id/gallery_choose_confirm"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/main_margin"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_baseline_check_24_white"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/gallery_actionMenu"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->activity.showPop()}"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_baseline_more_horiz_24_white" />
+
+        </RelativeLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/gallery_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

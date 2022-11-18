@@ -4,11 +4,12 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import com.protone.common.context.onGlobalLayout
 import com.protone.common.context.root
-import com.protone.ui.BaseActivity
+import com.protone.component.BaseActivity
 import com.protone.common.utils.todayDate
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
+import com.protone.common.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
 import com.protone.common.utils.displayUtils.imageLoader.Image
@@ -18,14 +19,15 @@ import com.protone.common.utils.json.toJson
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
 import com.protone.seenn.service.WorkService
-import com.protone.ui.MusicControllerIMP
-import com.protone.worker.database.DatabaseHelper
+import com.protone.component.BaseMusicActivity
+import com.protone.component.MusicControllerIMP
+import com.protone.worker.database.dao.DatabaseHelper
 import com.protone.worker.database.userConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity :
-    BaseActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>(true) {
+    BaseMusicActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>(true) {
     override val viewModel: MainViewModel by viewModels()
 
     private var userName: String? = null
@@ -60,7 +62,7 @@ class MainActivity :
     override fun createView(): MainActivityBinding {
         return MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
-            fitStatuesBarUsePadding(toolMotion)
+            toolMotion.fitStatuesBarUsePadding()
             root.onGlobalLayout {
                 actionBtnContainer.also {
                     it.y = it.y + viewModel.btnH * 2

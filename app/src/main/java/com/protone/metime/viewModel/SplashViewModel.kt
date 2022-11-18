@@ -7,8 +7,8 @@ import com.protone.common.context.MApplication
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.todayDate
 import com.protone.common.R
-import com.protone.worker.BaseViewModel
-import com.protone.worker.database.DatabaseHelper
+import com.protone.component.BaseViewModel
+import com.protone.worker.database.dao.DatabaseHelper
 import com.protone.worker.database.MediaAction
 import com.protone.worker.database.userConfig
 import com.protone.worker.media.scanAudio

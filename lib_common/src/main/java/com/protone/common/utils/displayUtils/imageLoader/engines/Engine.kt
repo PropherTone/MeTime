@@ -1,5 +1,6 @@
 package com.protone.common.utils.displayUtils.imageLoader.engines
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -7,6 +8,8 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
 import com.protone.common.utils.displayUtils.imageLoader.constant.ConfigConstant
 import java.io.File
@@ -29,6 +32,9 @@ interface RequestEngine {
     fun onTrimMemoryLevel(level: Int): RequestEngine
     fun addConfig(configConstant: ConfigConstant): RequestEngine
     fun into(context: Context, target: ImageView)
+    fun into(fragment: Fragment, target: ImageView)
+    fun into(fragmentActivity: FragmentActivity, target: ImageView)
+    fun into(activity: Activity, target: ImageView)
     fun clearCache()
     fun onTrimMemory()
 }

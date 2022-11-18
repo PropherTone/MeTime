@@ -12,3 +12,15 @@ val videoContent: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
 val musicContent: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
 val sizeFormatMap = mapOf(Pair(0, "B"), Pair(1, "KB"), Pair(2, "MB"), Pair(3, "GB"))
+
+object RouterPath {
+
+    object GalleryRouterPath {
+        private const val Home = "/Gallery"
+        const val Main = "$Home/Main"
+        const val GalleryView = "$Home/GalleryView"
+        const val Search = "$Home/Search"
+        const val Box = "$Home/Box"
+    }
+
+}

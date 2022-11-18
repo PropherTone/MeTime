@@ -1,12 +1,16 @@
 package com.protone.common.utils.displayUtils.imageLoader.engines
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -21,7 +25,36 @@ import java.util.ArrayDeque
 internal class GlideLoaderEngine : AbstractLoaderEngine<RequestBuilder<Drawable>>() {
 
     override fun into(context: Context, target: ImageView) {
-        Glide.with(context).asDrawable().load().config().let {
+        Glide.with(context).into(target)
+    }
+
+    override fun into(fragment: Fragment, target: ImageView) {
+        Glide.with(fragment).into(target)
+    }
+
+    override fun into(fragmentActivity: FragmentActivity, target: ImageView) {
+        Glide.with(fragmentActivity).into(target)
+    }
+
+    override fun into(activity: Activity, target: ImageView) {
+        Glide.with(activity).into(target)
+    }
+
+    override fun onTrimMemory() {
+        Glide.get(MApplication.app).clearMemory()
+    }
+
+    override fun clearCache() {
+        Glide.get(MApplication.app).clearDiskCache()
+    }
+
+    override fun onTrimMemoryLevel(level: Int): RequestEngine {
+        Glide.get(MApplication.app).onTrimMemory(level)
+        return this
+    }
+
+    private fun RequestManager.into(target: ImageView) {
+        asDrawable().load().config().let {
             if (requestFactory.requestInterceptor != null) {
                 it.addListener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
@@ -51,19 +84,6 @@ internal class GlideLoaderEngine : AbstractLoaderEngine<RequestBuilder<Drawable>
             } else it
         }.into(target)
         requestFactory = RequestFactory()
-    }
-
-    override fun onTrimMemory() {
-        Glide.get(MApplication.app).clearMemory()
-    }
-
-    override fun clearCache() {
-        Glide.get(MApplication.app).clearDiskCache()
-    }
-
-    override fun onTrimMemoryLevel(level: Int): RequestEngine {
-        Glide.get(MApplication.app).onTrimMemory(level)
-        return this
     }
 
     private fun RequestBuilder<Drawable>.load(): RequestBuilder<Drawable> {

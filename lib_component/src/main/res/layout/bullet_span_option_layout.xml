@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="@dimen/main_padding">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/confirm"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/gap_width_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:text="@string/gap_width"
+                android:textSize="@dimen/subContent_text"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/gap_width"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:contentDescription="@string/action"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:visibility="gone"
+                tools:ignore="LabelFor" />
+
+            <ImageView
+                android:id="@+id/pick_color"
+                android:background="@color/black"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginEnd="@dimen/small_margin"
+                android:contentDescription="@string/action"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/radius_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:text="@string/radius"
+                android:textSize="@dimen/subContent_text"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/radius"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:contentDescription="@string/action"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:visibility="gone"
+                tools:ignore="LabelFor" />
+
+            <ImageView
+                android:id="@+id/more"
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/small_margin"
+                android:background="@drawable/oval_fore_ripple_dark"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_baseline_add_24_black" />
+
+        </LinearLayout>
+
+        <com.protone.component.customView.colorPicker.MyColorPicker
+            android:id="@+id/color_picker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:barHeight="@dimen/smaller_Icon"
+            app:blurRadius="1"
+            app:buttonElevation="1"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/confirm"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:contentDescription="@string/action"
+            android:src="@drawable/ic_baseline_check_24"
+            app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/linearLayout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

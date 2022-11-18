@@ -37,12 +37,10 @@ android {
 
 dependencies {
 
-    implementation project(path: ':lib_ui')
+    implementation project(path: ':lib_component')
     implementation project(path: ':lib_common')
-    implementation project(path: ':lib_worker')
 
     if (!isModule.toBoolean()) {
-        implementation project(path: ':lib_dataBase')
         implementation project(path: ':module_note')
         implementation project(path: ':module_gallery')
         implementation project(path: ':module_music')

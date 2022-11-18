@@ -5,12 +5,11 @@ import com.protone.common.R
 import com.protone.common.baseType.toBitmap
 import com.protone.common.context.MApplication
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.media.photoInToday
+import com.protone.common.media.randomNote
+import com.protone.common.media.videoInToday
 import com.protone.common.utils.displayUtils.Blur
-import com.protone.worker.BaseViewModel
-import com.protone.worker.database.DatabaseHelper
-import com.protone.worker.media.photoInToday
-import com.protone.worker.media.randomNote
-import com.protone.worker.media.videoInToday
+import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -26,11 +25,9 @@ class MainViewModel : BaseViewModel() {
     }
 
     suspend fun getMusics(bucketName: String) = withContext(Dispatchers.IO) {
-        DatabaseHelper.instance.run {
-            musicBucketDAOBridge.getMusicBucketByName(bucketName)?.musicBucketId?.let {
-                musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(it)
+            musicDAO.getMusicBucketByName(bucketName)?.musicBucketId?.let {
+                musicDAO.getMusicWithMusicBucket(it)
             }
-        }
     }
 
     fun loadBlurIcon(path: String): Bitmap? {
