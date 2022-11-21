@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import com.protone.common.context.*
 import com.protone.metime.databinding.SplashActivityBinding
 import com.protone.metime.viewModel.SplashViewModel
-import com.protone.seenn.service.WorkService
+import com.protone.component.service.WorkService
 import com.protone.component.BaseActivity
 import com.protone.component.broadcast.workLocalBroadCast
 import com.protone.component.service.MusicService

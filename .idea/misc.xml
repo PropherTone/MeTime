@@ -43,9 +43,12 @@
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_gif_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_video_layout.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/module_music/src/main/res/layout/pick_music_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_note/src/main/res/layout/note_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_note/src/main/res/layout/note_list_adapter_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_note/src/main/res/layout/note_tpye_list_adapter.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/module_note/src/main/res/layout/note_view_activity.xml" value="0.24114583333333334" />
       </map>
     </option>
   </component>

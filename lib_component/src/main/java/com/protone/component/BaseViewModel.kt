@@ -9,9 +9,11 @@ abstract class BaseViewModel : ViewModel() {
 
     interface ViewEvent
 
-    protected val galleryDAO by lazy { DatabaseBridge.instance.galleryDAOBridge }
-    protected val musicDAO by lazy { DatabaseBridge.instance.musicDAOBridge }
-    protected val noteDAO by lazy { DatabaseBridge.instance.noteDAOBridge }
+    protected val dataBase by lazy { DatabaseBridge.instance }
+
+    protected val galleryDAO by lazy { dataBase.galleryDAOBridge }
+    protected val musicDAO by lazy { dataBase.musicDAOBridge }
+    protected val noteDAO by lazy { dataBase.noteDAOBridge }
 
     private val galleryMessenger by lazy { }
 

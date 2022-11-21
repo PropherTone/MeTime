@@ -1,4 +1,4 @@
-package com.protone.component.adapter
+package com.protone.component.view.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context

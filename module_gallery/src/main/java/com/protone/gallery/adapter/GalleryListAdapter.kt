@@ -167,7 +167,7 @@ class GalleryListAdapter(
         setSelect(holder, medias[position] in selectList)
         holder.binding.videoIcon.isGone = !medias[position].isVideo && !combine
         holder.binding.imageView.let { image ->
-            Image.load(medias[position].thumbnailUri).into(context,image)
+            Image.load(medias[position].thumbnailUri).with(context).into(image)
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(holder, medias[position])

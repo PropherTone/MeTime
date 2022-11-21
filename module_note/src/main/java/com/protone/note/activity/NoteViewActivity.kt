@@ -1,27 +1,30 @@
-package com.protone.seenn.activity
+package com.protone.note.activity
 
 import android.net.Uri
 import androidx.activity.viewModels
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.toast
-import com.protone.api.context.intent
-import com.protone.api.context.root
-import com.protone.api.entity.Note
-import com.protone.api.json.toJson
-import com.protone.seenn.databinding.NoteViewActivityBinding
-import com.protone.seenn.service.MusicBinder
-import com.protone.ui.customView.richText.RichNoteImageLoader
-import com.protone.ui.customView.richText.RichNoteView
-import com.protone.worker.R
-import com.protone.worker.viewModel.GalleryViewViewModel
-import com.protone.worker.viewModel.NoteEditViewModel
-import com.protone.worker.viewModel.NoteViewViewModel
+import com.alibaba.android.arouter.facade.annotation.Route
+import com.protone.common.R
+import com.protone.common.baseType.getString
+import com.protone.common.baseType.toast
+import com.protone.common.context.intent
+import com.protone.common.context.root
+import com.protone.common.entity.Note
+import com.protone.common.utils.RouterPath
+import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
+import com.protone.common.utils.json.toJson
+import com.protone.component.BaseMusicActivity
+import com.protone.component.service.MusicBinder
+import com.protone.component.view.customView.richText.RichNoteImageLoader
+import com.protone.component.view.customView.richText.RichNoteView
+import com.protone.note.databinding.NoteViewActivityBinding
+import com.protone.note.viewModel.NoteEditViewModel
+import com.protone.note.viewModel.NoteViewViewModel
 import kotlinx.coroutines.launch
 
+@Route(path = RouterPath.NoteRouterPath.NoteView)
 class NoteViewActivity :
-    BaseActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(true) {
+    BaseMusicActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(true) {
     override val viewModel: NoteViewViewModel by viewModels()
 
     private var binder: MusicBinder? = null
@@ -123,9 +126,8 @@ class NoteViewActivity :
     private suspend fun initNote(note: Note, listener: RichNoteView.IRichListener) {
         binding.apply {
             noteEditTitle.text = note.title
-            Glide.with(this@NoteViewActivity)
-                .asDrawable()
-                .load(note.imagePath)
+            Image.load(note.imagePath)
+                .with(this@NoteViewActivity)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(noteEditIcon)
             noteEditRichNote.isEditable = false

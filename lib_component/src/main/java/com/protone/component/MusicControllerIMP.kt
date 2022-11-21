@@ -4,12 +4,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
-import com.protone.base.R
-import com.protone.component.broadcast.musicBroadCastManager
-import com.protone.component.service.MusicBinder
 import com.protone.common.baseType.getString
 import com.protone.common.context.*
 import com.protone.common.entity.Music
+import com.protone.component.broadcast.musicBroadCastManager
+import com.protone.component.service.MusicBinder
 import com.protone.component.view.customView.Bubble
 import com.protone.component.view.customView.ColorfulProgressBar
 import com.protone.component.view.customView.musicPlayer.BaseMusicPlayer

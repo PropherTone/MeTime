@@ -238,7 +238,6 @@ class DatabaseBridge : DatabaseHelper() {
             return Pair(getNoteByName(note.title) != null, id)
         }
 
-
         suspend fun insertNoteDirRs(
             noteDir: NoteDir,
         ): Pair<Boolean, NoteDir> {

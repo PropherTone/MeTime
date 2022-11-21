@@ -6,15 +6,15 @@ import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
-import com.protone.component.R
-import com.protone.component.databinding.MusicBucketAdapterLayoutBinding
 import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.GlideConfigConstant
+import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
+import com.protone.component.R
+import com.protone.component.databinding.MusicBucketAdapterLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -152,7 +152,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 )
             }
 
-            if (musicBuckets[holder.layoutPosition].name != R.string.all_music.getString()) musicBucketAction.setOnClickListener {
+            if (musicBuckets[holder.layoutPosition].name != com.protone.common.R.string.all_music.getString()) musicBucketAction.setOnClickListener {
                 when (musicBucketBack.isVisible) {
                     true -> {
                         AnimationHelper.translationX(
@@ -195,16 +195,12 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         drawable: Drawable? = null
     ) {
         Image.run { if (iconPath != null) load(iconPath) else load(drawable) }
-            .addConfig(GlideConfigConstant.SkipMemoryCache)
-            .addConfig(GlideConfigConstant.diskCacheStrategy(GlideConfigConstant.DiskCacheStrategy.NONE))
-            .addConfig(GlideConfigConstant.showPlaceholderById(R.drawable.ic_music_note))
-            .addConfig(
-                GlideConfigConstant.overwrite(
-                    imageView.measuredWidth,
-                    imageView.measuredHeight
-                )
-            )
-            .into(context, imageView)
+            .with(context)
+            .skipMemoryCache()
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .placeholder(R.drawable.ic_music_note)
+            .overwrite(imageView.measuredWidth, imageView.measuredHeight)
+            .into(imageView)
     }
 
     override fun getItemCount(): Int = musicBuckets.size

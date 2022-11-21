@@ -32,4 +32,9 @@ class MainApplication : Application() {
             else "${base?.externalCacheDir?.path}/s_crash_log_${todayDate}.txt"
     }
 
+    override fun onTerminate() {
+        super.onTerminate()
+        ARouter.getInstance().destroy()
+    }
+
 }

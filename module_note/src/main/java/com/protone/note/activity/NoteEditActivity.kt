@@ -1,4 +1,4 @@
-package com.protone.seenn.activity
+package com.protone.note.activity
 
 import android.content.Intent
 import android.graphics.drawable.Animatable
@@ -6,30 +6,35 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import com.bumptech.glide.Glide
-import com.protone.api.animation.AnimationHelper
-import com.protone.api.baseType.*
-import com.protone.api.context.*
-import com.protone.api.entity.*
-import com.protone.api.json.listToJson
-import com.protone.api.json.toEntity
-import com.protone.api.json.toJson
-import com.protone.api.spans.ISpanForUse
-import com.protone.api.spans.SpanStates
-import com.protone.seenn.R
-import com.protone.seenn.databinding.NoteEditActivityBinding
-import com.protone.ui.customView.richText.RichNoteImageLoader
-import com.protone.ui.customView.richText.RichNoteView
-import com.protone.ui.dialog.imageListDialog
-import com.protone.ui.dialog.titleDialog
-import com.protone.ui.popWindows.ColorfulPopWindow
-import com.protone.worker.viewModel.GalleryViewModel
-import com.protone.worker.viewModel.NoteEditViewModel
-import com.protone.worker.viewModel.NoteViewViewModel
-import com.protone.worker.viewModel.PickMusicViewModel
+import com.alibaba.android.arouter.facade.annotation.Route
+import com.protone.common.R
+import com.protone.common.baseType.*
+import com.protone.common.context.isKeyBroadShow
+import com.protone.common.context.marginBottom
+import com.protone.common.context.root
+import com.protone.common.context.setSoftInputStatusListener
+import com.protone.common.entity.*
+import com.protone.common.utils.RouterPath
+import com.protone.common.utils.displayUtils.AnimationHelper
+import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.common.utils.json.listToJson
+import com.protone.common.utils.json.toEntity
+import com.protone.common.utils.json.toJson
+import com.protone.common.utils.spans.ISpanForUse
+import com.protone.common.utils.spans.SpanStates
+import com.protone.component.BaseActivity
+import com.protone.component.dialog.imageListDialog
+import com.protone.component.dialog.titleDialog
+import com.protone.component.view.customView.richText.RichNoteImageLoader
+import com.protone.component.view.customView.richText.RichNoteView
+import com.protone.component.view.popWindows.ColorfulPopWindow
+import com.protone.note.databinding.NoteEditActivityBinding
+import com.protone.note.viewModel.NoteEditViewModel
+import com.protone.note.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@Route(path = RouterPath.NoteRouterPath.Edit)
 class NoteEditActivity :
     BaseActivity<NoteEditActivityBinding, NoteEditViewModel, NoteEditViewModel.NoteEvent>(true),
     ISpanForUse {
@@ -244,11 +249,11 @@ class NoteEditActivity :
     }
 
     private suspend fun setNoteIcon(uri: Uri?) = withContext(Dispatchers.Main) {
-        Glide.with(this@NoteEditActivity).asDrawable().load(uri).into(binding.noteEditIcon)
+        Image.load(uri).with(this@NoteEditActivity).into(binding.noteEditIcon)
     }
 
     private suspend fun setNoteIcon(path: String?) = withContext(Dispatchers.Main) {
-        Glide.with(this@NoteEditActivity).asDrawable().load(path).into(binding.noteEditIcon)
+        Image.load(path).with(this@NoteEditActivity).into(binding.noteEditIcon)
     }
 
     private suspend fun showProgress(isShow: Boolean) = withContext(Dispatchers.Main) {

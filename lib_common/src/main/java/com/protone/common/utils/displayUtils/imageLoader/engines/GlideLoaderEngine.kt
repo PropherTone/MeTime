@@ -10,42 +10,166 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.protone.common.context.MApplication
-import com.protone.common.utils.displayUtils.imageLoader.*
-import com.protone.common.utils.displayUtils.imageLoader.constant.*
+import com.protone.common.utils.displayUtils.imageLoader.ImageType
+import com.protone.common.utils.displayUtils.imageLoader.LoadFailedResult
+import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
+import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
+import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
+import com.protone.common.utils.displayUtils.imageLoader.constant.Transition
 import java.io.File
-import java.util.ArrayDeque
 
 internal class GlideLoaderEngine : AbstractLoaderEngine<RequestBuilder<Drawable>>() {
 
-    override fun into(context: Context, target: ImageView) {
-        Glide.with(context).into(target)
+    private var manager: RequestBuilder<Drawable>? = null
+
+    override fun with(context: Context): RequestEngine {
+        manager = Glide.with(context).asDrawable().load()
+        return this
     }
 
-    override fun into(fragment: Fragment, target: ImageView) {
-        Glide.with(fragment).into(target)
+    override fun with(fragment: Fragment): RequestEngine {
+        manager = Glide.with(fragment).asDrawable().load()
+        return this
     }
 
-    override fun into(fragmentActivity: FragmentActivity, target: ImageView) {
-        Glide.with(fragmentActivity).into(target)
+    override fun with(fragmentActivity: FragmentActivity): RequestEngine {
+        manager = Glide.with(fragmentActivity).asDrawable().load()
+        return this
     }
 
-    override fun into(activity: Activity, target: ImageView) {
-        Glide.with(activity).into(target)
+    override fun with(activity: Activity): RequestEngine {
+        manager = Glide.with(activity).asDrawable().load()
+        return this
     }
 
     override fun onTrimMemory() {
         Glide.get(MApplication.app).clearMemory()
     }
 
+    override fun setInterceptor(requestInterceptor: RequestInterceptor): RequestEngine {
+        manager = manager?.addListener(object : RequestListener<Drawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                requestInterceptor.onLoadFailed(LoadFailedResult(e, model))
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Drawable?,
+                model: Any?,
+                target: Target<Drawable>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                requestInterceptor.onLoadSuccess(LoadSuccessResult(resource, model))
+                return false
+            }
+        })
+        return this
+    }
+
+    override fun centerCrop(isOptional: Boolean): RequestEngine {
+        manager = manager?.let { if (isOptional) it.centerCrop() else it.optionalCenterCrop() }
+        return this
+    }
+
+    override fun circleCrop(isOptional: Boolean): RequestEngine {
+        manager = manager?.let { if (isOptional) it.centerCrop() else it.optionalCenterCrop() }
+        return this
+    }
+
+    override fun centerInside(isOptional: Boolean): RequestEngine {
+        manager = manager?.let { if (isOptional) it.centerCrop() else it.optionalCenterCrop() }
+        return this
+    }
+
+    override fun fitCenter(isOptional: Boolean): RequestEngine {
+        manager = manager?.let { if (isOptional) it.centerCrop() else it.optionalCenterCrop() }
+        return this
+    }
+
+    override fun skipMemoryCache(): RequestEngine {
+        manager = manager?.skipMemoryCache(true)
+        return this
+    }
+
+    override fun diskCacheStrategy(cacheStrategy: Int): RequestEngine {
+        manager = manager?.diskCacheStrategy(
+            when (cacheStrategy) {
+                DiskCacheStrategy.ALL -> com.bumptech.glide.load.engine.DiskCacheStrategy.ALL
+                DiskCacheStrategy.DATA -> com.bumptech.glide.load.engine.DiskCacheStrategy.DATA
+                DiskCacheStrategy.AUTOMATIC -> com.bumptech.glide.load.engine.DiskCacheStrategy.AUTOMATIC
+                DiskCacheStrategy.RESOURCE -> com.bumptech.glide.load.engine.DiskCacheStrategy.RESOURCE
+                else -> com.bumptech.glide.load.engine.DiskCacheStrategy.NONE
+            }
+        )
+        return this
+    }
+
+    override fun error(resId: Int): RequestEngine {
+        manager = manager?.error(resId)
+        return this
+    }
+
+    override fun error(drawable: Drawable): RequestEngine {
+        manager = manager?.error(drawable)
+        return this
+    }
+
+    override fun fallback(resId: Int): RequestEngine {
+        manager = manager?.fallback(resId)
+        return this
+    }
+
+    override fun fallbackBy(drawable: Drawable): RequestEngine {
+        manager = manager?.fallback(drawable)
+        return this
+    }
+
+    override fun placeholder(resId: Int): RequestEngine {
+        manager = manager?.placeholder(resId)
+        return this
+    }
+
+    override fun placeholder(drawable: Drawable): RequestEngine {
+        manager = manager?.placeholder(drawable)
+        return this
+    }
+
+    override fun transition(transition: Transition): RequestEngine {
+        manager = manager?.transition(
+            when (transition) {
+                Transition.CrossFade -> DrawableTransitionOptions.withCrossFade(transition.duration)
+            }
+        )
+        return this
+    }
+
+    override fun overwrite(width: Int, height: Int): RequestEngine {
+        manager = manager?.override(width, height)
+        return this
+    }
+
+    override fun into(target: ImageView) {
+        manager?.into(target)
+    }
+
     override fun clearCache() {
         Glide.get(MApplication.app).clearDiskCache()
+    }
+
+    override fun clearMem() {
+        Glide.get(MApplication.app).clearMemory()
     }
 
     override fun onTrimMemoryLevel(level: Int): RequestEngine {
@@ -53,133 +177,34 @@ internal class GlideLoaderEngine : AbstractLoaderEngine<RequestBuilder<Drawable>
         return this
     }
 
-    private fun RequestManager.into(target: ImageView) {
-        asDrawable().load().config().let {
-            if (requestFactory.requestInterceptor != null) {
-                it.addListener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        requestFactory.requestInterceptor
-                            ?.onLoadFailed(LoadFailedResult(e, model))
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        requestFactory.requestInterceptor
-                            ?.onLoadSuccess(LoadSuccessResult(resource, model))
-                        return false
-                    }
-
-                })
-            } else it
-        }.into(target)
-        requestFactory = RequestFactory()
-    }
-
     private fun RequestBuilder<Drawable>.load(): RequestBuilder<Drawable> {
         return when (requestFactory.type) {
             ImageType.String -> {
-                load(requestFactory.path as String?)
+                load(requestFactory.path.checkType<String?>())
             }
             ImageType.Bitmap -> {
-                load(requestFactory.path as Bitmap?)
+                load(requestFactory.path.checkType<Bitmap?>())
             }
             ImageType.Drawable -> {
-                load(requestFactory.path as Drawable?)
+                load(requestFactory.path.checkType<Drawable?>())
             }
             ImageType.Uri -> {
-                load(requestFactory.path as Uri?)
+                load(requestFactory.path.checkType<Uri?>())
             }
             ImageType.File -> {
-                load(requestFactory.path as File?)
+                load(requestFactory.path.checkType<File?>())
             }
             ImageType.Int -> {
-                load(requestFactory.path as Int?)
+                load(requestFactory.path.checkType<Int?>())
             }
             ImageType.Any -> {
                 load(requestFactory.path)
             }
             ImageType.ByteArray -> {
-                load(requestFactory.path as ByteArray?)
+                load(requestFactory.path.checkType<ByteArray?>())
             }
         }
     }
-
-    override fun RequestBuilder<Drawable>.config(): RequestBuilder<Drawable> =
-        requestFactory.configs?.let { enableConfig(it) } ?: this
-
-    private fun RequestBuilder<Drawable>.enableConfig(
-        configs: ArrayDeque<ConfigConstant>
-    ): RequestBuilder<Drawable> =
-        configs.poll()?.let {
-            scaleType(it)?.cacheOption(it)?.stateImage(it)
-        }?.enableConfig(configs) ?: this
-
-    private fun RequestBuilder<Drawable>.scaleType(
-        obj: ConfigConstant
-    ): RequestBuilder<Drawable>? =
-        when (obj) {
-            is GlideConfigConstant.CenterCrop ->
-                if (obj.isOptional) this.optionalCenterCrop() else this.centerCrop()
-            is GlideConfigConstant.CircleCrop ->
-                if (obj.isOptional) this.optionalCircleCrop() else this.circleCrop()
-            is GlideConfigConstant.CenterInside ->
-                if (obj.isOptional) this.optionalCenterInside() else this.centerInside()
-            is GlideConfigConstant.FitCenter ->
-                if (obj.isOptional) this.optionalFitCenter() else this.fitCenter()
-            else -> null
-        }
-
-    private fun RequestBuilder<Drawable>.cacheOption(
-        obj: ConfigConstant
-    ): RequestBuilder<Drawable>? =
-        when (obj) {
-            is GlideConfigConstant.SkipMemoryCache -> this.skipMemoryCache(true)
-            is GlideConfigConstant.DiskCacheStrategy ->
-                this.diskCacheStrategy(
-                    when (obj.cacheStrategy) {
-                        0 -> com.bumptech.glide.load.engine.DiskCacheStrategy.ALL
-                        1 -> com.bumptech.glide.load.engine.DiskCacheStrategy.DATA
-                        2 -> com.bumptech.glide.load.engine.DiskCacheStrategy.AUTOMATIC
-                        3 -> com.bumptech.glide.load.engine.DiskCacheStrategy.RESOURCE
-                        else -> com.bumptech.glide.load.engine.DiskCacheStrategy.NONE
-                    }
-                )
-            else -> null
-        }
-
-    private fun RequestBuilder<Drawable>.stateImage(
-        obj: ConfigConstant
-    ): RequestBuilder<Drawable>? =
-        when (obj) {
-            is GlideConfigConstant.ShowErrorById ->
-                this.error(obj.resId)
-            is GlideConfigConstant.ShowErrorByDrawable ->
-                this.error(obj.drawable)
-            is GlideConfigConstant.ShowFallbackById ->
-                this.fallback(obj.resId)
-            is GlideConfigConstant.ShowFallbackByDrawable ->
-                this.fallback(obj.drawable)
-            is GlideConfigConstant.ShowPlaceholderById ->
-                this.placeholder(obj.resId)
-            is GlideConfigConstant.ShowPlaceholderByDrawable ->
-                this.placeholder(obj.drawable)
-            is GlideConfigConstant.CrossFadeTransition ->
-                this.transition(DrawableTransitionOptions.withCrossFade(obj.duration))
-            is GlideConfigConstant.Overwrite ->
-                this.override(obj.width, obj.height)
-            else -> null
-        }
 
     private inline fun <reified T> Any?.checkType(): T? {
         if (this == null) return null

@@ -116,7 +116,7 @@ class GalleryBucketAdapter(
                 bucketThumb.let { thumb ->
                     if (thumb.tag != data.first) {
                         thumb.tag = data.first
-                        Image.load(data.first).into(context,thumb)
+                        Image.load(data.first).with(context).into(thumb)
                     }
                 }
                 data.second.also { sec ->

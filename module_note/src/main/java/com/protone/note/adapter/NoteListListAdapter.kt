@@ -5,13 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.component.databinding.NoteListAdapterLayoutBinding
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Note
 import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.GlideConfigConstant
-import com.protone.component.adapter.BaseListAdapter
+import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
+import com.protone.component.view.adapter.BaseListAdapter
 import com.protone.note.databinding.NoteListAdapterLayoutBinding
 import kotlinx.coroutines.launch
 
@@ -84,8 +83,9 @@ class NoteListListAdapter(context: Context) :
             }
             currentList[holder.layoutPosition].let {
                 Image.load(it.imagePath)
-                    .addConfig(GlideConfigConstant.diskCacheStrategy(GlideConfigConstant.DiskCacheStrategy.NONE))
-                    .into(context, noteBack)
+                    .with(context)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(noteBack)
                 noteTitle.text = it.title
                 noteDate.text = it.time.toDateString()
             }

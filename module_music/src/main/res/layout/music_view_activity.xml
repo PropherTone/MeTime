@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.protone.music.activity.MusicViewActivity" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.protone.component.view.customView.musicPlayer.MusicPlayerViewFull
+            android:id="@+id/musicPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:id="@+id/toolBar"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_marginStart="@dimen/back_margin"
+            android:background="@drawable/oval_fore_ripple_dark"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->activity.finish()}"
+            android:padding="@dimen/icon_padding"
+            android:src="@drawable/ic_round_arrow_left__white_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/showPlayList" />
+
+        <ImageView
+            android:id="@+id/showPlayList"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_marginTop="@dimen/back_margin"
+            android:layout_marginEnd="@dimen/back_margin"
+            android:background="@drawable/oval_fore_ripple_dark"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->activity.showPop()}"
+            android:padding="@dimen/icon_padding"
+            android:src="@drawable/ic_baseline_album_24_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolBar" />
+
+        <com.protone.component.view.customView.blurView.SBlurView
+            android:id="@+id/pop"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/showPlayList"
+            app:layout_constraintHeight_percent="0.8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/showPlayList"
+            app:layout_constraintVertical_bias="0.1"
+            app:layout_constraintWidth_percent="0.9">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/playList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never" />
+
+        </com.protone.component.view.customView.blurView.SBlurView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

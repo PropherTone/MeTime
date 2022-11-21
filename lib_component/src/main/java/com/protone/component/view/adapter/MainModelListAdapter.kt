@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.component.R
+import com.protone.common.R
 import com.protone.component.databinding.*
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.newLayoutInflater
@@ -110,7 +110,7 @@ class MainModelListAdapter(
             }
             is NoteCardBinding -> {
                 val note = itemList[position].substring(6).toEntity(Note::class.java)
-                Image.load(note.imagePath).into(context, holder.binding.modelNoteIcon)
+                Image.load(note.imagePath).with(context).into(holder.binding.modelNoteIcon)
                 holder.binding.modelNoteTitle.text = note.title
             }
             is PhotoCardBinding -> {
@@ -118,7 +118,7 @@ class MainModelListAdapter(
                     itemList[position].substring(6).toEntity(GalleryMedia::class.java)
                 holder.binding.photoCard.apply {
                     title = media.date.toDateString("yyyy/MM/dd E").toString()
-                    Image.load(media.uri).into(context, photo)
+                    Image.load(media.uri).with(context).into(photo)
                     setOnClickListener {
                         modelClkListener?.onPhoto(media.toJson())
                     }

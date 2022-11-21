@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loop_list">列表循环</string>
+    <string name="loop_single">单曲循环</string>
+    <string name="play_list">列表播放</string>
+    <string name="no_loop">无循环</string>
+    <string name="random">随机播放</string>
+</resources>

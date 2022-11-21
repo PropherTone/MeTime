@@ -25,8 +25,9 @@ class GalleryViewPager2Adapter(context: Context, private val data: MutableList<G
                 image.setImageResource(data[position].uri)
             } else {
                 Image.load(data[position].uri)
-                    .addConfig(GlideConfigConstant.SkipMemoryCache)
-                    .into(context, image)
+                    .with(context)
+                    .skipMemoryCache()
+                    .into(image)
             }
             image.onSingleTap = {
                 launch {

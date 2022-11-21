@@ -13,7 +13,7 @@ val musicContent: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
 val sizeFormatMap = mapOf(Pair(0, "B"), Pair(1, "KB"), Pair(2, "MB"), Pair(3, "GB"))
 
-object RouterPath {
+class RouterPath {
 
     object GalleryRouterPath {
         private const val Home = "/Gallery"
@@ -23,4 +23,18 @@ object RouterPath {
         const val Box = "$Home/Box"
     }
 
+    object NoteRouterPath {
+        private const val Home = "/Note"
+        const val Main = "$Home/Main"
+        const val Edit = "$Home/Edit"
+        const val NoteView = "$Home/View"
+    }
+
+    object MusicRouterPath {
+        private const val Home = "/Music"
+        const val Main = "$Home/Main"
+        const val AddBucket = "$Home/AddMusicBucket"
+        const val MusicPlayer = "$Home/MusicView"
+        const val Pick = "$Home/PickMusic"
+    }
 }

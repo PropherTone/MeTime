@@ -1,18 +1,18 @@
-package com.protone.worker.viewModel
+package com.protone.note.viewModel
 
 import android.net.Uri
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.imageSaveToDisk
-import com.protone.api.baseType.toast
-import com.protone.api.entity.GalleriesWithNotes
-import com.protone.api.entity.GalleryMedia
-import com.protone.api.entity.Note
-import com.protone.api.entity.NoteDirWithNotes
-import com.protone.api.json.toUri
-import com.protone.api.json.toUriJson
-import com.protone.api.onResult
-import com.protone.worker.R
-import com.protone.worker.database.DatabaseHelper
+import com.protone.common.R
+import com.protone.common.baseType.getString
+import com.protone.common.baseType.imageSaveToDisk
+import com.protone.common.baseType.toast
+import com.protone.common.entity.GalleriesWithNotes
+import com.protone.common.entity.GalleryMedia
+import com.protone.common.entity.Note
+import com.protone.common.entity.NoteDirWithNotes
+import com.protone.common.utils.json.toUri
+import com.protone.common.utils.json.toUriJson
+import com.protone.common.utils.onResult
+import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -53,12 +53,12 @@ class NoteEditViewModel : BaseViewModel() {
     }
 
     suspend fun getAllNote() = withContext(Dispatchers.Default) {
-        (DatabaseHelper.instance.noteDAOBridge.getAllNote() ?: mutableListOf())
+        (noteDAO.getAllNote() ?: mutableListOf())
             .map { note -> note.title }.toList() as MutableList<String>
     }
 
     suspend fun getMusicTitle(uri: Uri) = withContext(Dispatchers.IO) {
-        val musicByUri = DatabaseHelper.instance.musicDAOBridge.getMusicByUri(uri)
+        val musicByUri = musicDAO.getMusicByUri(uri)
         musicByUri?.title ?: "^ ^"
     }
 
@@ -71,27 +71,21 @@ class NoteEditViewModel : BaseViewModel() {
     }
 
     suspend fun updateNote(note: Note) =
-        DatabaseHelper.instance.noteDAOBridge.updateNote(note)
+        noteDAO.updateNote(note)
 
     suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.Default) {
-        DatabaseHelper.instance.noteDAOBridge.insertNoteRs(note).let { result ->
+        noteDAO.insertNoteRs(note).let { result ->
             if (result.first) {
                 dir?.let {
-                    val noteDir = DatabaseHelper.instance.noteDirDAOBridge.getNoteDir(it)
+                    val noteDir = noteDAO.getNoteDir(it)
                     if (noteDir != null) {
-                        DatabaseHelper
-                            .instance
-                            .noteDirWithNoteDAOBridge
-                            .insertNoteDirWithNote(
-                                NoteDirWithNotes(noteDir.noteDirId, result.second)
-                            )
+                        noteDAO.insertNoteDirWithNote(
+                            NoteDirWithNotes(noteDir.noteDirId, result.second)
+                        )
                     }
                 }
                 medias.forEach {
-                    DatabaseHelper
-                        .instance
-                        .galleriesWithNotesDAOBridge
-                        .insertGalleriesWithNotes(GalleriesWithNotes(it.uri, result.second))
+                    galleryDAO.insertGalleriesWithNotes(GalleriesWithNotes(it.uri, result.second))
                 }
                 true
             } else {
@@ -105,7 +99,7 @@ class NoteEditViewModel : BaseViewModel() {
         var count = 0
         var tempNoteTitle = noteTitle
         val names = mutableMapOf<String, Int>()
-        DatabaseHelper.instance.noteDAOBridge.getAllNote()?.forEach {
+        noteDAO.getAllNote()?.forEach {
             names[it.title] = 1
             if (it.title == tempNoteTitle) {
                 tempNoteTitle = "${noteTitle}(${++count})"
@@ -118,8 +112,7 @@ class NoteEditViewModel : BaseViewModel() {
     }
 
     suspend fun getNoteByName(name: String) =
-        DatabaseHelper.instance.noteDAOBridge.getNoteByName(name)
-
+        noteDAO.getNoteByName(name)
 
     suspend fun checkNoteCover(imagePath: String) = onResult { co ->
         onEdit = true

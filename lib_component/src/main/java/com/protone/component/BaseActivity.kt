@@ -1,8 +1,11 @@
 package com.protone.component
 
-import android.content.*
+import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResult
@@ -10,19 +13,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
+import com.alibaba.android.arouter.facade.Postcard
 import com.alibaba.android.arouter.launcher.ARouter
+import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchMain
+import com.protone.common.baseType.toast
 import com.protone.common.context.*
+import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.TAG
 import com.protone.common.utils.onResult
-import com.protone.component.broadcast.MusicReceiver
-import com.protone.component.service.MusicBinder
-import com.protone.component.service.MusicService
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.toast
-import com.protone.common.utils.IntentDataHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -139,6 +143,37 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         ) {
             co.resumeWith(Result.success(it))
         }.launch(intent)
+    }
+
+    private val _activityResultMessenger by lazy { MutableSharedFlow<Intent>() }
+    val activityResultMessenger by lazy { _activityResultMessenger.asSharedFlow() }
+
+    inline fun <reified T> startActivityForResult(
+        routerPath: String,
+        postCard: Postcard.() -> Postcard,
+        crossinline onResult: (T) -> Unit
+    ) {
+        ARouter.getInstance()
+            .build(routerPath)
+            .postCard()
+            .navigation(this, code.incrementAndGet())
+        var job: Job? = null
+        job = launchMain {
+            activityResultMessenger.collect {
+                if (it is T) {
+                    onResult.invoke(it as T)
+                    job?.cancel()
+                }
+            }
+        }
+        job.start()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == code.get()) {
+            launch { if (data != null) _activityResultMessenger.emit(data) }
+        }
     }
 
     fun sendViewEvent(event: VE) {

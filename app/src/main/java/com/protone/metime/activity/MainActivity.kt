@@ -2,27 +2,25 @@ package com.protone.metime.activity
 
 import androidx.activity.viewModels
 import androidx.core.view.isGone
-import com.protone.common.context.onGlobalLayout
-import com.protone.common.context.root
-import com.protone.component.BaseActivity
-import com.protone.common.utils.todayDate
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
+import com.protone.common.context.onGlobalLayout
+import com.protone.common.context.root
+import com.protone.common.database.dao.DatabaseBridge
 import com.protone.common.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
 import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.GlideConfigConstant
+import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
-import com.protone.metime.databinding.MainActivityBinding
-import com.protone.metime.viewModel.MainViewModel
-import com.protone.seenn.service.WorkService
+import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
-import com.protone.worker.database.dao.DatabaseHelper
-import com.protone.worker.database.userConfig
+import com.protone.metime.databinding.MainActivityBinding
+import com.protone.metime.viewModel.MainViewModel
+import com.protone.component.service.WorkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -47,8 +45,9 @@ class MainActivity :
             if (field == value) return
             if (value.isNotEmpty()) {
                 Image.load(value)
-                    .addConfig(GlideConfigConstant.diskCacheStrategy(GlideConfigConstant.DiskCacheStrategy.NONE))
-                    .into(this, binding.userIcon)
+                    .with(this)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(binding.userIcon)
                 launchIO {
                     val loadBlurIcon = viewModel.loadBlurIcon(value)
                     withMainContext {
@@ -93,7 +92,7 @@ class MainActivity :
             userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
             userConfig.lastMusic =
                 musicController.getPlayingMusic()?.toJson() ?: ""
-            DatabaseHelper.instance.shutdownNow()
+            DatabaseBridge.instance.shutdownNow()
             stopService(WorkService::class.intent)
         }
 
@@ -137,7 +136,7 @@ class MainActivity :
 
     private suspend fun MainViewModel.refreshModelList() {
         getPhotoInToday()?.let { media ->
-            Image.load(media.uri).into(this@MainActivity, binding.photoCardPhoto)
+            Image.load(media.uri).with(this@MainActivity).into(binding.photoCardPhoto)
             binding.photoCardTitle.text = media.date.toDateString("yyyy/MM/dd")
             binding.timePhoto.setOnClickListener {
                 startActivity(GalleryViewActivity::class.intent.apply {

@@ -6,9 +6,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.NoteViewActivity" />
+            type="com.protone.note.activity.NoteViewActivity" />
 
-        <import type="com.protone.worker.viewModel.NoteViewViewModel.NoteViewEvent" />
+        <import type="com.protone.note.viewModel.NoteViewViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -99,7 +99,7 @@
             app:layout_anchorGravity="bottom"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-            <com.protone.ui.customView.richText.RichNoteView
+            <com.protone.component.view.customView.richText.RichNoteView
                 android:id="@+id/noteEdit_richNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

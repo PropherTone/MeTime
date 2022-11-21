@@ -35,7 +35,7 @@ class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListD
                 is ImageCateLayoutBinding ->
                     launch {
                         catoListDataProxy.getMedia(catoList[position])?.let { media ->
-                            Image.load(media.uri).into(context, catoBack)
+                            Image.load(media.uri).with(context).into(catoBack)
                             catoName.text = media.name
                             root.setOnClickListener {
                                 itemClick?.invoke(catoList[position])

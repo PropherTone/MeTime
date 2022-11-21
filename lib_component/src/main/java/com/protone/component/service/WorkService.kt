@@ -1,4 +1,4 @@
-package com.protone.seenn.service
+package com.protone.component.service
 
 import android.content.BroadcastReceiver
 import android.content.Intent
@@ -8,19 +8,18 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
-import com.protone.api.ActiveTimer
-import com.protone.api.TAG
-import com.protone.api.baseType.bufferCollect
-import com.protone.api.baseType.toast
-import com.protone.api.context.workIntentFilter
-import com.protone.api.entity.GalleryMedia
-import com.protone.api.entity.Music
+import com.protone.common.baseType.bufferCollect
+import com.protone.common.baseType.toast
+import com.protone.common.context.workIntentFilter
+import com.protone.common.database.dao.DatabaseBridge
+import com.protone.common.entity.GalleryMedia
+import com.protone.common.entity.Music
+import com.protone.common.media.*
+import com.protone.common.utils.ActiveTimer
+import com.protone.common.utils.TAG
 import com.protone.component.broadcast.MediaContentObserver
 import com.protone.component.broadcast.WorkReceiver
 import com.protone.component.broadcast.workLocalBroadCast
-import com.protone.component.service.LifecycleService
-import com.protone.common.database.DatabaseHelper
-import com.protone.common.media.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 
@@ -100,7 +99,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     private fun updateMusic(uri: Uri) {
         launch(Dispatchers.IO) {
             scanAudioWithUri(uri) {
-                DatabaseHelper.instance.musicDAOBridge.insertMusicCheck(it)
+                DatabaseBridge.instance.musicDAOBridge.insertMusicCheck(it)
             }
             updateMusicBucket()
         }
@@ -116,7 +115,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
             } else false
         }
 
-        DatabaseHelper.instance.musicDAOBridge.run {
+        DatabaseBridge.instance.musicDAOBridge.run {
             val allMusic = mutableListOf<Music>()
             launch(Dispatchers.IO) {
                 getAllMusic()?.let { allMusic.addAll(it) }
@@ -140,13 +139,13 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
     private fun updateGallery(uri: Uri) = launch(Dispatchers.IO) {
         if (!isUriExist(uri)) {
-            DatabaseHelper.instance.signedGalleryDAOBridge.deleteSignedMediaByUri(uri)
+            DatabaseBridge.instance.galleryDAOBridge.deleteSignedMediaByUri(uri)
             Log.d(TAG, "updateGallery(uri: Uri):!isUriExist 相册更新完毕")
             makeToast("相册更新完毕")
         } else scanGalleryWithUri(uri) {
-            val checkedMedia = DatabaseHelper
+            val checkedMedia = DatabaseBridge
                 .instance
-                .signedGalleryDAOBridge
+                .galleryDAOBridge
                 .insertSignedMediaChecked(it)
             if (checkedMedia != null) {
                 Log.d(TAG, "updateGallery(uri: Uri): 相册更新完毕")
@@ -155,7 +154,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         }
     }
 
-    private fun updateGallery() = DatabaseHelper.instance.signedGalleryDAOBridge.run {
+    private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
         launch(Dispatchers.Default) {
             val sortMedias = async(Dispatchers.Default) {
                 val allGallery = getAllGallery() as MutableList<String>
@@ -178,7 +177,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
             val allSignedMedia = getAllSignedMedia()
 
             suspend fun sortMedia(
-                dao: DatabaseHelper.GalleryDAOBridge,
+                dao: DatabaseBridge.GalleryDAOBridge,
                 allSignedMedia: List<GalleryMedia>?,
                 it: GalleryMedia
             ) {

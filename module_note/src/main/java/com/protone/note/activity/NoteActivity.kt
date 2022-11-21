@@ -5,6 +5,7 @@ import android.transition.TransitionManager
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
@@ -13,19 +14,19 @@ import com.protone.common.context.root
 import com.protone.common.database.MediaAction
 import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
+import com.protone.common.utils.RouterPath
 import com.protone.component.BaseActivity
 import com.protone.component.dialog.titleDialog
 import com.protone.note.adapter.NoteListListAdapter
 import com.protone.note.adapter.NoteTypeListAdapter
 import com.protone.note.databinding.NoteActivityBinding
 import com.protone.note.viewModel.NoteViewModel
-import com.protone.seenn.activity.NoteEditActivity
-import com.protone.seenn.activity.NoteViewActivity
-import com.protone.worker.viewModel.NoteEditViewModel
-import com.protone.worker.viewModel.NoteViewViewModel
+import com.protone.note.viewModel.NoteEditViewModel
+import com.protone.note.viewModel.NoteViewViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+@Route(path = RouterPath.NoteRouterPath.Main)
 class NoteActivity :
     BaseActivity<NoteActivityBinding, NoteViewModel, NoteViewModel.NoteViewEvent>(true) {
     override val viewModel: NoteViewModel by viewModels()

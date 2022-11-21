@@ -12,7 +12,7 @@ import com.protone.component.databinding.GalleryOptionPopBinding
 import com.protone.component.dialog.cateDialog
 import com.protone.component.dialog.checkListDialog
 import com.protone.component.dialog.titleDialog
-import com.protone.component.popWindows.ColorfulPopWindow
+import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.component.popWindows.GalleryOptionPop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -175,6 +175,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
             }
         }, addCon = {
             launchDefault {
+
                 startActivityForResult(
                     GalleryActivity::class.intent.also { intent ->
                         intent.putExtra(

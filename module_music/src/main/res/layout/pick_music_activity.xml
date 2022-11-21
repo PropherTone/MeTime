@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.protone.music.activity.PickMusicActivity" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/main_background"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/search_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/foreDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/addMB_search"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon"
+                android:background="@color/transparent"
+                android:drawableStart="@drawable/ic_baseline_search_24_white"
+                android:drawablePadding="@dimen/icon_padding"
+                android:hint="@string/search_music"
+                android:importantForAutofill="no"
+                android:inputType="textNoSuggestions"
+                android:paddingStart="@dimen/icon_padding_mid"
+                android:paddingEnd="0dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textSize="@dimen/sub_text"
+                tools:ignore="LabelFor" />
+
+        </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/addMB_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_container" />
+
+        <com.protone.component.view.customView.blurView.SBlurView
+            android:id="@+id/action_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/addMB_leave"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon_p"
+                android:background="@drawable/trans_dark_ripple"
+                android:contentDescription="@string/action"
+                android:onClick="@{()-> activity.finish()}"
+                android:padding="@dimen/icon_padding_mid"
+                android:src="@drawable/ic_round_keyboard_backspace_24_white"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/addMB_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon_p"
+                android:background="@drawable/trans_dark_ripple"
+                android:contentDescription="@string/action"
+                android:onClick="@{()-> activity.confirm()}"
+                android:padding="@dimen/icon_padding_mid"
+                android:src="@drawable/ic_baseline_check_24_white"
+                android:visibility="gone" />
+
+        </com.protone.component.view.customView.blurView.SBlurView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -5,11 +5,10 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
-import com.protone.common.utils.displayUtils.imageLoader.constant.GlideConfigConstant
+import com.protone.common.utils.displayUtils.imageLoader.engines.ContextEngine
 import com.protone.common.utils.displayUtils.imageLoader.engines.GlideLoaderEngine
 import com.protone.common.utils.displayUtils.imageLoader.engines.ImageEngine
 import com.protone.common.utils.displayUtils.imageLoader.engines.LoaderEngine
-import com.protone.common.utils.displayUtils.imageLoader.engines.RequestEngine
 import java.io.File
 
 object Image : LoaderEngine {
@@ -17,25 +16,28 @@ object Image : LoaderEngine {
     private var imageLoader: ImageEngine? = null
     private fun get(): ImageEngine = imageLoader ?: GlideLoaderEngine().also { imageLoader = it }
 
-    override fun load(path: String?): RequestEngine = get().load(path)
+    override fun load(path: String?): ContextEngine = get().load(path)
 
-    override fun load(bitmap: Bitmap?): RequestEngine = get().load(bitmap)
+    override fun load(bitmap: Bitmap?): ContextEngine = get().load(bitmap)
 
-    override fun load(drawable: Drawable?): RequestEngine = get().load(drawable)
+    override fun load(drawable: Drawable?): ContextEngine = get().load(drawable)
 
-    override fun load(uri: Uri?): RequestEngine = get().load(uri)
+    override fun load(uri: Uri?): ContextEngine = get().load(uri)
 
-    override fun load(file: File?): RequestEngine = get().load(file)
+    override fun load(file: File?): ContextEngine = get().load(file)
 
-    override fun load(@RawRes @DrawableRes resId: Int?): RequestEngine = get().load(resId)
+    override fun load(@RawRes @DrawableRes resId: Int?): ContextEngine = get().load(resId)
 
-    override fun load(model: Any?): RequestEngine = get().load(model)
+    override fun load(model: Any?): ContextEngine = get().load(model)
 
-    override fun load(byteArray: ByteArray?): RequestEngine = get().load(byteArray)
+    override fun load(byteArray: ByteArray?): ContextEngine = get().load(byteArray)
 
-    fun clear() {
-        get().clearCache()
-        GlideConfigConstant.clear()
+    fun clearMem() {
+        get().clearMem()
         imageLoader = null
+    }
+
+    fun clearDiskCache() {
+        get().clearCache()
     }
 }

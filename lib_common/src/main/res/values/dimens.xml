@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="music_player_mid">150dp</dimen>
+    <dimen name="action_icon">50dp</dimen>
+    <dimen name="action_icon_p">58dp</dimen>
+    <dimen name="small_Icon">40dp</dimen>
+    <dimen name="smaller_Icon">28dp</dimen>
+    <dimen name="hug_title_text">40sp</dimen>
+    <dimen name="mid_title_text">32sp</dimen>
+    <dimen name="title_text">20sp</dimen>
+    <dimen name="sub_text">14sp</dimen>
+    <dimen name="user_icon">100dp</dimen>
+    <dimen name="list_icon">66dp</dimen>
+    <dimen name="icon">24dp</dimen>
+    <dimen name="subContent_text">12sp</dimen>
+    <dimen name="card_corner">10dp</dimen>
+    <dimen name="action_btn">50dp</dimen>
+    <dimen name="model_icon_dimen">60dp</dimen>
+    <dimen name="list_item_height">68dp</dimen>
+    <dimen name="huge_icon">160dp</dimen>
+    <dimen name="small_title_text">18sp</dimen>
+    <dimen name="small_elevation">2dp</dimen>
+
+    <dimen name="icon_padding_lite">10dp</dimen>
+    <dimen name="icon_padding_mid">15dp</dimen>
+    <dimen name="title_texts_padding">10dp</dimen>
+    <dimen name="texts_padding">5dp</dimen>
+    <dimen name="main_padding">10dp</dimen>
+    <dimen name="icon_padding">5dp</dimen>
+
+    <dimen name="icon_margin">20dp</dimen>
+    <dimen name="back_margin">10dp</dimen>
+    <dimen name="main_margin">10dp</dimen>
+    <dimen name="small_margin">5dp</dimen>
+    <dimen name="lists_margin">1dp</dimen>
+    <dimen name="texts_margin">10dp</dimen>
+    <dimen name="full_edit_margin">24dp</dimen>
+</resources>

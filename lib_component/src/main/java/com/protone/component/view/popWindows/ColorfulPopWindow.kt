@@ -1,4 +1,4 @@
-package com.protone.component.popWindows
+package com.protone.component.view.popWindows
 
 import android.content.Context
 import android.graphics.Color
@@ -12,13 +12,13 @@ import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
-import com.protone.api.baseType.toInt
-import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.root
-import com.protone.api.spans.SpanStates
+import com.protone.common.baseType.toInt
+import com.protone.common.context.newLayoutInflater
+import com.protone.common.context.root
+import com.protone.common.utils.spans.SpanStates
 import com.protone.component.R
-import com.protone.component.view.adapter.CheckListAdapter
 import com.protone.component.databinding.*
+import com.protone.component.view.adapter.CheckListAdapter
 import java.lang.ref.WeakReference
 
 class ColorfulPopWindow(context: Context) : PopupWindow(context) {
