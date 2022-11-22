@@ -5,6 +5,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
@@ -30,6 +31,9 @@ class GalleryActivity :
     BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: GalleryViewModel by viewModels()
 
+    @Autowired(name = RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE)
+    var chooseType: String? = null
+
     override fun createView(): GalleryActivityBinding {
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GalleryActivity
@@ -39,7 +43,7 @@ class GalleryActivity :
     }
 
     override suspend fun GalleryViewModel.init() {
-        val chooseType = intent.getStringExtra(GalleryViewModel.CHOOSE_MODE) ?: ""
+        val chooseType = this@GalleryActivity.chooseType ?: ""
 
         if (chooseType.isNotEmpty()) {
             binding.galleryActionMenu.isVisible = false

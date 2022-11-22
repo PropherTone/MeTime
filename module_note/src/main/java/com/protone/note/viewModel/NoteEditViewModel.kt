@@ -70,8 +70,7 @@ class NoteEditViewModel : BaseViewModel() {
         inNote.imagePath = if (iconUri != null) saveIcon(note.title) else inNote.imagePath
     }
 
-    suspend fun updateNote(note: Note) =
-        noteDAO.updateNote(note)
+    suspend fun updateNote(note: Note) = noteDAO.updateNote(note)
 
     suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.Default) {
         noteDAO.insertNoteRs(note).let { result ->

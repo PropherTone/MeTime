@@ -2,6 +2,7 @@ package com.protone.note.activity
 
 import android.net.Uri
 import androidx.activity.viewModels
+import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.R
 import com.protone.common.baseType.getString
@@ -10,6 +11,7 @@ import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toJson
@@ -24,8 +26,13 @@ import kotlinx.coroutines.launch
 
 @Route(path = RouterPath.NoteRouterPath.NoteView)
 class NoteViewActivity :
-    BaseMusicActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(true) {
+    BaseMusicActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(
+        true
+    ) {
     override val viewModel: NoteViewViewModel by viewModels()
+
+    @Autowired(name = RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
+    var noteName: String? = null
 
     private var binder: MusicBinder? = null
 
@@ -39,7 +46,7 @@ class NoteViewActivity :
     override suspend fun NoteViewViewModel.init() {
         bindMusicService { binder = it }
 
-        intent.getStringExtra(NoteViewViewModel.NOTE_NAME)?.let {
+        noteName?.let {
             noteQueue.offer(it)
             initSeen(noteQueue.poll())
         }
@@ -90,10 +97,9 @@ class NoteViewActivity :
                     launch {
                         val collect = filterMedia(uri, isVideo)
                         if (collect != null && collect.size > 0) {
-                            startActivity(GalleryViewActivity::class.intent.apply {
-                                putExtra(GalleryViewViewModel.MEDIA, collect[0].toJson())
-                                putExtra(GalleryViewViewModel.IS_VIDEO, isVideo)
-                            })
+                            startActivity(RouterPath.GalleryRouterPath.GalleryView) {
+                                galleryViewPostcard(collect[0].toJson(), isVideo)
+                            }
                         } else R.string.none.getString().toast()
                     }
                 }
@@ -107,7 +113,7 @@ class NoteViewActivity :
             NoteEditActivity::class.intent.also { intent ->
                 intent.putExtra(
                     NoteEditViewModel.NOTE,
-                    this@NoteViewActivity.intent.getStringExtra(NoteViewViewModel.NOTE_NAME)
+                    this@NoteViewActivity.intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
                 )
             }
         )
@@ -116,7 +122,7 @@ class NoteViewActivity :
             return@apply
         }
         if (re.resultCode != RESULT_OK) return@apply
-        intent.getStringExtra(NoteViewViewModel.NOTE_NAME)?.let { name ->
+        intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)?.let { name ->
             noteQueue.remove(name)
             noteQueue.offer(name)
             initSeen(noteQueue.poll())

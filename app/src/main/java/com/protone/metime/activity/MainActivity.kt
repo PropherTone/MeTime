@@ -11,6 +11,8 @@ import com.protone.common.database.dao.DatabaseBridge
 import com.protone.common.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
+import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toEntity
@@ -18,9 +20,9 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
+import com.protone.component.service.WorkService
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
-import com.protone.component.service.WorkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -78,7 +80,7 @@ class MainActivity :
             binding.userBack.setImageBitmap(it)
         }
         musicController.onClick {
-            startActivity(MusicViewActivity::class.intent)
+            startActivity(RouterPath.MusicRouterPath.MusicPlayer)
         }
 
         onResume = {
@@ -119,14 +121,14 @@ class MainActivity :
         onViewEvent {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
-                    startActivity(GalleryActivity::class.intent)
+                    startActivity(RouterPath.GalleryRouterPath.Main)
                 MainViewModel.MainViewEvent.Note ->
                     if (userConfig.lockNote == "")
-                        startActivity(NoteActivity::class.intent)
+                        startActivity(RouterPath.NoteRouterPath.Main)
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
                     if (userConfig.lockMusic == "")
-                        startActivity(MusicActivity::class.intent)
+                        startActivity(RouterPath.MusicRouterPath.MusicPlayer)
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig ->
                     startActivity(UserConfigActivity::class.intent)
@@ -139,22 +141,18 @@ class MainActivity :
             Image.load(media.uri).with(this@MainActivity).into(binding.photoCardPhoto)
             binding.photoCardTitle.text = media.date.toDateString("yyyy/MM/dd")
             binding.timePhoto.setOnClickListener {
-                startActivity(GalleryViewActivity::class.intent.apply {
-                    putExtra(GalleryViewViewModel.MEDIA, media.toJson())
-                    putExtra(GalleryViewViewModel.IS_VIDEO, false)
-                    putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
-                })
+                startActivity(RouterPath.GalleryRouterPath.GalleryView) {
+                    galleryViewPostcard(media.toJson(),false, R.string.all_gallery.getString())
+                }
             }
         }
         getVideoInToday()?.let { media ->
             binding.videoPlayer.setVideoPath(media.uri)
             binding.videoCardTitle.text = media.date.toDateString()
             binding.videoPlayer.setFullScreen {
-                startActivity(GalleryViewActivity::class.intent.apply {
-                    putExtra(GalleryViewViewModel.MEDIA, media.toJson())
-                    putExtra(GalleryViewViewModel.IS_VIDEO, true)
-                    putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
-                })
+                startActivity(RouterPath.GalleryRouterPath.GalleryView) {
+                    galleryViewPostcard(media.toJson(),true, R.string.all_gallery.getString())
+                }
             }
         }
     }

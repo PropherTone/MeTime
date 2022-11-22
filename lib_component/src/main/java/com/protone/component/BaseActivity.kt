@@ -145,30 +145,37 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         }.launch(intent)
     }
 
-    private val _activityResultMessenger by lazy { MutableSharedFlow<Intent>() }
+    private val _activityResultMessenger by lazy { MutableSharedFlow<Intent?>() }
     val activityResultMessenger by lazy { _activityResultMessenger.asSharedFlow() }
 
-    inline fun <reified T> startActivityForResult(
+    inline fun startActivity(routerPath: String, postCard: Postcard.() -> Postcard) {
+        ARouter.getInstance().build(routerPath).postCard().navigation(this)
+    }
+
+    fun startActivity(routerPath: String) {
+        ARouter.getInstance().build(routerPath).navigation(this)
+    }
+
+    suspend inline fun startActivityForResult(
         routerPath: String,
-        postCard: Postcard.() -> Postcard,
-        crossinline onResult: (T) -> Unit
-    ) {
+        crossinline postCard: Postcard.() -> Postcard,
+    ) = onResult { co ->
         ARouter.getInstance()
             .build(routerPath)
             .postCard()
-            .navigation(this, code.incrementAndGet())
+            .navigation(this@BaseActivity, code.incrementAndGet())
         var job: Job? = null
         job = launchMain {
             activityResultMessenger.collect {
-                if (it is T) {
-                    onResult.invoke(it as T)
-                    job?.cancel()
-                }
+                co.resumeWith(Result.success(it))
+                job?.cancel()
             }
         }
         job.start()
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == code.get()) {

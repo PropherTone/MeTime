@@ -45,7 +45,7 @@ class NoteActivity :
             this.noteListEventListener = object : NoteListListAdapter.NoteListEvent {
                 override fun onNote(title: String) {
                     startActivity(NoteViewActivity::class.intent.also {
-                        it.putExtra(NoteViewViewModel.NOTE_NAME, title)
+                        it.putExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, title)
                     })
                 }
 

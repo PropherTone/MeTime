@@ -15,10 +15,6 @@ class NoteViewViewModel : BaseViewModel() {
         object Edit : NoteViewEvent()
     }
 
-    companion object {
-        const val NOTE_NAME = "NOTE_NAME"
-    }
-
     val noteQueue = ArrayDeque<String>()
 
     suspend fun getNoteByName(name: String) = withContext(Dispatchers.IO) {

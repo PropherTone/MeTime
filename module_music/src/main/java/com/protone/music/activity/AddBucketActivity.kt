@@ -5,19 +5,22 @@ import android.net.Uri
 import androidx.activity.viewModels
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.baseType.toast
+import com.protone.common.baseType.withDefaultContext
+import com.protone.common.baseType.withMainContext
 import com.protone.common.context.marginBottom
 import com.protone.common.context.root
 import com.protone.common.context.setSoftInputStatusListener
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.URI
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toUri
 import com.protone.component.BaseActivity
 import com.protone.music.databinding.AddBucketActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.AddBucket)
 class AddBucketActivity : BaseActivity<
@@ -80,26 +83,20 @@ class AddBucketActivity : BaseActivity<
         }
     }
 
-    private suspend fun chooseIcon() = withContext(Dispatchers.Main) {
-        startActivityForResult(RouterPath.GalleryRouterPath.Main)
-        startActivityForResult(
-            GalleryActivity::class.intent.also { intent ->
-                intent.putExtra(
-                    GalleryViewModel.CHOOSE_MODE,
-                    GalleryViewModel.CHOOSE_PHOTO
-                )
-            }
-        ).let { result ->
-            uri = result?.data?.getStringExtra(GalleryViewModel.URI)?.toUri()
+    private suspend fun chooseIcon() = withMainContext {
+        startActivityForResult(RouterPath.GalleryRouterPath.Main) {
+            galleryMainPostcard(CHOOSE_PHOTO)
+        }.let { result ->
+            uri = result?.getStringExtra(URI)?.toUri()
         }
     }
 
-    private suspend fun cancelAdd() = withContext(Dispatchers.Default) {
+    private suspend fun cancelAdd() = withDefaultContext {
         setResult(RESULT_CANCELED)
         finish()
     }
 
-    private suspend fun AddBucketViewModel.confirm() = withContext(Dispatchers.Main) {
+    private suspend fun AddBucketViewModel.confirm() = withMainContext {
         var intent: Intent?
         if (editName != null) {
             val re = musicBucket?.let {
@@ -122,7 +119,7 @@ class AddBucketActivity : BaseActivity<
         }
     }
 
-    private suspend fun refresh(musicBucket: MusicBucket) = withContext(Dispatchers.Main) {
+    private suspend fun refresh(musicBucket: MusicBucket) = withMainContext {
         this@AddBucketActivity.name = musicBucket.name
         detail = musicBucket.detail.toString()
         Image.load(musicBucket.icon)

@@ -1,4 +1,4 @@
-package com.protone.seenn.activity
+package com.protone.music.activity
 
 import android.view.ViewGroup
 import androidx.core.view.isGone
@@ -8,26 +8,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.protone.api.baseType.getDrawable
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.toBitmap
-import com.protone.api.baseType.toast
-import com.protone.api.context.*
-import com.protone.api.entity.MusicBucket
-import com.protone.api.img.Blur
+import com.protone.common.baseType.getString
+import com.protone.common.baseType.toBitmap
+import com.protone.common.baseType.toast
+import com.protone.common.context.*
+import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.RouterPath
-import com.protone.music.activity.MusicViewActivity
-import com.protone.music.activity.PickMusicActivity
-import com.protone.seenn.R
-import com.protone.seenn.databinding.MusicActivtiyBinding
-import com.protone.seenn.viewModel.MusicControllerIMP
-import com.protone.ui.adapter.MusicBucketAdapter
-import com.protone.ui.adapter.MusicListAdapter
-import com.protone.ui.customView.StatusImageView
-import com.protone.ui.customView.blurView.DefaultBlurController
-import com.protone.ui.customView.blurView.DefaultBlurEngine
+import com.protone.common.utils.displayUtils.Blur
+import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
+import com.protone.component.BaseMusicActivity
+import com.protone.component.MusicControllerIMP
+import com.protone.component.view.adapter.MusicBucketAdapter
+import com.protone.component.view.adapter.MusicListAdapter
+import com.protone.component.view.customView.StatusImageView
+import com.protone.component.view.customView.blurView.DefaultBlurController
+import com.protone.component.view.customView.blurView.DefaultBlurEngine
+import com.protone.music.R
+import com.protone.music.databinding.MusicActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 import com.protone.music.viewModel.MusicModel
 import com.protone.music.viewModel.PickMusicViewModel
@@ -36,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.Main)
-class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.MusicEvent>(true),
+class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicModel.MusicEvent>(true),
     StatusImageView.StateListener {
 
     private var doBlur = true
@@ -60,10 +58,10 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
         }
     }
 
-    override fun createView(): MusicActivtiyBinding {
-        return MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
+    override fun createView(): MusicActivityBinding {
+        return MusicActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
-            fitStatuesBar(musicBucketContainer)
+            musicBucketContainer.fitStatuesBar()
             mySmallMusicPlayer.interceptAlbumCover = true
             musicPlayerCover.updateLayoutParams {
                 height += (toolbar.minHeight + statuesBarHeight)
@@ -112,9 +110,9 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                     withContext(Dispatchers.Main) {
                         binding.apply {
                             if (it.icon != null) {
-                                Glide.with(this@MusicActivity).asDrawable().load(it.icon)
+                                Image.load(it.icon).with(this@MusicActivity)
                                     .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                    .override(
+                                    .overwrite(
                                         musicBucketIcon.measuredWidth,
                                         musicBucketIcon.measuredHeight
                                     ).into(musicBucketIcon)
@@ -128,7 +126,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                             musicBucketName.text = it.name
                             musicBucketNamePhanton.text = it.name
                             musicBucketMsg.text =
-                                if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else R.string.none.getString()
+                                if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else com.protone.common.R.string.none.getString()
                         }
                     }
                 }
@@ -150,7 +148,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 }
                 is MusicModel.MusicEvent.Edit -> withContext(Dispatchers.Default) {
                     if (it.bucket == R.string.all_music.getString()) {
-                        R.string.bruh.getString().toast()
+                        com.protone.common.R.string.bruh.getString().toast()
                         return@withContext
                     }
                     val ar = startActivityForResult(
@@ -168,12 +166,12 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 }
                 is MusicModel.MusicEvent.Delete -> {
                     if (it.bucket == R.string.all_music.getString()) {
-                        R.string.bruh.getString().toast()
+                        com.protone.common.R.string.bruh.getString().toast()
                         return@onViewEvent
                     }
                     val musicBucket = tryDeleteMusicBucket(it.bucket)
                     if (musicBucket == null) {
-                        R.string.failed_msg.getString().toast()
+                        com.protone.common.R.string.failed_msg.getString().toast()
                     }
                 }
                 is MusicModel.MusicEvent.RefreshBucket -> {
@@ -184,7 +182,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 is MusicModel.MusicEvent.AddMusicBucket -> {
                     val re = startActivityForResult(AddBucketActivity::class.intent)
                     when (re?.resultCode) {
-                        RESULT_CANCELED -> R.string.cancel.getString().toast()
+                        RESULT_CANCELED -> com.protone.common.R.string.cancel.getString().toast()
                     }
                 }
                 is MusicModel.MusicEvent.AddBucket ->
@@ -236,7 +234,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             }
         }
     }
-
 
 
     private fun initMusicList() {

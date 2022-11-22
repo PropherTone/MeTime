@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.baseType.getStorageSize
 import com.protone.common.baseType.toDateString
@@ -27,6 +28,7 @@ import com.protone.gallery.databinding.GalleryViewActivityBinding
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteViewWire.noteViewPostcard
 import com.protone.gallery.fragment.GalleryViewFragment
 import com.protone.gallery.viewModel.GalleryViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +42,15 @@ class GalleryViewActivity : BaseMediaActivity<
         GalleryViewViewModel,
         GalleryViewViewModel.GalleryViewEvent>(true) {
     override val viewModel: GalleryViewViewModel by viewModels()
+
+    @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA)
+    var mediaJson: String? = null
+
+    @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO)
+    var isVideo: Boolean = false
+
+    @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY)
+    var targetGallery: String = R.string.all_gallery.getString()
 
     override fun createView(): GalleryViewActivityBinding {
         return GalleryViewActivityBinding.inflate(layoutInflater, root, false).apply {
@@ -58,9 +69,7 @@ class GalleryViewActivity : BaseMediaActivity<
                 layoutManager = LinearLayoutManager(context)
                 adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
                     it.startNote = {
-                        startActivity(NoteViewActivity::class.intent.apply {
-                            putExtra(NoteViewViewModel.NOTE_NAME, it)
-                        })
+                        startActivity(RouterPath.NoteRouterPath.NoteView){ noteViewPostcard(it) }
                     }
                 }
             }
@@ -88,10 +97,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     override suspend fun GalleryViewViewModel.init() {
-        val isVideo = intent.getBooleanExtra(GalleryViewViewModel.IS_VIDEO, false)
-        val gallery =
-            intent.getStringExtra(GalleryViewViewModel.GALLERY) ?: R.string.all_gallery.getString()
-        initGalleryData(gallery, isVideo)
+        initGalleryData(targetGallery, isVideo)
 
         val mediaIndex = getMediaIndex()
         initViewPager(mediaIndex, galleryMedias) { position ->
@@ -143,8 +149,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     private suspend fun GalleryViewViewModel.getMediaIndex() = onResult { co ->
-        val galleryMedia =
-            intent.getStringExtra(GalleryViewViewModel.MEDIA)?.toEntity(GalleryMedia::class.java)
+        val galleryMedia = mediaJson?.toEntity(GalleryMedia::class.java)
         val indexOf = galleryMedias.indexOf(galleryMedia)
         curPosition = indexOf
         co.resumeWith(Result.success(indexOf))

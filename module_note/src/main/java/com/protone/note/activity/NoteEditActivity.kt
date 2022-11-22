@@ -15,6 +15,12 @@ import com.protone.common.context.root
 import com.protone.common.context.setSoftInputStatusListener
 import com.protone.common.entity.*
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_VIDEO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
+import com.protone.common.utils.RouterPath.MusicRouterPath.PickPostcard.PICK_MUSIC
+import com.protone.common.utils.RouterPath.MusicRouterPath.PickPostcard.pickMusicPostcard
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.json.listToJson
@@ -30,7 +36,6 @@ import com.protone.component.view.customView.richText.RichNoteView
 import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.note.databinding.NoteEditActivityBinding
 import com.protone.note.viewModel.NoteEditViewModel
-import com.protone.note.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -147,12 +152,10 @@ class NoteEditActivity :
     }
 
     private suspend fun NoteEditViewModel.pickMusic() {
-        startActivityForResult(
-            PickMusicActivity::class.intent.apply {
-                putExtra(PickMusicViewModel.MODE, PickMusicViewModel.PICK_MUSIC)
-            }
-        )?.also { re ->
-            re.data?.data?.let { uri ->
+        startActivityForResult(RouterPath.MusicRouterPath.Pick) {
+            pickMusicPostcard(PICK_MUSIC)
+        }?.also { re ->
+            re.data?.let { uri ->
                 if (allNote == null) allNote = getAllNote()
                 insertMusic(uri, allNote!!, getMusicTitle(uri))
             }
@@ -198,7 +201,7 @@ class NoteEditActivity :
             }
             copyNote(inNote, note)
             val re = updateNote(inNote)
-            if (re == null && re == -1) {
+            if (re == -1) {
                 insertNote(
                     inNote,
                     intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
@@ -206,7 +209,10 @@ class NoteEditActivity :
                     if (result) {
                         setResult(
                             RESULT_OK,
-                            Intent().putExtra(NoteViewViewModel.NOTE_NAME, inNote.title)
+                            Intent().putExtra(
+                                RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME,
+                                inNote.title
+                            )
                         )
                         finish()
                     } else R.string.failed_msg.getString().toast()
@@ -227,14 +233,10 @@ class NoteEditActivity :
     }
 
     private suspend fun startGalleryPick(isPhoto: Boolean) =
-        startActivityForResult(GalleryActivity::class.intent.apply {
-            putExtra(
-                GalleryViewModel.CHOOSE_MODE,
-                if (isPhoto) GalleryViewModel.CHOOSE_PHOTO else GalleryViewModel.CHOOSE_VIDEO
-            )
-        })?.let { re ->
-            re.data?.getStringExtra(GalleryViewModel.Gallery_DATA)
-                ?.toEntity(GalleryMedia::class.java)
+        startActivityForResult(RouterPath.GalleryRouterPath.Main) {
+            galleryMainPostcard(if (isPhoto) CHOOSE_PHOTO else CHOOSE_VIDEO)
+        }?.let { re ->
+            re.getStringExtra(GALLERY_DATA)?.toEntity(GalleryMedia::class.java)
         }
 
     private suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
