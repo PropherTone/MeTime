@@ -26,14 +26,14 @@ import androidx.annotation.StyleRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
-import com.protone.component.databinding.RichMusicLayoutBinding
-import com.protone.component.databinding.RichPhotoLayoutBinding
-import com.protone.component.databinding.VideoCardBinding
-import com.protone.component.view.customView.musicPlayer.BaseMusicPlayer
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.*
 import com.protone.common.utils.spans.ISpanForEditor
 import com.protone.common.utils.spans.SpanStates
+import com.protone.component.databinding.RichMusicLayoutBinding
+import com.protone.component.databinding.RichPhotoLayoutBinding
+import com.protone.component.databinding.RichTextVideoCardBinding
+import com.protone.component.view.customView.musicPlayer.BaseMusicPlayer
 
 /**
  * RichText editor by ProTone 2022/4/15
@@ -260,7 +260,7 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
-        addView(VideoCardBinding.inflate(context.newLayoutInflater, this, false).apply {
+        addView(RichTextVideoCardBinding.inflate(context.newLayoutInflater, this, false).apply {
             videoPlayer.setVideoPath(video.uri)
             videoPlayer.setFullScreen {
                 iRichListener?.open(video.uri, "", true)

@@ -79,7 +79,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
 
     init {
         setPadding(0)
-        button.setImageResource(R.drawable.oval_white)
+        button.setImageResource(R.drawable.oval_back_white)
         addView(button)
         setBackgroundColor(Color.TRANSPARENT)
         context.theme.obtainStyledAttributes(

@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">module_music</string>
     <string name="music_bucket">MusicBucket</string>
-    <string name="all_music">全部音乐</string>
 </resources>

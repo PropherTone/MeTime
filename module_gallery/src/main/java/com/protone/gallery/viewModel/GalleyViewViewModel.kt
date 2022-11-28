@@ -3,7 +3,7 @@ package com.protone.gallery.viewModel
 import android.net.Uri
 import com.protone.common.R
 import com.protone.common.baseType.*
-import com.protone.common.database.userConfig
+import com.protone.component.database.userConfig
 import com.protone.common.entity.GalleryMedia
 import com.protone.component.BaseViewModel
 import java.util.stream.Collectors

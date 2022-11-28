@@ -7,8 +7,8 @@ import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.onGlobalLayout
 import com.protone.common.context.root
-import com.protone.common.database.dao.DatabaseBridge
-import com.protone.common.database.userConfig
+import com.protone.component.database.dao.DatabaseBridge
+import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
 import com.protone.common.utils.RouterPath
@@ -130,8 +130,9 @@ class MainActivity :
                     if (userConfig.lockMusic == "")
                         startActivity(RouterPath.MusicRouterPath.MusicPlayer)
                     else R.string.locked.getString().toast()
-                MainViewModel.MainViewEvent.UserConfig ->
-                    startActivity(UserConfigActivity::class.intent)
+                MainViewModel.MainViewEvent.UserConfig -> {
+//                    startActivity(UserConfigActivity::class.intent)
+                }
             }
         }
     }
@@ -142,7 +143,7 @@ class MainActivity :
             binding.photoCardTitle.text = media.date.toDateString("yyyy/MM/dd")
             binding.timePhoto.setOnClickListener {
                 startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                    galleryViewPostcard(media.toJson(),false, R.string.all_gallery.getString())
+                    galleryViewPostcard(media.toJson(), false, R.string.all_gallery.getString())
                 }
             }
         }
@@ -151,7 +152,7 @@ class MainActivity :
             binding.videoCardTitle.text = media.date.toDateString()
             binding.videoPlayer.setFullScreen {
                 startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                    galleryViewPostcard(media.toJson(),true, R.string.all_gallery.getString())
+                    galleryViewPostcard(media.toJson(), true, R.string.all_gallery.getString())
                 }
             }
         }

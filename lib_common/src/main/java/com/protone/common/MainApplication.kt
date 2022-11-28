@@ -20,7 +20,7 @@ class MainApplication : Application() {
             ARouter.openLog()
             ARouter.openDebug()
         }
-        ARouter.init(base as Application?)
+        ARouter.init(MApplication.app)
         DPI = MApplication.app.resources.displayMetrics.densityDpi
         val file = File("${base?.externalCacheDir?.path}/CrashLog")
         val result = if (!file.exists()) {

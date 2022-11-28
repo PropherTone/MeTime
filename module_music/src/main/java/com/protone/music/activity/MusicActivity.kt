@@ -8,19 +8,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toBitmap
 import com.protone.common.baseType.toast
 import com.protone.common.context.*
 import com.protone.common.entity.MusicBucket
+import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
-import com.protone.component.view.adapter.MusicBucketAdapter
-import com.protone.component.view.adapter.MusicListAdapter
+import com.protone.music.adapter.MusicBucketAdapter
+import com.protone.music.adapter.MusicListAdapter
 import com.protone.component.view.customView.StatusImageView
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
@@ -73,7 +75,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                         it.scaleFactor = 16f
                     })
             )
-            musicBucketContainer.setForeColor(getColor(R.color.foreDark))
+            musicBucketContainer.setForeColor(getColor(com.protone.component.R.color.foreDark))
             root.onGlobalLayout {
                 actionBtnContainer.marginBottom(mySmallMusicPlayer.height + search.marginBottom)
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
@@ -121,7 +123,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                                 }
                             } else {
                                 blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
-                                musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
+                                musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
                             }
                             musicBucketName.text = it.name
                             musicBucketNamePhanton.text = it.name
@@ -131,8 +133,8 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                     }
                 }
                 is MusicModel.MusicEvent.AddMusic -> {
-                    if (it.bucket == R.string.all_music.getString()) {
-                        R.string.bruh.getString().toast()
+                    if (it.bucket == ALL_MUSIC) {
+                        com.protone.common.R.string.bruh.getString().toast()
                         return@onViewEvent
                     }
                     startActivityForResult(
@@ -147,7 +149,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                     }
                 }
                 is MusicModel.MusicEvent.Edit -> withContext(Dispatchers.Default) {
-                    if (it.bucket == R.string.all_music.getString()) {
+                    if (it.bucket == ALL_MUSIC) {
                         com.protone.common.R.string.bruh.getString().toast()
                         return@withContext
                     }
@@ -165,7 +167,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                     }
                 }
                 is MusicModel.MusicEvent.Delete -> {
-                    if (it.bucket == R.string.all_music.getString()) {
+                    if (it.bucket == ALL_MUSIC) {
                         com.protone.common.R.string.bruh.getString().toast()
                         return@onViewEvent
                     }

@@ -5,6 +5,7 @@ import com.protone.common.baseType.deleteFile
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.entity.MusicBucket
+import com.protone.common.utils.MUSIC_BUCKET
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseViewModel
 import com.protone.music.R
@@ -34,7 +35,7 @@ class AddBucketViewModel : BaseViewModel() {
         musicDAO.addMusicBucketWithCallBack(
             MusicBucket(
                 name,
-                uri?.imageSaveToDisk(name, R.string.music_bucket.getString()),
+                uri?.imageSaveToDisk(name, MUSIC_BUCKET),
                 0,
                 detail,
                 todayDate("yyyy/MM/dd")

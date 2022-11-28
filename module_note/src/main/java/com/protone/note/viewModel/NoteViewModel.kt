@@ -7,7 +7,7 @@ import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchIO
 import com.protone.common.context.MApplication
-import com.protone.common.database.MediaAction
+import com.protone.component.database.MediaAction
 import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
 import com.protone.common.entity.NoteDirWithNotes

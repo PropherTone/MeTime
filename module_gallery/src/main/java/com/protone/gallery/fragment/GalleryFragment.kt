@@ -24,7 +24,7 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.json.toJson
-import com.protone.component.dialog.titleDialog
+import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.customView.StatusImageView
 import com.protone.gallery.activity.GallerySearchActivity
 import com.protone.gallery.activity.GalleryViewActivity

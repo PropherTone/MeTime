@@ -14,7 +14,7 @@
         android:background="@color/gray_1"
         android:contentDescription="@string/icon"
         android:padding="@dimen/icon_padding"
-        android:src="@drawable/ic_music_note" />
+        android:src="@drawable/ic_baseline_music_note_24" />
 
     <LinearLayout
         android:layout_weight="1"
@@ -62,7 +62,7 @@
                 android:layout_height="@dimen/small_Icon"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
-                android:src="@drawable/ic_play" />
+                android:src="@drawable/ic_baseline_play_arrow_24" />
 
             <ImageView
                 android:id="@+id/notify_music_next"

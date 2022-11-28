@@ -102,23 +102,23 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         loop = mode
         when (mode) {
             LOOP_LIST -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_repeat_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_repeat_24_white)
                 showToast(targetView, R.string.loop_list.getString())
             }
             LOOP_SINGLE -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_repeat_one_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_repeat_one_24_white)
                 showToast(targetView, R.string.loop_single.getString())
             }
             PLAY_LIST -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_playlist_play_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_playlist_play_24_white)
                 showToast(targetView, R.string.play_list.getString())
             }
             NO_LOOP -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_block_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_block_24_white)
                 showToast(targetView, R.string.no_loop.getString())
             }
             RANDOM -> {
-                controller.looper?.setImageResource(R.drawable.ic_round_loop_white)
+                controller.looper?.setImageResource(R.drawable.ic_round_loop_24_white)
                 showToast(targetView, R.string.random.getString())
             }
         }

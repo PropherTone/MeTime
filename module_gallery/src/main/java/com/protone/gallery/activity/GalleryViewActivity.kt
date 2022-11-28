@@ -43,12 +43,15 @@ class GalleryViewActivity : BaseMediaActivity<
         GalleryViewViewModel.GalleryViewEvent>(true) {
     override val viewModel: GalleryViewViewModel by viewModels()
 
+    @JvmField
     @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA)
     var mediaJson: String? = null
 
+    @JvmField
     @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO)
     var isVideo: Boolean = false
 
+    @JvmField
     @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY)
     var targetGallery: String = R.string.all_gallery.getString()
 

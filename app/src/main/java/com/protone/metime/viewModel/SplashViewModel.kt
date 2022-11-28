@@ -7,11 +7,13 @@ import com.protone.common.context.MApplication
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.todayDate
 import com.protone.common.R
+import com.protone.common.media.scanAudio
+import com.protone.common.utils.ALL_MUSIC
+import com.protone.common.utils.MUSIC_BUCKET
 import com.protone.component.BaseViewModel
-import com.protone.worker.database.dao.DatabaseHelper
-import com.protone.worker.database.MediaAction
-import com.protone.worker.database.userConfig
-import com.protone.worker.media.scanAudio
+import com.protone.component.database.MediaAction
+import com.protone.component.database.dao.DatabaseHelper
+import com.protone.component.database.userConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -27,39 +29,34 @@ class SplashViewModel : BaseViewModel() {
 
     suspend fun firstBootWork() {
         if (userConfig.isFirstBoot) {
-            DatabaseHelper.instance.run {
-                withContext(Dispatchers.IO) {
-                    musicDAOBridge.insertMusicMulti(scanAudio { _, _ -> })
-                }
+            withContext(Dispatchers.IO) {
+                musicDAO.insertMusicMulti(scanAudio { _, _ -> })
+            }
+            val allMusicRs = musicDAO.getAllMusic() ?: return
 
-                val allMusicRs = musicDAOBridge.getAllMusic() ?: return
-
-                var launch: Job? = null
-                launch = viewModelScope.launch(Dispatchers.Default) {
-                    mediaNotifier.collect {
-                        if (it is MediaAction.OnNewMusicBucket) {
-                            musicWithMusicBucketDAOBridge.insertMusicMultiAsyncWithBucket(
-                                R.string.all_music.getString(),
-                                allMusicRs
-                            )
-                            launch?.cancel()
-                        }
+            var launch: Job? = null
+            launch = viewModelScope.launch(Dispatchers.Default) {
+                observeMusicData {
+                    if (it is MediaAction.MusicDataAction.OnNewMusicBucket) {
+                        musicDAO.insertMusicMultiAsyncWithBucket(
+                            ALL_MUSIC,
+                            allMusicRs
+                        )
+                        launch?.cancel()
                     }
                 }
-
-                musicBucketDAOBridge.addMusicBucketAsync(
-                    MusicBucket(
-                        R.string.all_music.getString(),
-                        if (allMusicRs.isNotEmpty()) allMusicRs[0].uri.imageSaveToFile(
-                            R.string.all_music.getString(),
-                            R.string.music_bucket.getString()
-                        ) else null,
-                        allMusicRs.size,
-                        null,
-                        todayDate("yyyy/MM/dd")
-                    )
-                )
             }
+            musicDAO.addMusicBucketAsync(
+                MusicBucket(
+                    ALL_MUSIC,
+                    if (allMusicRs.isNotEmpty())
+                        allMusicRs[0].uri.imageSaveToFile(ALL_MUSIC, MUSIC_BUCKET)
+                    else null,
+                    allMusicRs.size,
+                    null,
+                    todayDate("yyyy/MM/dd")
+                )
+            )
             withContext(Dispatchers.IO) {
                 val dir = File("${MApplication.app.filesDir.absolutePath}/SharedMedia")
                 if (!dir.exists()) {
@@ -68,7 +65,7 @@ class SplashViewModel : BaseViewModel() {
             }
             userConfig.apply {
                 isFirstBoot = false
-                lastMusicBucket = R.string.all_music.getString()
+                lastMusicBucket = ALL_MUSIC
                 playedMusicPosition = -1
             }
         }

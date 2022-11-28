@@ -27,7 +27,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 ) : FrameLayout(context, attrs), CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
     val baseAlbumDrawable by lazy {
-        ResourcesCompat.getDrawable(resources, R.drawable.ic_music_note, null)
+        ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_music_note_24, null)
     }
     val baseCoverDrawable by lazy {
         ResourcesCompat.getDrawable(resources, R.drawable.main_background, null)

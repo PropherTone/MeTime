@@ -45,41 +45,46 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
 
     override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
         when (holder.binding) {
-            is PictureBoxAdapterGifLayoutBinding -> holder.binding.apply {
-                image.scaleType = ImageView.ScaleType.FIT_XY
-                loadingMedia(position, image)
-            }
-            is PictureBoxAdapterLayoutBinding -> holder.binding.apply {
-                image.setImageResource(picUri[position].uri)
-            }
-            is PictureBoxAdapterVideoLayoutBinding -> holder.binding.apply {
-                start.isGone = false
-                videoCover.isGone = false
-                loadingMedia(position, videoCover)
-                start.setOnClickListener {
-                    start.isGone = true
-                    videoCover.isGone = true
-                    videoPlayer.setVideoPath(picUri[holder.layoutPosition].uri)
+            is PictureBoxAdapterGifLayoutBinding ->
+                (holder.binding as PictureBoxAdapterGifLayoutBinding).apply {
+                    image.scaleType = ImageView.ScaleType.FIT_XY
+                    loadingMedia(position, image)
                 }
-                videoPlayer.doOnCompletion {
-                    videoPlayer.release()
+            is PictureBoxAdapterLayoutBinding ->
+                (holder.binding as PictureBoxAdapterLayoutBinding).apply {
+                    image.setImageResource(picUri[position].uri)
+                }
+            is PictureBoxAdapterVideoLayoutBinding ->
+                (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
                     start.isGone = false
                     videoCover.isGone = false
+                    loadingMedia(position, videoCover)
+                    start.setOnClickListener {
+                        start.isGone = true
+                        videoCover.isGone = true
+                        videoPlayer.setVideoPath(picUri[holder.layoutPosition].uri)
+                    }
+                    videoPlayer.doOnCompletion {
+                        videoPlayer.release()
+                        start.isGone = false
+                        videoCover.isGone = false
+                    }
                 }
-            }
         }
     }
 
     override fun onViewRecycled(holder: Holder<ViewDataBinding>) {
         when (holder.binding) {
-            is PictureBoxAdapterLayoutBinding -> holder.binding.apply {
-                image.clear()
-            }
-            is PictureBoxAdapterVideoLayoutBinding -> holder.binding.apply {
-                start.isGone = false
-                videoCover.isGone = false
-                videoPlayer.release()
-            }
+            is PictureBoxAdapterLayoutBinding ->
+                (holder.binding as PictureBoxAdapterGifLayoutBinding).apply {
+                    image.clear()
+                }
+            is PictureBoxAdapterVideoLayoutBinding ->
+                (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
+                    start.isGone = false
+                    videoCover.isGone = false
+                    videoPlayer.release()
+                }
         }
         super.onViewRecycled(holder)
     }
@@ -90,21 +95,22 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
     }
 
     private fun loadingMedia(position: Int, view: ImageView) {
-        Image.load(picUri[position].path).setInterceptor(object : RequestInterceptor() {
-            override fun onLoadSuccess(result: LoadSuccessResult) {
-                result.resource?.apply {
-                    val mix = this.intrinsicWidth.toFloat().let {
-                        view.width / it
-                    }
-                    val heightSpan = (this.intrinsicHeight * mix).roundToInt()
-                    view.updateLayoutParams {
-                        this.height = heightSpan
-                    }
-                    view.updateLayoutParams {
-                        this.height = heightSpan
+        Image.load(picUri[position].path).with(context)
+            .setInterceptor(object : RequestInterceptor() {
+                override fun onLoadSuccess(result: LoadSuccessResult) {
+                    result.resource?.apply {
+                        val mix = this.intrinsicWidth.toFloat().let {
+                            view.width / it
+                        }
+                        val heightSpan = (this.intrinsicHeight * mix).roundToInt()
+                        view.updateLayoutParams {
+                            this.height = heightSpan
+                        }
+                        view.updateLayoutParams {
+                            this.height = heightSpan
+                        }
                     }
                 }
-            }
-        }).into(context, view)
+            }).into(view)
     }
 }

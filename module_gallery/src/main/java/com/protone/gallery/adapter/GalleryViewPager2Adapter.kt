@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.GlideConfigConstant
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.gallery.databinding.GalleryVp2AdapterLayoutBinding
 import kotlinx.coroutines.launch

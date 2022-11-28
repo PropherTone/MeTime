@@ -8,7 +8,7 @@
             name="activity"
             type="com.protone.note.activity.NoteEditActivity" />
 
-        <import type="com.protone.note.viewModel.NoteEditViewModel" />
+        <import type="com.protone.note.viewModel.NoteEditViewModel.NoteEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

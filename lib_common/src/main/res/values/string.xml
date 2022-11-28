@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Seenn</string>
+    <string name="app_name">MeTime</string>
     <string name="model_account">用户</string>
     <string name="model_gallery">相册</string>
     <string name="model_noteBook">记事本</string>

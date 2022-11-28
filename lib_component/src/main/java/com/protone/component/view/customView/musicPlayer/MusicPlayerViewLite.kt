@@ -29,11 +29,11 @@ class MusicPlayerViewLite @JvmOverloads constructor(
     override var duration: Long? = 0L
 
     override fun onPlay() {
-        binding.musicControl.setImageResource(R.drawable.ic_round_paused_white)
+        binding.musicControl.setImageResource(R.drawable.ic_round_paused_white_24)
     }
 
     override fun onPause() {
-        binding.musicControl.setImageResource(R.drawable.ic_round_on_white)
+        binding.musicControl.setImageResource(R.drawable.ic_round_on_white_24)
     }
 
     override fun setName(name: String) {

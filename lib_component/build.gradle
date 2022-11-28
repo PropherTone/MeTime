@@ -2,6 +2,9 @@ apply from: '../lib_build.gradle'
 
 dependencies {
 
+    implementation libs.datastore
+
     implementation project(path: ':lib_common')
+    implementation project(path: ':lib_dataBase')
 
 }

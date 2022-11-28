@@ -8,7 +8,7 @@
             name="activity"
             type="com.protone.gallery.activity.GalleryViewActivity" />
 
-        <import type="com.protone.worker.viewModel.GalleryViewViewModel.GalleryViewEvent" />
+        <import type="com.protone.gallery.viewModel.GalleryViewViewModel.GalleryViewEvent" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

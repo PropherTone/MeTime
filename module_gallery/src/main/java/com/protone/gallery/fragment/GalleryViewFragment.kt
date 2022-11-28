@@ -44,7 +44,7 @@ class GalleryViewFragment(
         super.onResume()
         if (!galleryMedia.isVideo) {
             if (galleryMedia.name.contains("gif")) {
-                imageBinding?.image?.let { Image.load(galleryMedia.uri).into(this,it) }
+                imageBinding?.image?.let { Image.load(galleryMedia.uri).with(this).into(it) }
             } else {
                 imageBinding?.image?.setImageResource(galleryMedia.uri)
             }

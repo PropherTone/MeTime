@@ -9,7 +9,7 @@
             name="activity"
             type="com.protone.metime.activity.MainActivity" />
 
-        <import type="com.protone.metime.viewModel.MainViewModel" />
+        <import type="com.protone.metime.viewModel.MainViewModel.MainViewEvent" />
     </data>
 
     <FrameLayout

@@ -1,4 +1,4 @@
-package com.protone.component.dialog
+package com.protone.component.view.dialog
 
 import android.app.Activity
 import android.net.Uri
@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.root
-import com.protone.api.onResult
+import com.protone.common.context.newLayoutInflater
+import com.protone.common.context.root
+import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.common.utils.onResult
 import com.protone.component.R
+import com.protone.component.databinding.*
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.adapter.CheckListAdapter
-import com.protone.component.databinding.*
 import kotlinx.coroutines.Dispatchers
 
 fun Activity.loginDialog(
@@ -167,8 +167,7 @@ suspend fun Activity.imageListDialog(
                     holder: Holder<PhotoCardLayoutBinding>,
                     position: Int
                 ) {
-                    Glide.with(context).asDrawable().load(dataList[position])
-                        .into(holder.binding.photoCardPhoto)
+                    Image.load(dataList[position]).with(context).into(holder.binding.photoCardPhoto)
                     val i = position + 1
                     holder.binding.photoCardTitle.text = i.toString()
                 }

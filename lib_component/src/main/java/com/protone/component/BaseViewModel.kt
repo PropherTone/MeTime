@@ -2,8 +2,8 @@ package com.protone.component
 
 import androidx.lifecycle.ViewModel
 import com.protone.common.baseType.bufferCollect
-import com.protone.common.database.MediaAction
-import com.protone.common.database.dao.DatabaseBridge
+import com.protone.component.database.MediaAction
+import com.protone.component.database.dao.DatabaseBridge
 
 abstract class BaseViewModel : ViewModel() {
 

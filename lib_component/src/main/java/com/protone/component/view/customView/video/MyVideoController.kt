@@ -8,11 +8,11 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.bumptech.glide.Glide
-import com.protone.component.R
-import com.protone.component.databinding.VideoControllerBinding
 import com.protone.common.baseType.getDrawable
 import com.protone.common.context.newLayoutInflater
+import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.component.R
+import com.protone.component.databinding.VideoControllerBinding
 import com.protone.component.view.customView.ColorfulProgressBar
 
 class MyVideoController @JvmOverloads constructor(
@@ -47,22 +47,22 @@ class MyVideoController @JvmOverloads constructor(
     }
 
     fun loadCover(path: String) {
-        Glide.with(context).asDrawable().load(path).into(binding.vVideoCover)
+        Image.load(path).with(context).into(binding.vVideoCover)
     }
 
     fun loadCover(path: Uri) {
-        Glide.with(context).asDrawable().load(path).into(binding.vVideoCover)
+        Image.load(path).with(context).into(binding.vVideoCover)
     }
 
     private var isPlaying = false
         set(value) {
             binding.vStart.setImageDrawable(
-                if (!value) R.drawable.ic_play_white.getDrawable()
-                else R.drawable.ic_pause_white.getDrawable()
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+                else R.drawable.ic_baseline_pause_24_white.getDrawable()
             )
             binding.vControl.setImageDrawable(
-                if (!value) R.drawable.ic_play_white.getDrawable()
-                else R.drawable.ic_pause_white.getDrawable()
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+                else R.drawable.ic_baseline_pause_24_white.getDrawable()
             )
             field = value
         }

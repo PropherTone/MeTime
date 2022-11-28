@@ -29,8 +29,8 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.spans.ISpanForUse
 import com.protone.common.utils.spans.SpanStates
 import com.protone.component.BaseActivity
-import com.protone.component.dialog.imageListDialog
-import com.protone.component.dialog.titleDialog
+import com.protone.component.view.dialog.imageListDialog
+import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.customView.richText.RichNoteImageLoader
 import com.protone.component.view.customView.richText.RichNoteView
 import com.protone.component.view.popWindows.ColorfulPopWindow
@@ -273,7 +273,7 @@ class NoteEditActivity :
     private suspend fun changeIconAni(view: ImageView) = withContext(Dispatchers.Main) {
         AnimationHelper.apply {
             animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
-                view.setImageDrawable(R.drawable.ic_baseline_check_24.getDrawable())
+                view.setImageDrawable(com.protone.component.R.drawable.ic_baseline_check_24.getDrawable())
                 animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true, doOnEnd = {
                     alpha(view, 0f, play = true, doOnEnd = { view.isVisible = false })
                 })

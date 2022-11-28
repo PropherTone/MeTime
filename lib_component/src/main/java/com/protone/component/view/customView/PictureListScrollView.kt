@@ -15,8 +15,8 @@ import android.widget.ScrollView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
-import com.bumptech.glide.Glide
 import com.protone.common.context.MApplication
+import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.onResult
 import kotlinx.coroutines.*
 import java.io.InputStream
@@ -105,8 +105,7 @@ class PictureListScrollView @JvmOverloads constructor(
                     withContext(Dispatchers.Main) {
                         it.imageView.visibility = if (localVisibleRect) {
                             Log.d(TAG, "checkState: ${it.position}")
-                            Glide.with(context).load(dataList?.get(it.position)!!)
-                                .into(it.imageView)
+                            Image.load(dataList?.get(it.position)!!).with(context).into(it.imageView)
 //                            it.imageView.setImageBitmap(decodeBitmap(dataList?.get(it.position)!!))
 //                            visibleIndex = it.position
                             View.VISIBLE

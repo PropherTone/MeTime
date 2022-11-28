@@ -1,0 +1,54 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.MeTime" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/main_color1</item>
+        <item name="colorPrimaryVariant">@color/main_color2</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/main_color2</item>
+        <item name="colorSecondaryVariant">@color/main_color1</item>
+        <item name="colorOnSecondary">@color/blue_3</item>
+
+        <item name="android:windowBackground">@drawable/main_background</item>
+
+        <!--设置全屏-->
+        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
+        <!-- 设置statusBarColor -->
+        <item name="android:statusBarColor">@color/main_color1</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:windowDisablePreview">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="MyRoundCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="colorControlActivated">@color/main_color1</item>
+        <item name="colorButtonNormal">@color/black</item>
+    </style>
+
+    <style name="MyRadioCheckBox" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="colorControlActivated">@color/main_color1</item>
+        <item name="buttonTint">@color/white</item>
+        <item name="colorButtonNormal">@color/black</item>
+    </style>
+
+    <style name="BlueRadioCheckBox" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="colorControlActivated">@color/main_color1</item>
+        <item name="buttonTint">@color/main_color1</item>
+        <item name="colorButtonNormal">@color/black</item>
+    </style>
+
+    <style name="PopAnimationUpToBot">
+        <item name="duration">100</item>
+        <item name="android:windowEnterAnimation">@anim/pop_ani_y_in</item>
+        <item name="android:windowExitAnimation">@anim/pop_ani_y_out</item>
+    </style>
+
+    <style name="PopAnimationBotToUp">
+        <item name="duration">100</item>
+        <item name="android:windowEnterAnimation">@anim/pop_ani_y_out</item>
+        <item name="android:windowExitAnimation">@anim/pop_ani_y_in</item>
+    </style>
+
+</resources>

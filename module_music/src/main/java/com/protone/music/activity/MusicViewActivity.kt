@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.context.root
 import com.protone.common.context.statuesBarHeight
-import com.protone.common.database.userConfig
+import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.component.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.MusicControllerIMP
 import com.protone.common.R
 import com.protone.common.utils.RouterPath
-import com.protone.component.view.adapter.TransparentPlayListAdapter
+import com.protone.music.adapter.TransparentPlayListAdapter
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
 import com.protone.music.adapter.MusicItemDecoration

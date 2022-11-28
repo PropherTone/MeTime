@@ -15,13 +15,14 @@ import com.protone.common.context.MUSIC_PLAY_CUR
 import com.protone.common.context.linkInput
 import com.protone.common.context.root
 import com.protone.common.entity.Music
+import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.SearchModel
 import com.protone.component.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.service.MusicBinder
-import com.protone.component.view.adapter.AddMusicListAdapter
+import com.protone.music.adapter.AddMusicListAdapter
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
 import com.protone.music.R
@@ -63,7 +64,7 @@ class PickMusicActivity :
         val mode = intent.getStringExtra(PickMusicViewModel.MODE)
 
         val bucket = when (mode) {
-            PickMusicViewModel.PICK_MUSIC -> R.string.all_music.getString()
+            PickMusicViewModel.PICK_MUSIC -> ALL_MUSIC
             else -> intent.getStringExtra(PickMusicViewModel.BUCKET_NAME)
         }
 

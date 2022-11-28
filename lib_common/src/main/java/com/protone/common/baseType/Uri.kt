@@ -39,7 +39,7 @@ suspend fun Uri.imageSaveToDisk(
 ): String? {
     if (this == Uri.EMPTY) return null
     var exists = false
-    var mimeType = ""
+    var mimeType: String
     return onResult {
         val bytes = MApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
             ?.use { inputStream -> inputStream.readBytes() } ?: toBitmapByteArray()

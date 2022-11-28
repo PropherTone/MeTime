@@ -9,6 +9,9 @@ import com.protone.common.utils.json.toJson
 
 const val TAG = "MeTimeLogTAG"
 
+const val ALL_MUSIC = "全部音乐"
+const val MUSIC_BUCKET = "MusicBucket"
+
 val imageContent: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
 val videoContent: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI

@@ -11,7 +11,7 @@ import android.util.Log
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.toast
 import com.protone.common.context.workIntentFilter
-import com.protone.common.database.dao.DatabaseBridge
+import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
 import com.protone.common.media.*

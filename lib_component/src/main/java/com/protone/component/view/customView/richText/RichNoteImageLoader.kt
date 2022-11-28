@@ -5,10 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.widget.ImageView
-import com.bumptech.glide.Glide
-import com.protone.component.R
 import com.protone.common.baseType.toBitmap
 import com.protone.common.context.MApplication
+import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.component.R
 
 class RichNoteImageLoader : IRichNoteImageLoader {
 
@@ -18,26 +18,24 @@ class RichNoteImageLoader : IRichNoteImageLoader {
 
     override fun loadImage(context: Context, path: String?, view: ImageView) {
         val bitmapWH = getWHFromPath(path)
-        Glide.with(context).asDrawable()
-            .load(path).error(R.drawable.ic_error_outline_white)
-            .let { glide ->
-                if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
+        Image.load(path).with(context)
+            .error(R.drawable.ic_baseline_error_outline_24_black)
+            .let {
+                if (bitmapWH != null) it.overwrite(bitmapWH[0], bitmapWH[1]) else it
             }.into(view)
     }
 
     override fun loadImage(context: Context, bitmap: Bitmap?, view: ImageView) {
         if (bitmap == null) return
         val bitmapWH = getBitmapWH(bitmap)
-        Glide.with(context).asDrawable().load(bitmap)
-            .error(R.drawable.ic_error_outline_white).let { glide ->
-                if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
+        Image.load(bitmap).with(context)
+            .error(R.drawable.ic_baseline_error_outline_24_black).let {
+                if (bitmapWH != null) it.overwrite(bitmapWH[0], bitmapWH[1]) else it
             }.into(view)
     }
 
     override fun loadError(context: Context, view: ImageView) {
-        Glide.with(context).asDrawable()
-            .load(R.drawable.ic_error_outline_white)
-            .into(view)
+        Image.load(R.drawable.ic_baseline_error_outline_24_black).with(context).into(view)
     }
 
     private fun getWHFromPath(path: String?): IntArray? {

@@ -34,12 +34,12 @@ class MusicPlayerViewMid @JvmOverloads constructor(
 
     override fun onPlay() {
         binding.musicProgress.start()
-        binding.musicControl.setImageResource(R.drawable.ic_round_paused_white)
+        binding.musicControl.setImageResource(R.drawable.ic_round_paused_white_24)
     }
 
     override fun onPause() {
         binding.musicProgress.stop()
-        binding.musicControl.setImageResource(R.drawable.ic_round_on_white)
+        binding.musicControl.setImageResource(R.drawable.ic_round_on_white_24)
     }
 
     override fun setName(name: String) {

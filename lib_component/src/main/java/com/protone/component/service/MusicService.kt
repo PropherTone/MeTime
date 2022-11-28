@@ -102,8 +102,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
                     withContext(Dispatchers.Main) {
                         remoteViews?.setImageViewResource(
                             R.id.notify_music_control,
-                            if (state) R.drawable.ic_pause
-                            else R.drawable.ic_play
+                            if (state) R.drawable.ic_baseline_pause_24
+                            else R.drawable.ic_baseline_play_arrow_24
                         )
                         if (state || ref) {
                             remoteViews?.setTextViewText(
@@ -205,12 +205,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
             notificationManager?.createNotificationChannel(channel)
             Notification.Builder(this, MUSIC_NOTIFICATION_NAME).apply {
                 setCustomContentView(remoteViews)
-                setSmallIcon(R.drawable.ic_music_note)
+                setSmallIcon(R.drawable.ic_baseline_music_note_24)
             }.build()
         } else {
             @Suppress("DEPRECATION") Notification().apply {
                 contentView = remoteViews
-                icon = R.drawable.ic_music_note
+                icon = R.drawable.ic_baseline_music_note_24
             }
         }.also {
             it.flags = Notification.FLAG_NO_CLEAR

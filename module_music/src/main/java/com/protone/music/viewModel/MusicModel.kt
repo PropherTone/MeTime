@@ -5,10 +5,11 @@ import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.baseType.withIOContext
-import com.protone.common.database.MediaAction
-import com.protone.common.database.userConfig
+import com.protone.component.database.MediaAction
+import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
+import com.protone.common.utils.MUSIC_BUCKET
 import com.protone.component.BaseViewModel
 import com.protone.music.R
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +68,7 @@ class MusicModel : BaseViewModel() {
             it.size
             val newBucket = musicDAO.getMusicWithMusicBucket(it.musicBucketId)
             if (it.size == 0 && newBucket.isNotEmpty()) {
-                it.icon = newBucket[0].uri.imageSaveToDisk(name, R.string.music_bucket.getString())
+                it.icon = newBucket[0].uri.imageSaveToDisk(name, MUSIC_BUCKET)
                 musicDAO.updateMusicBucket(it)
             }
             it.size = newBucket.size

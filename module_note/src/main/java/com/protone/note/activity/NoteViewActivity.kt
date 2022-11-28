@@ -31,6 +31,7 @@ class NoteViewActivity :
     ) {
     override val viewModel: NoteViewViewModel by viewModels()
 
+    @JvmField
     @Autowired(name = RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
     var noteName: String? = null
 

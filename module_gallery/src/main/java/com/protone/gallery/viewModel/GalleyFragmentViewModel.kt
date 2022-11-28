@@ -7,8 +7,8 @@ import com.protone.common.R
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
-import com.protone.common.database.MediaAction
-import com.protone.common.database.dao.DatabaseBridge
+import com.protone.component.database.MediaAction
+import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import kotlinx.coroutines.Dispatchers

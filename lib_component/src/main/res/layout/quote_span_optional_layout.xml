@@ -82,7 +82,7 @@
 
         </LinearLayout>
 
-        <com.protone.component.customView.colorPicker.MyColorPicker
+        <com.protone.component.view.customView.colorPicker.MyColorPicker
             android:id="@+id/color_picker"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

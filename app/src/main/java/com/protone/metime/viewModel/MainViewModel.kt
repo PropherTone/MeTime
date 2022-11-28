@@ -5,9 +5,9 @@ import com.protone.common.R
 import com.protone.common.baseType.toBitmap
 import com.protone.common.context.MApplication
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.media.photoInToday
-import com.protone.common.media.randomNote
-import com.protone.common.media.videoInToday
+import com.protone.component.database.photoInToday
+import com.protone.component.database.randomNote
+import com.protone.component.database.videoInToday
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers

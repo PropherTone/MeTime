@@ -6,12 +6,15 @@ import androidx.databinding.ViewDataBinding
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.*
-import com.protone.common.database.dao.DatabaseBridge
+import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.component.databinding.GalleryOptionPopBinding
-import com.protone.component.dialog.cateDialog
-import com.protone.component.dialog.checkListDialog
-import com.protone.component.dialog.titleDialog
+import com.protone.component.view.dialog.cateDialog
+import com.protone.component.view.dialog.checkListDialog
+import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.component.popWindows.GalleryOptionPop
 import kotlinx.coroutines.Dispatchers
@@ -175,16 +178,11 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
             }
         }, addCon = {
             launchDefault {
-
-                startActivityForResult(
-                    GalleryActivity::class.intent.also { intent ->
-                        intent.putExtra(
-                            GalleryViewModel.CHOOSE_MODE,
-                            GalleryViewModel.CHOOSE_MEDIA
-                        )
-                    }
-                ).let { result ->
-                    val uri = result?.data?.getStringExtra(GalleryViewModel.URI)
+                startActivityForResult(RouterPath.GalleryRouterPath.Main) {
+                    galleryMainPostcard(CHOOSE_MEDIA)
+                }.let { result ->
+                    val uri =
+                        result?.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.URI)
                     if (uri != null) {
                         addCate(uri, gms)
                     } else showFailedToast()

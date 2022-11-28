@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/small_elevation"
-        android:background="@drawable/oval_background_white"
+        android:background="@drawable/oval_background"
         android:paddingTop="@dimen/main_padding"
         android:paddingBottom="@dimen/main_padding">
 

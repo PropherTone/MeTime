@@ -10,7 +10,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
 import com.protone.common.context.root
-import com.protone.common.database.userConfig
+import com.protone.component.database.userConfig
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUriJson
@@ -31,6 +31,7 @@ class GalleryActivity :
     BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: GalleryViewModel by viewModels()
 
+    @JvmField
     @Autowired(name = RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE)
     var chooseType: String? = null
 
