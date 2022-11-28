@@ -168,6 +168,10 @@ class DatabaseBridge : DatabaseHelper() {
             }
         }
 
+        fun updateSignedMediaAsync(media: GalleryMedia) = execute {
+            updateSignedMedia(media)
+        }
+
         fun deleteSignedMediaAsync(media: GalleryMedia) {
             execute {
                 deleteSignedMedia(media)
@@ -176,6 +180,20 @@ class DatabaseBridge : DatabaseHelper() {
 
         fun updateMediaMultiAsync(list: MutableList<GalleryMedia>) {
             execute { list.forEach { updateSignedMedia(it) } }
+        }
+
+        fun insertMediaAsync(media: GalleryMedia) = execute {
+            insertSignedMedia(media)
+        }
+
+        fun deleteSignedMediasByGalleryAsync(gallery: String) = execute {
+            deleteSignedMediasByGallery(gallery)
+        }
+
+        fun deleteGalleryBucketAsync(galleryBucket: GalleryBucket) {
+            execute {
+                deleteGalleryBucket(galleryBucket)
+            }
         }
 
         suspend fun insertSignedMediaChecked(media: GalleryMedia): GalleryMedia? {
@@ -187,13 +205,6 @@ class DatabaseBridge : DatabaseHelper() {
             } else {
                 insertSignedMedia(media)
                 media
-            }
-        }
-
-
-        fun deleteGalleryBucketAsync(galleryBucket: GalleryBucket) {
-            execute {
-                deleteGalleryBucket(galleryBucket)
             }
         }
 

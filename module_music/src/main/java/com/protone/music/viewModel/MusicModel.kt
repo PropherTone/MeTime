@@ -1,10 +1,7 @@
 package com.protone.music.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.common.baseType.bufferCollect
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.imageSaveToDisk
-import com.protone.common.baseType.withIOContext
+import com.protone.common.baseType.*
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
@@ -59,8 +56,15 @@ class MusicModel : BaseViewModel() {
     }
 
     suspend fun getCurrentMusicList(bucket: MusicBucket): MutableList<Music> =
-        withContext(Dispatchers.IO) {
-            musicDAO.getMusicWithMusicBucket(bucket.musicBucketId) as MutableList<Music>
+        musicDAO.run {
+            (getMusicWithMusicBucket(bucket.musicBucketId) as MutableList<Music>).let {
+                if (it.isEmpty())
+                    getMusicBucketByName(bucket.name)
+                        ?.musicBucketId
+                        ?.let { id -> getMusicWithMusicBucket(id) as MutableList<Music> }
+                        ?: mutableListOf()
+                else it
+            }
         }
 
     suspend fun getBucketRefreshed(name: String) = withIOContext {
@@ -68,7 +72,7 @@ class MusicModel : BaseViewModel() {
             it.size
             val newBucket = musicDAO.getMusicWithMusicBucket(it.musicBucketId)
             if (it.size == 0 && newBucket.isNotEmpty()) {
-                it.icon = newBucket[0].uri.imageSaveToDisk(name, MUSIC_BUCKET)
+                it.icon = newBucket[0].uri.toBitmap()?.saveToFile(name, MUSIC_BUCKET)
                 musicDAO.updateMusicBucket(it)
             }
             it.size = newBucket.size
@@ -80,9 +84,7 @@ class MusicModel : BaseViewModel() {
         musicDAO.getMusicBucketByName(name)
 
     suspend fun getLastMusicBucket(list: MutableList<MusicBucket>): MusicBucket =
-        withContext(Dispatchers.Default) {
-            list.find { it.name == lastBucket } ?: MusicBucket()
-        }
+        withContext(Dispatchers.Default) { list.find { it.name == lastBucket } ?: MusicBucket() }
 
     suspend fun getMusicBuckets(): MutableList<MusicBucket> = withContext(Dispatchers.IO) {
         musicDAO.run {

@@ -9,6 +9,8 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import com.protone.common.baseType.bufferCollect
+import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.launchIO
 import com.protone.common.baseType.toast
 import com.protone.common.context.workIntentFilter
 import com.protone.component.database.dao.DatabaseBridge
@@ -97,7 +99,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     }
 
     private fun updateMusic(uri: Uri) {
-        launch(Dispatchers.IO) {
+        launchDefault {
             scanAudioWithUri(uri) {
                 DatabaseBridge.instance.musicDAOBridge.insertMusicCheck(it)
             }
@@ -117,7 +119,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
         DatabaseBridge.instance.musicDAOBridge.run {
             val allMusic = mutableListOf<Music>()
-            launch(Dispatchers.IO) {
+            launchDefault {
                 getAllMusic()?.let { allMusic.addAll(it) }
                 flow {
                     scanAudio { _, music ->
@@ -137,7 +139,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         }
     }
 
-    private fun updateGallery(uri: Uri) = launch(Dispatchers.IO) {
+    private fun updateGallery(uri: Uri) = launchIO {
         if (!isUriExist(uri)) {
             DatabaseBridge.instance.galleryDAOBridge.deleteSignedMediaByUri(uri)
             Log.d(TAG, "updateGallery(uri: Uri):!isUriExist 相册更新完毕")
@@ -155,14 +157,14 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     }
 
     private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
-        launch(Dispatchers.Default) {
+        launchDefault {
+            val allSignedMedia = getAllSignedMedia() as MutableList
             val sortMedias = async(Dispatchers.Default) {
                 val allGallery = getAllGallery() as MutableList<String>
                 sortGalleries(allGallery)
                 allGallery.forEach {
-                    deleteSignedMediasByGallery(it)
+                    deleteSignedMediasByGalleryAsync(it)
                 }
-                val allSignedMedia = getAllSignedMedia() as MutableList
                 flow {
                     allSignedMedia.forEach {
                         if (!isUriExist(it.uri)) {
@@ -170,13 +172,14 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                         }
                     }
                 }.bufferCollect {
-                    deleteSignedMedia(it)
+                    deleteSignedMediaAsync(it)
+                    allSignedMedia.remove(it)
                 }
             }
 
-            val allSignedMedia = getAllSignedMedia()
+            sortMedias.await()
 
-            suspend fun sortMedia(
+            fun sortMedia(
                 dao: DatabaseBridge.GalleryDAOBridge,
                 allSignedMedia: List<GalleryMedia>?,
                 it: GalleryMedia
@@ -185,13 +188,13 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     allSignedMedia.indexOf(it).let { index ->
                         if (index != -1) {
                             if (allSignedMedia[index] == it) return@let
-                            dao.updateSignedMedia(it)
+                            dao.updateSignedMediaAsync(it)
                         } else {
-                            dao.insertSignedMedia(it)
+                            dao.insertMediaAsync(it)
                         }
                     }
                 } else {
-                    dao.insertSignedMedia(it)
+                    dao.insertMediaAsync(it)
                 }
             }
 
