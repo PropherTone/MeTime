@@ -35,6 +35,12 @@ android {
     }
 }
 
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+    }
+}
+
 dependencies {
 
     implementation project(path: ':lib_component')
@@ -53,5 +59,6 @@ dependencies {
     api libs.bundles.baseLibs
     api libs.bundles.componentLibs
 
+    kapt libs.arouter.compiler
 
 }

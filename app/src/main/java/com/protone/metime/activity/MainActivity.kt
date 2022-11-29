@@ -128,7 +128,7 @@ class MainActivity :
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
                     if (userConfig.lockMusic == "")
-                        startActivity(RouterPath.MusicRouterPath.MusicPlayer)
+                        startActivity(RouterPath.MusicRouterPath.Main)
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig -> {
 //                    startActivity(UserConfigActivity::class.intent)
