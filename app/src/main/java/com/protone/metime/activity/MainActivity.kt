@@ -11,6 +11,7 @@ import com.protone.component.database.dao.DatabaseBridge
 import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
 import com.protone.common.utils.displayUtils.imageLoader.Image
@@ -143,7 +144,7 @@ class MainActivity :
             binding.photoCardTitle.text = media.date.toDateString("yyyy/MM/dd")
             binding.timePhoto.setOnClickListener {
                 startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                    galleryViewPostcard(media.toJson(), false, R.string.all_gallery.getString())
+                    galleryViewPostcard(media.toJson(), false, ALL_GALLERY)
                 }
             }
         }
@@ -152,7 +153,7 @@ class MainActivity :
             binding.videoCardTitle.text = media.date.toDateString()
             binding.videoPlayer.setFullScreen {
                 startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                    galleryViewPostcard(media.toJson(), true, R.string.all_gallery.getString())
+                    galleryViewPostcard(media.toJson(), true, ALL_GALLERY)
                 }
             }
         }

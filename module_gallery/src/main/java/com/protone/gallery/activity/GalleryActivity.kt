@@ -5,17 +5,16 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
 import com.protone.common.context.root
-import com.protone.component.database.userConfig
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUriJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
+import com.protone.component.database.userConfig
 import com.protone.gallery.adapter.MyFragmentStateAdapter
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryFragment
@@ -31,10 +30,6 @@ class GalleryActivity :
     BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: GalleryViewModel by viewModels()
 
-    @JvmField
-    @Autowired(name = RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE)
-    var chooseType: String? = null
-
     override fun createView(): GalleryActivityBinding {
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GalleryActivity
@@ -44,7 +39,8 @@ class GalleryActivity :
     }
 
     override suspend fun GalleryViewModel.init() {
-        val chooseType = this@GalleryActivity.chooseType ?: ""
+        val chooseType =
+            intent.extras?.getString(RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE) ?: ""
 
         if (chooseType.isNotEmpty()) {
             binding.galleryActionMenu.isVisible = false

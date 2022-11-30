@@ -87,8 +87,8 @@ class NoteEditActivity :
 
     override suspend fun NoteEditViewModel.init() {
         binding.noteEditRichNote.setRichList(listOf(RichNoteStates("")))
-        val contentTitle = intent.getStringExtra(NoteEditViewModel.CONTENT_TITLE)
-        val noteName = intent.getStringExtra(NoteEditViewModel.NOTE)
+        val contentTitle = intent?.extras?.getString(NoteEditViewModel.CONTENT_TITLE)
+        val noteName = intent?.extras?.getString(NoteEditViewModel.NOTE)
         if (contentTitle != null) {
             title = contentTitle
             initEditor(
@@ -188,7 +188,7 @@ class NoteEditActivity :
             indexedRichNote.first
         )
         if (onEdit) {
-            if (intent.getStringExtra(NoteEditViewModel.NOTE) == null) {
+            if (intent?.extras?.getString(NoteEditViewModel.NOTE) == null) {
                 setResult(RESULT_CANCELED)
                 finish()
                 return
@@ -204,7 +204,7 @@ class NoteEditActivity :
             if (re == -1) {
                 insertNote(
                     inNote,
-                    intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
+                    intent?.extras?.getString(NoteEditViewModel.NOTE_DIR)
                 ).let { result ->
                     if (result) {
                         setResult(
@@ -225,7 +225,7 @@ class NoteEditActivity :
         } else if (
             insertNote(
                 note.apply { imagePath = saveIcon(checkedTitle) },
-                intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
+                intent?.extras?.getString(NoteEditViewModel.NOTE_DIR)
             )
         ) {
             finish()

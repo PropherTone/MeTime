@@ -5,17 +5,12 @@ import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.component.database.userConfig
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.BaseViewModel
 import java.util.stream.Collectors
 import kotlin.streams.toList
 
 class GalleryViewViewModel : BaseViewModel() {
-
-    companion object {
-        const val MEDIA = "GalleryViewActivity:MediaData"
-        const val IS_VIDEO = "GalleryViewActivity:IsVideo"
-        const val GALLERY = "GalleryViewActivity:Gallery"
-    }
 
     sealed class GalleryViewEvent : ViewEvent {
         object SetNote : GalleryViewEvent()
@@ -29,8 +24,8 @@ class GalleryViewViewModel : BaseViewModel() {
         var allMedia = (galleryDAO.let {
             if (userConfig.combineGallery) it.getAllSignedMedia() else it.getAllMediaByType(isVideo)
         } ?: mutableListOf()) as MutableList<GalleryMedia>
-        if (gallery != R.string.all_gallery.getString()) allMedia =
-            allMedia.stream().filter {
+        if (gallery != ALL_GALLERY)
+            allMedia = allMedia.stream().filter {
                 (it.bucket == gallery) || (it.type?.contains(gallery) == true)
             }.collect(Collectors.toList())
         galleryMedias = allMedia

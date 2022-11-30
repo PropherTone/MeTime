@@ -27,7 +27,6 @@
     <string name="music_bucket_name">歌单名称</string>
     <string name="description">描述</string>
     <string name="test_title">这是个标题这是个标题</string>
-    <string name="all_gallery">全部</string>
     <string name="no_permission">未取得权限</string>
     <string name="unknown_error">未知错误</string>
     <string name="failed_msg">好像没有成功哦</string>

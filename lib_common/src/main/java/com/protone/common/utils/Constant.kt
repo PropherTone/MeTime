@@ -1,6 +1,7 @@
 package com.protone.common.utils
 
 import android.net.Uri
+import android.os.Bundle
 import android.provider.MediaStore
 import com.alibaba.android.arouter.facade.Postcard
 import com.protone.common.R
@@ -9,6 +10,7 @@ import com.protone.common.utils.json.toJson
 
 const val TAG = "MeTimeLogTAG"
 
+const val ALL_GALLERY = "全部"
 const val ALL_MUSIC = "全部音乐"
 const val MUSIC_BUCKET = "MusicBucket"
 
@@ -39,7 +41,9 @@ class RouterPath {
 
             fun Postcard.galleryMainPostcard(
                 chooseMode: String
-            ): Postcard = withString(CHOOSE_MODE, chooseMode)
+            ): Postcard = with(Bundle().apply {
+                putString(CHOOSE_MODE, chooseMode)
+            })
         }
 
         object GalleryViewWire {
@@ -51,9 +55,11 @@ class RouterPath {
                 mediaJson: String,
                 isVideo: Boolean,
                 targetGallery: String = "全部"
-            ): Postcard = withString(MEDIA, mediaJson)
-                .withBoolean(IS_VIDEO, isVideo)
-                .withString(GALLERY, targetGallery)
+            ): Postcard = with(Bundle().apply {
+                putString(MEDIA, mediaJson)
+                putBoolean(IS_VIDEO, isVideo)
+                putString(GALLERY, targetGallery)
+            })
         }
     }
 
@@ -67,7 +73,9 @@ class RouterPath {
             const val NOTE_NAME = "NOTE_NAME"
 
             fun Postcard.noteViewPostcard(noteName: String): Postcard =
-                withString(NOTE_NAME, noteName)
+                with(Bundle().apply {
+                    putString(NOTE_NAME, noteName)
+                })
         }
     }
 
@@ -85,7 +93,10 @@ class RouterPath {
             const val PICK_MUSIC = "PICK"
             const val SEARCH_MUSIC = "SEARCH"
 
-            fun Postcard.pickMusicPostcard(mode: String): Postcard = withString(MODE, mode)
+            fun Postcard.pickMusicPostcard(mode: String): Postcard =
+                with(Bundle().apply {
+                    putString(MODE, mode)
+                })
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.protone.music.activity
 
+import android.os.Bundle
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.marginBottom
@@ -8,10 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.baseType.getDrawable
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.toBitmap
-import com.protone.common.baseType.toast
+import com.protone.common.baseType.*
 import com.protone.common.context.*
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
@@ -36,7 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.Main)
-class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicModel.MusicEvent>(true),
+class MusicActivity :
+    BaseMusicActivity<MusicActivityBinding, MusicModel, MusicModel.MusicEvent>(true),
     StatusImageView.StateListener {
 
     private var doBlur = true
@@ -138,26 +137,24 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                         return@onViewEvent
                     }
                     startActivityForResult(
-                        PickMusicActivity::class.intent.putExtra(
-                            PickMusicViewModel.BUCKET_NAME,
-                            it.bucket
-                        )
+                        PickMusicActivity::class.intent.putExtras {
+                            putString(PickMusicViewModel.BUCKET_NAME, it.bucket)
+                        }
                     ).run {
                         getBucketRefreshed(it.bucket)?.let { mb ->
                             refreshListAndBucket(mb)
                         }
                     }
                 }
-                is MusicModel.MusicEvent.Edit -> withContext(Dispatchers.Default) {
+                is MusicModel.MusicEvent.Edit -> withDefaultContext {
                     if (it.bucket == ALL_MUSIC) {
                         com.protone.common.R.string.bruh.getString().toast()
-                        return@withContext
+                        return@withDefaultContext
                     }
                     val ar = startActivityForResult(
-                        AddBucketActivity::class.intent.putExtra(
-                            AddBucketViewModel.BUCKET_NAME,
-                            it.bucket
-                        )
+                        AddBucketActivity::class.intent.putExtras {
+                            putString(AddBucketViewModel.BUCKET_NAME, it.bucket)
+                        }
                     )
                     ar?.also { re ->
                         if (re.resultCode != RESULT_OK) return@also
@@ -199,9 +196,11 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicM
                 }
                 is MusicModel.MusicEvent.Search ->
                     startActivity(
-                        PickMusicActivity::class.intent
-                            .putExtra(PickMusicViewModel.BUCKET_NAME, lastBucket)
-                            .putExtra(PickMusicViewModel.MODE, PickMusicViewModel.SEARCH_MUSIC)
+                        PickMusicActivity::class.intent.putExtras {
+                            putString(PickMusicViewModel.BUCKET_NAME, lastBucket)
+                            putString(PickMusicViewModel.MODE, PickMusicViewModel.SEARCH_MUSIC)
+                        }
+
                     )
             }
         }

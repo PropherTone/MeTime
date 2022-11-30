@@ -11,6 +11,7 @@ import com.protone.component.database.MediaAction
 import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.ALL_GALLERY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -50,9 +51,7 @@ class GalleryFragmentViewModel : ViewModel() {
 
     fun getGallery(gallery: String) = galleryMap[gallery]
 
-    fun getGalleryName() = if (rightGallery == "") {
-        R.string.all_gallery.getString()
-    } else rightGallery
+    fun getGalleryName() = if (rightGallery == "") { ALL_GALLERY } else rightGallery
 
     fun getBucket(bucket: String) = Pair(
         if ((getGallery(bucket)?.size ?: 0) > 0) {
@@ -62,11 +61,11 @@ class GalleryFragmentViewModel : ViewModel() {
     )
 
     fun onTargetGallery(bucket: String): Boolean {
-        return bucket == rightGallery || rightGallery == R.string.all_gallery.getString()
+        return bucket == rightGallery || rightGallery == ALL_GALLERY
     }
 
     fun sortData(combine: Boolean) = viewModelScope.launch(Dispatchers.Default) {
-        galleryMap[R.string.all_gallery.getString()] = mutableListOf()
+        galleryMap[ALL_GALLERY] = mutableListOf()
         DatabaseBridge.instance
             .galleryDAOBridge
             .run {
@@ -78,13 +77,13 @@ class GalleryFragmentViewModel : ViewModel() {
                     return@launch
                 }
                 signedMedias.let {
-                    galleryMap[R.string.all_gallery.getString()] = it
+                    galleryMap[ALL_GALLERY] = it
                     sendEvent(
                         FragEvent.OnNewBucket(
                             Pair(
                                 if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
                                 arrayOf(
-                                    R.string.all_gallery.getString(),
+                                    ALL_GALLERY,
                                     signedMedias.size.toString()
                                 )
                             )
@@ -167,7 +166,7 @@ class GalleryFragmentViewModel : ViewModel() {
 
     private fun observeGallery() {
         viewModelScope.launch(Dispatchers.Default) {
-            val allGallery = R.string.all_gallery.getString()
+            val allGallery = ALL_GALLERY
             fun sortDeleteMedia(
                 media: GalleryMedia,
                 map: MutableMap<String?, MutableList<GalleryMedia>>

@@ -2,6 +2,7 @@ package com.protone.common.context
 
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Bundle
 import kotlin.reflect.KClass
 
 const val MUSIC_PLAY = "ControlMusic"
@@ -51,3 +52,10 @@ val appIntentFilter: IntentFilter
 
 val KClass<*>.intent
     get() = Intent(MApplication.app, this.java)
+
+inline fun Intent.putExtras(block: Bundle.() -> Unit): Intent {
+    return Bundle().let {
+        block(it)
+        putExtras(it)
+    }
+}

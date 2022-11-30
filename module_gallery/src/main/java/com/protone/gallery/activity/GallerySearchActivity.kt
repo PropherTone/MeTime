@@ -12,9 +12,14 @@ import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.linkInput
+import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
 import com.protone.common.utils.SearchModel
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseMediaActivity
@@ -124,13 +129,10 @@ class GallerySearchActivity : BaseMediaActivity<
     }
 
     override fun openView(galleryMedia: GalleryMedia) {
-        startActivity(GalleryViewActivity::class.intent.apply {
-            putExtra(GalleryViewViewModel.MEDIA, galleryMedia.toJson())
-            putExtra(GalleryViewViewModel.IS_VIDEO, galleryMedia.isVideo)
-            putExtra(
-                GalleryViewViewModel.GALLERY,
-                intent.getStringExtra("gallery") ?: R.string.all_gallery.getString()
-            )
+        startActivity(GalleryViewActivity::class.intent.putExtras {
+            putString(MEDIA, galleryMedia.toJson())
+            putBoolean(IS_VIDEO, galleryMedia.isVideo)
+            putString(GALLERY, intent.extras?.getString("gallery") ?: ALL_GALLERY)
         })
     }
 

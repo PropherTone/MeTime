@@ -61,11 +61,11 @@ class PickMusicActivity :
     }
 
     override suspend fun PickMusicViewModel.init() {
-        val mode = intent.getStringExtra(PickMusicViewModel.MODE)
+        val mode = intent?.extras?.getString(PickMusicViewModel.MODE)
 
         val bucket = when (mode) {
             PickMusicViewModel.PICK_MUSIC -> ALL_MUSIC
-            else -> intent.getStringExtra(PickMusicViewModel.BUCKET_NAME)
+            else -> intent?.extras?.getString(PickMusicViewModel.BUCKET_NAME)
         }
 
         if (bucket != null) {

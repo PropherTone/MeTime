@@ -2,12 +2,12 @@ package com.protone.note.activity
 
 import android.net.Uri
 import androidx.activity.viewModels
-import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
+import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.utils.RouterPath
@@ -31,10 +31,6 @@ class NoteViewActivity :
     ) {
     override val viewModel: NoteViewViewModel by viewModels()
 
-    @JvmField
-    @Autowired(name = RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
-    var noteName: String? = null
-
     private var binder: MusicBinder? = null
 
     override fun createView(): NoteViewActivityBinding {
@@ -47,7 +43,7 @@ class NoteViewActivity :
     override suspend fun NoteViewViewModel.init() {
         bindMusicService { binder = it }
 
-        noteName?.let {
+        intent.extras?.getString(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)?.let {
             noteQueue.offer(it)
             initSeen(noteQueue.poll())
         }
@@ -111,8 +107,8 @@ class NoteViewActivity :
 
     private suspend fun edit() = viewModel.apply {
         val re = startActivityForResult(
-            NoteEditActivity::class.intent.also { intent ->
-                intent.putExtra(
+            NoteEditActivity::class.intent.putExtras {
+                putString(
                     NoteEditViewModel.NOTE,
                     this@NoteViewActivity.intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
                 )

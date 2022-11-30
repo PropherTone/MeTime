@@ -10,13 +10,21 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.alibaba.android.arouter.facade.annotation.Autowired
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.protone.common.R
 import com.protone.common.baseType.getStorageSize
+import com.protone.common.baseType.getString
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.intent
+import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.ALL_GALLERY
+import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteViewWire.noteViewPostcard
 import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUri
@@ -25,10 +33,6 @@ import com.protone.component.BaseMediaActivity
 import com.protone.component.view.adapter.CatoListAdapter
 import com.protone.component.view.adapter.CheckListAdapter
 import com.protone.gallery.databinding.GalleryViewActivityBinding
-import com.protone.common.R
-import com.protone.common.baseType.getString
-import com.protone.common.utils.RouterPath
-import com.protone.common.utils.RouterPath.NoteRouterPath.NoteViewWire.noteViewPostcard
 import com.protone.gallery.fragment.GalleryViewFragment
 import com.protone.gallery.viewModel.GalleryViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -42,18 +46,6 @@ class GalleryViewActivity : BaseMediaActivity<
         GalleryViewViewModel,
         GalleryViewViewModel.GalleryViewEvent>(true) {
     override val viewModel: GalleryViewViewModel by viewModels()
-
-    @JvmField
-    @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA)
-    var mediaJson: String? = null
-
-    @JvmField
-    @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO)
-    var isVideo: Boolean = false
-
-    @JvmField
-    @Autowired(name = RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY)
-    var targetGallery: String = R.string.all_gallery.getString()
 
     override fun createView(): GalleryViewActivityBinding {
         return GalleryViewActivityBinding.inflate(layoutInflater, root, false).apply {
@@ -72,7 +64,7 @@ class GalleryViewActivity : BaseMediaActivity<
                 layoutManager = LinearLayoutManager(context)
                 adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
                     it.startNote = {
-                        startActivity(RouterPath.NoteRouterPath.NoteView){ noteViewPostcard(it) }
+                        startActivity(RouterPath.NoteRouterPath.NoteView) { noteViewPostcard(it) }
                     }
                 }
             }
@@ -88,9 +80,9 @@ class GalleryViewActivity : BaseMediaActivity<
                     it.setItemClick { cate ->
                         launch {
                             val media = viewModel.getMediaByUri(cate.toUri())
-                            startActivity(GalleryViewActivity::class.intent.apply {
-                                putExtra(GalleryViewViewModel.MEDIA, media?.toJson())
-                                putExtra(GalleryViewViewModel.IS_VIDEO, media?.isVideo)
+                            startActivity(GalleryViewActivity::class.intent.putExtras {
+                                putString(MEDIA, media?.toJson())
+                                putBoolean(IS_VIDEO, media?.isVideo ?: false)
                             })
                         }
                     }
@@ -100,7 +92,13 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     override suspend fun GalleryViewViewModel.init() {
-        initGalleryData(targetGallery, isVideo)
+        intent.extras.let {
+            val targetGallery =
+                it?.getString(GALLERY) ?: ALL_GALLERY
+            val isVideo =
+                it?.getBoolean(IS_VIDEO) ?: false
+            initGalleryData(targetGallery, isVideo)
+        }
 
         val mediaIndex = getMediaIndex()
         initViewPager(mediaIndex, galleryMedias) { position ->
@@ -139,7 +137,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     private fun GalleryViewViewModel.setMediaInfo(position: Int) {
-        if (position < galleryMedias.size - 1) {
+        if (position > 0 && position < galleryMedias.size - 1) {
             galleryMedias[position].let { m ->
                 setMediaInfo(
                     m.name,
@@ -152,11 +150,12 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     private suspend fun GalleryViewViewModel.getMediaIndex() = onResult { co ->
-        val galleryMedia = mediaJson?.toEntity(GalleryMedia::class.java)
+        val galleryMedia = intent.extras
+            ?.getString(MEDIA)
+            ?.toEntity(GalleryMedia::class.java)
         val indexOf = galleryMedias.indexOf(galleryMedia)
         curPosition = indexOf
         co.resumeWith(Result.success(indexOf))
-
     }
 
     private fun initViewPager(

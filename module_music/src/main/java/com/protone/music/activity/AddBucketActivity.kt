@@ -62,7 +62,7 @@ class AddBucketActivity : BaseActivity<
     }
 
     override suspend fun AddBucketViewModel.init() {
-        editName = intent.getStringExtra(AddBucketViewModel.BUCKET_NAME)
+        editName = intent?.extras?.getString(AddBucketViewModel.BUCKET_NAME)
         editName?.let { eName ->
             musicBucket = getMusicBucketByName(eName)
             if (musicBucket == null) {

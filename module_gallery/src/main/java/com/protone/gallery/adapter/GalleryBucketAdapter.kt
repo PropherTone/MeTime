@@ -12,6 +12,7 @@ import com.protone.common.context.MApplication
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.R
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryBucketListLayoutBinding
 
@@ -42,7 +43,7 @@ class GalleryBucketAdapter(
                 }
             }
             is GalleryBucketEvent.RefreshBucket -> {
-                if (data.bucket.second[0] != R.string.all_gallery.getString() &&
+                if (data.bucket.second[0] != ALL_GALLERY &&
                     data.bucket.second[1].toInt() <= 0
                 ) {
                     galleries.find { data.bucket.second[0] == it.second[0] }

@@ -10,6 +10,7 @@ import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
+import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.component.database.MediaAction
 import com.protone.common.entity.Note
@@ -43,8 +44,8 @@ class NoteActivity :
             this as NoteListListAdapter
             this.noteListEventListener = object : NoteListListAdapter.NoteListEvent {
                 override fun onNote(title: String) {
-                    startActivity(NoteViewActivity::class.intent.also {
-                        it.putExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, title)
+                    startActivity(NoteViewActivity::class.intent.putExtras {
+                        putString(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, title)
                     })
                 }
 
@@ -56,7 +57,9 @@ class NoteActivity :
             }
         }
         addNoteType {
-            startActivity(NoteEditActivity::class.intent.putExtra(NoteEditViewModel.NOTE_DIR, it))
+            startActivity(NoteEditActivity::class.intent.putExtras {
+                putString(NoteEditViewModel.NOTE_DIR, it)
+            })
         }
         onTypeSelected { type ->
             launch {

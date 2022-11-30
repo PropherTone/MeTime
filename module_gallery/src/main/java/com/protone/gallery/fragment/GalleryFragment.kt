@@ -20,8 +20,13 @@ import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.onGlobalLayout
+import com.protone.common.context.putExtras
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.IntentDataHolder
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.json.toJson
 import com.protone.component.view.dialog.titleDialog
@@ -85,7 +90,7 @@ class GalleryFragment(
                                     getListAdapter().selectList
                                 } else {
                                     getGallery(getGalleryName())
-                                        ?: getGallery(R.string.all_gallery.getString())
+                                        ?: getGallery(ALL_GALLERY)
                                 })
                             )
                             startActivity(PictureBoxActivity::class.intent)
@@ -147,7 +152,7 @@ class GalleryFragment(
 
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
-                            onGallerySelected(R.string.all_gallery.getString())
+                            onGallerySelected(ALL_GALLERY)
                         }
                         viewModel.isBucketShowUp = false
                         galleryToolButton.isVisible = onSelectMod
@@ -159,8 +164,8 @@ class GalleryFragment(
             gallerySearch.setOnClickListener {
                 val gallery = viewModel.getGalleryName()
                 IntentDataHolder.put(viewModel.getGallery(gallery))
-                startActivity(GallerySearchActivity::class.intent.also { intent ->
-                    intent.putExtra("gallery", gallery)
+                startActivity(GallerySearchActivity::class.intent.putExtras {
+                    putString("gallery", gallery)
                 })
             }
             galleryToolButton.setOnClickListener {
@@ -231,7 +236,7 @@ class GalleryFragment(
     private fun refreshBucket(media: GalleryMedia): Unit = viewModel.run {
         getBucketAdapter().apply {
             refreshBucket(getBucket(media.bucket))
-            refreshBucket(getBucket(R.string.all_gallery.getString()))
+            refreshBucket(getBucket(ALL_GALLERY))
         }
     }
 
@@ -276,10 +281,10 @@ class GalleryFragment(
     }
 
     override fun openView(galleryMedia: GalleryMedia) {
-        startActivity(GalleryViewActivity::class.intent.apply {
-            putExtra(GalleryViewViewModel.MEDIA, galleryMedia.toJson())
-            putExtra(GalleryViewViewModel.IS_VIDEO, galleryMedia.isVideo)
-            putExtra(GalleryViewViewModel.GALLERY, viewModel.getGalleryName())
+        startActivity(GalleryViewActivity::class.intent.putExtras {
+            putString(MEDIA, galleryMedia.toJson())
+            putBoolean(IS_VIDEO, galleryMedia.isVideo)
+            putString(GALLERY, viewModel.getGalleryName())
         })
     }
 
