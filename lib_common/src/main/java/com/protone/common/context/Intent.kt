@@ -55,7 +55,7 @@ val KClass<*>.intent
 
 inline fun Intent.putExtras(block: Bundle.() -> Unit): Intent {
     return Bundle().let {
-        block(it)
+        it.block()
         putExtras(it)
     }
 }

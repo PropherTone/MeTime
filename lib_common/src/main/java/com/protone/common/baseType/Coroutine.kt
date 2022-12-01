@@ -5,32 +5,32 @@ import kotlinx.coroutines.flow.*
 
 inline fun CoroutineScope.launchDefault(crossinline func: suspend CoroutineScope.() -> Unit): Job =
     launch(Dispatchers.Default) {
-        func.invoke(this)
+         this.func()
     }
 
 inline fun CoroutineScope.launchIO(crossinline func: suspend CoroutineScope.() -> Unit) : Job =
     launch(Dispatchers.IO) {
-        func.invoke(this)
+        this.func()
     }
 
 inline fun CoroutineScope.launchMain(crossinline func: suspend CoroutineScope.() -> Unit) : Job =
     launch(Dispatchers.Main) {
-        func.invoke(this)
+        this.func()
     }
 
 suspend inline fun <T> withMainContext(crossinline func: suspend CoroutineScope.() -> T) =
     withContext(Dispatchers.Main) {
-        func.invoke(this)
+         this.func()
     }
 
 suspend inline fun <T> withIOContext(crossinline func: suspend CoroutineScope.() -> T) =
     withContext(Dispatchers.IO) {
-        func.invoke(this)
+         this.func()
     }
 
 suspend inline fun <T> withDefaultContext(crossinline func: suspend CoroutineScope.() -> T) =
     withContext(Dispatchers.Default) {
-        func.invoke(this)
+         this.func()
     }
 
 @Suppress("ObjectLiteralToLambda")
