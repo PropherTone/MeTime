@@ -40,32 +40,6 @@ class NoteActivity :
 
     override suspend fun NoteViewModel.init() {
         initList()
-        binding.noteList.adapter.apply {
-            this as NoteListListAdapter
-            this.noteListEventListener = object : NoteListListAdapter.NoteListEvent {
-                override fun onNote(title: String) {
-                    startActivity(NoteViewActivity::class.intent.putExtras {
-                        putString(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, title)
-                    })
-                }
-
-                override fun onDelete(note: Note) {
-                    titleDialog(R.string.delete.getString(), R.string.delete.getString()) {
-                        this@init.deleteNote(note)
-                    }
-                }
-            }
-        }
-        addNoteType {
-            startActivity(NoteEditActivity::class.intent.putExtras {
-                putString(NoteEditViewModel.NOTE_DIR, it)
-            })
-        }
-        onTypeSelected { type ->
-            launch {
-                refreshNoteList(viewModel.getNoteList(type))
-            }
-        }
 
         refreshList()
 
@@ -124,7 +98,7 @@ class NoteActivity :
     }
 
     private suspend fun refreshList() {
-        refreshNoteList(viewModel.queryAllNote())
+        refreshNoteList(viewModel.getNoteList(NoteDir(R.string.all.getString(), null)))
         refreshNoteType(viewModel.queryAllNoteType())
     }
 
@@ -132,26 +106,38 @@ class NoteActivity :
         binding.apply {
             noteList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
-                it.adapter = NoteListListAdapter(this@NoteActivity)
+                it.adapter = NoteListListAdapter(this@NoteActivity) {
+                    onNote {
+                        startActivity(NoteViewActivity::class.intent.putExtras {
+                            putString(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, it)
+                        })
+                    }
+                    onDelete { note ->
+                        titleDialog(R.string.delete.getString(), R.string.delete.getString()) {
+                            viewModel.deleteNote(note)
+                        }
+                    }
+                }
             }
             noteBucketList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
-                it.adapter = NoteTypeListAdapter(this@NoteActivity,
-                    object : NoteTypeListAdapter.NoteTypeListAdapterDataProxy {
-                        override fun deleteNoteDir(noteType: NoteDir) {
-                            viewModel.deleteNoteDir(noteType)
+                it.adapter = NoteTypeListAdapter(this@NoteActivity) {
+                    addNote {
+                        startActivity(NoteEditActivity::class.intent.putExtras {
+                            putString(NoteEditViewModel.NOTE_DIR, it)
+                        })
+                    }
+                    onTypeSelected {
+                        launch {
+                            refreshNoteList(viewModel.getNoteList(it))
                         }
-                    })
+                    }
+                    deleteNoteDir {
+                        viewModel.deleteNoteDir(it)
+                    }
+                }
             }
         }
-    }
-
-    private fun addNoteType(it: ((String?) -> Unit)?) {
-        getNoteTypeAdapter()?.addNote = it
-    }
-
-    private fun onTypeSelected(it: ((NoteDir) -> Unit)?) {
-        getNoteTypeAdapter()?.onTypeSelected = it
     }
 
     private fun refreshNoteList(list: List<Note>) {

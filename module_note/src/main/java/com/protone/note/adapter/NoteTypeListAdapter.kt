@@ -13,8 +13,12 @@ import com.protone.note.databinding.NoteTpyeListAdapterBinding
 
 class NoteTypeListAdapter(
     context: Context,
-    private val noteTypeListAdapterDataProxy: NoteTypeListAdapterDataProxy
+    block: NoteTypeListAdapterDataProxy.() -> Unit
 ) : SelectListAdapter<NoteTpyeListAdapterBinding, NoteDir, Any>(context) {
+
+    init {
+        NoteTypeListAdapterDataProxy().block()
+    }
 
     private val noteDirList = arrayListOf<NoteDir>()
 
@@ -38,8 +42,6 @@ class NoteTypeListAdapter(
         )
     }
 
-    var addNote: ((String?) -> Unit)? = null
-    var onTypeSelected: ((NoteDir) -> Unit)? = null
 
     override fun onBindViewHolder(holder: Holder<NoteTpyeListAdapterBinding>, position: Int) {
         setSelect(holder, noteDirList[position] in selectList)
@@ -54,7 +56,7 @@ class NoteTypeListAdapter(
                     context.getString(R.string.confirm)
                 ) { dialog, _ ->
                     val noteType = noteDirList[position]
-                    noteTypeListAdapterDataProxy.deleteNoteDir(noteType)
+                    deleteNoteDir?.invoke(noteType)
                     notifyItemRemoved(position)
                     dialog.dismiss()
                 }.setNegativeButton(R.string.cancel.getString()) { dialog, _ ->
@@ -79,18 +81,32 @@ class NoteTypeListAdapter(
     fun setNoteTypeList(list: List<NoteDir>) {
         val size = noteDirList.size
         noteDirList.clear()
-        notifyItemRangeRemoved(0,size)
+        notifyItemRangeRemoved(0, size)
         selectList.clear()
         NoteDir(R.string.all.getString(), "").let {
             noteDirList.add(it)
             selectList.add(it)
         }
         noteDirList.addAll(list)
-        notifyItemRangeInserted(0,noteDirList.size)
+        notifyItemRangeInserted(0, noteDirList.size)
     }
 
-    interface NoteTypeListAdapterDataProxy {
-        fun deleteNoteDir(noteType: NoteDir)
+    private var addNote: ((String?) -> Unit)? = null
+    private var onTypeSelected: ((NoteDir) -> Unit)? = null
+    private var deleteNoteDir: ((NoteDir) -> Unit)? = null
+
+    inner class NoteTypeListAdapterDataProxy {
+        fun addNote(block: (String?) -> Unit) {
+            addNote = block
+        }
+
+        fun onTypeSelected(block: (NoteDir) -> Unit) {
+            onTypeSelected = block
+        }
+
+        fun deleteNoteDir(block: (NoteDir) -> Unit) {
+            deleteNoteDir = block
+        }
     }
 
 }

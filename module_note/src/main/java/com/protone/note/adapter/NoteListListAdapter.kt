@@ -14,19 +14,25 @@ import com.protone.component.view.adapter.BaseListAdapter
 import com.protone.note.databinding.NoteListAdapterLayoutBinding
 import kotlinx.coroutines.launch
 
-class NoteListListAdapter(context: Context) :
-    BaseListAdapter<Note, NoteListAdapterLayoutBinding, NoteListListAdapter.NoteEvent>(
-        context,
-        true,
-        AsyncDifferConfig.Builder(object :
-            DiffUtil.ItemCallback<Note>() {
-            override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean = oldItem == newItem
+class NoteListListAdapter(
+    context: Context,
+    block: NoteListEvent.() -> Unit
+) : BaseListAdapter<Note, NoteListAdapterLayoutBinding, NoteListListAdapter.NoteEvent>(
+    context,
+    true,
+    AsyncDifferConfig.Builder(object :
+        DiffUtil.ItemCallback<Note>() {
+        override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean = oldItem == newItem
 
-            override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean =
-                oldItem.title == newItem.title && oldItem.time == newItem.time
+        override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean =
+            oldItem.title == newItem.title && oldItem.time == newItem.time
 
-        }).build()
-    ) {
+    }).build()
+) {
+
+    init {
+        NoteListEvent().block()
+    }
 
     private val noteList = arrayListOf<Note>()
 
@@ -75,10 +81,10 @@ class NoteListListAdapter(context: Context) :
     override fun onBindViewHolder(holder: Holder<NoteListAdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
             root.setOnClickListener {
-                noteListEventListener?.onNote(currentList[holder.layoutPosition].title)
+                onNote?.invoke(currentList[holder.layoutPosition].title)
             }
             root.setOnLongClickListener {
-                noteListEventListener?.onDelete(currentList[holder.layoutPosition])
+                onDelete?.invoke(currentList[holder.layoutPosition])
                 true
             }
             currentList[holder.layoutPosition].let {
@@ -118,10 +124,17 @@ class NoteListListAdapter(context: Context) :
         }
     }
 
-    var noteListEventListener: NoteListEvent? = null
+    private var onNote: ((title: String) -> Unit)? = null
+    private var onDelete: ((note: Note) -> Unit)? = null
 
-    interface NoteListEvent {
-        fun onNote(title: String)
-        fun onDelete(note: Note)
+    inner class NoteListEvent {
+
+        fun onNote(block: (title: String) -> Unit) {
+            onNote = block
+        }
+
+        fun onDelete(block: (note: Note) -> Unit) {
+            onDelete = block
+        }
     }
 }
