@@ -9,8 +9,12 @@ import com.protone.component.view.adapter.BaseAdapter
 import com.protone.gallery.databinding.GalleryVp2AdapterLayoutBinding
 import kotlinx.coroutines.launch
 
-class GalleryViewPager2Adapter(context: Context, private val data: MutableList<GalleryMedia>) :
-    BaseAdapter<GalleryVp2AdapterLayoutBinding, Any>(context) {
+class GalleryViewPager2Adapter(context: Context,data: MutableList<GalleryMedia>) :
+    BaseAdapter<GalleryMedia,GalleryVp2AdapterLayoutBinding, Any>(context) {
+
+    init {
+        mList.addAll(data)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -20,10 +24,10 @@ class GalleryViewPager2Adapter(context: Context, private val data: MutableList<G
 
     override fun onBindViewHolder(holder: Holder<GalleryVp2AdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
-            if (!data[position].name.contains("gif")) {
-                image.setImageResource(data[position].uri)
+            if (!mList[position].name.contains("gif")) {
+                image.setImageResource(mList[position].uri)
             } else {
-                Image.load(data[position].uri)
+                Image.load(mList[position].uri)
                     .with(context)
                     .skipMemoryCache()
                     .into(image)
@@ -43,5 +47,4 @@ class GalleryViewPager2Adapter(context: Context, private val data: MutableList<G
 
     var onClk: (() -> Unit)? = null
 
-    override fun getItemCount(): Int = data.size
 }

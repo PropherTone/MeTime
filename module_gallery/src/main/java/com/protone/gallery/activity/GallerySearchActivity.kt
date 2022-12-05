@@ -69,7 +69,7 @@ class GallerySearchActivity : BaseMediaActivity<
     private fun newAdapter(list: MutableList<GalleryMedia>) = GalleryListAdapter(
         this@GallerySearchActivity, true
     ).also {
-        it.setMedias(list)
+        it.setData(list)
         it.multiChoose = true
         it.setNewSelectList(viewModel.selectList)
         it.setOnSelectListener(this@GallerySearchActivity)

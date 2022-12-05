@@ -9,7 +9,9 @@ import com.protone.database.room.showRoomDB
 import com.protone.database.room.shutdownDataBase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.emitAll
 
 abstract class DatabaseHelper {
 
@@ -25,22 +27,28 @@ abstract class DatabaseHelper {
     private val _galleryMessenger = MutableSharedFlow<MediaAction.GalleryDataAction>()
     val galleryMessenger = _galleryMessenger.asSharedFlow()
 
-    protected fun sendMusicAction(musicDataAction: MediaAction.MusicDataAction) {
-        execute {
-            _musicMessenger.emit(musicDataAction)
-        }
+    protected suspend fun sendMusicAction(musicDataAction: MediaAction.MusicDataAction) {
+        _musicMessenger.emit(musicDataAction)
     }
 
-    protected fun sendNoteAction(musicDataAction: MediaAction.NoteDataAction) {
-        execute {
-            _noteMessenger.emit(musicDataAction)
-        }
+    protected suspend fun sendNoteAction(noteDataAction: MediaAction.NoteDataAction) {
+        _noteMessenger.emit(noteDataAction)
     }
 
-    protected fun sendGalleryAction(musicDataAction: MediaAction.GalleryDataAction) {
-        execute {
-            _galleryMessenger.emit(musicDataAction)
-        }
+    protected suspend fun sendGalleryAction(galleryDataAction: MediaAction.GalleryDataAction) {
+        _galleryMessenger.emit(galleryDataAction)
+    }
+
+    protected suspend fun sendGalleryAction(galleryDataAction: List<MediaAction.GalleryDataAction>) {
+        _galleryMessenger.emitAll(galleryDataAction.asFlow())
+    }
+
+    protected suspend fun sendMusicAction(musicDataAction: List<MediaAction.MusicDataAction>) {
+        _musicMessenger.emitAll(musicDataAction.asFlow())
+    }
+
+    protected suspend fun sendNoteAction(noteDataAction: List<MediaAction.NoteDataAction>) {
+        _noteMessenger.emitAll(noteDataAction.asFlow())
     }
 
     fun showDataBase(context: Context) {

@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.room.*
 import com.protone.common.utils.converters.UriTypeConverter
 import com.protone.common.entity.GalleryMedia
+import com.protone.database.room.mapToLongList
 
 @Dao
 @TypeConverters(UriTypeConverter::class)
@@ -33,19 +34,34 @@ interface SignedGalleryDAO {
     @Query("DELETE FROM GalleryMedia WHERE bucket LIKE :gallery")
     fun deleteSignedMediasByGallery(gallery: String)
 
-    @Delete
-    fun deleteSignedMedia(media: GalleryMedia)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSignedMedia(media: GalleryMedia): Long
-
     @Query("SELECT * FROM GalleryMedia WHERE media_uri LIKE :uri")
     fun getSignedMedia(uri: Uri): GalleryMedia?
 
     @Query("SELECT * FROM GalleryMedia WHERE path LIKE :path")
     fun getSignedMedia(path: String): GalleryMedia?
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSignedMedia(media: GalleryMedia): Long
+
+    @Transaction
+    fun insertSignedMediaMulti(medias: List<GalleryMedia>): List<Long> {
+        return medias.mapToLongList { insertSignedMedia(it) }
+    }
+
+    @Delete
+    fun deleteSignedMedia(media: GalleryMedia): Int
+
+    @Transaction
+    fun deleteSignedMediaMulti(medias: List<GalleryMedia>): List<Long> {
+        return medias.mapToLongList { deleteSignedMedia(it).toLong() }
+    }
+
     @Update
-    fun updateSignedMedia(galleryMedia: GalleryMedia)
+    fun updateSignedMedia(galleryMedia: GalleryMedia) : Int
+
+    @Transaction
+    fun updateSignedMediaMulti(galleryMedias: List<GalleryMedia>): List<Long> {
+        return galleryMedias.mapToLongList { updateSignedMedia(it).toLong() }
+    }
 
 }

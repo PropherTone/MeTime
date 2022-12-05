@@ -16,6 +16,7 @@ import com.protone.component.database.MediaAction
 import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE_DIR
 import com.protone.component.BaseActivity
 import com.protone.component.view.dialog.titleDialog
 import com.protone.note.adapter.NoteListListAdapter
@@ -124,7 +125,7 @@ class NoteActivity :
                 it.adapter = NoteTypeListAdapter(this@NoteActivity) {
                     addNote {
                         startActivity(NoteEditActivity::class.intent.putExtras {
-                            putString(NoteEditViewModel.NOTE_DIR, it)
+                            putString(NOTE_DIR, it)
                         })
                     }
                     onTypeSelected {

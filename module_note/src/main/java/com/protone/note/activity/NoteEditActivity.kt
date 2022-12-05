@@ -21,6 +21,9 @@ import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GAL
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.RouterPath.MusicRouterPath.PickPostcard.PICK_MUSIC
 import com.protone.common.utils.RouterPath.MusicRouterPath.PickPostcard.pickMusicPostcard
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.CONTENT_TITLE
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE_DIR
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.json.listToJson
@@ -87,8 +90,8 @@ class NoteEditActivity :
 
     override suspend fun NoteEditViewModel.init() {
         binding.noteEditRichNote.setRichList(listOf(RichNoteStates("")))
-        val contentTitle = intent?.extras?.getString(NoteEditViewModel.CONTENT_TITLE)
-        val noteName = intent?.extras?.getString(NoteEditViewModel.NOTE)
+        val contentTitle = intent?.extras?.getString(CONTENT_TITLE)
+        val noteName = intent?.extras?.getString(NOTE)
         if (contentTitle != null) {
             title = contentTitle
             initEditor(
@@ -188,7 +191,7 @@ class NoteEditActivity :
             indexedRichNote.first
         )
         if (onEdit) {
-            if (intent?.extras?.getString(NoteEditViewModel.NOTE) == null) {
+            if (intent?.extras?.getString(NOTE) == null) {
                 setResult(RESULT_CANCELED)
                 finish()
                 return
@@ -199,12 +202,17 @@ class NoteEditActivity :
                 finish()
                 return
             }
-            copyNote(inNote, note)
+            copyNote(
+                inNote,
+                note,
+                binding.noteEditIcon.measuredWidth,
+                binding.noteEditIcon.measuredHeight
+            )
             val re = updateNote(inNote)
             if (re == -1) {
                 insertNote(
                     inNote,
-                    intent?.extras?.getString(NoteEditViewModel.NOTE_DIR)
+                    intent?.extras?.getString(NOTE_DIR)
                 ).let { result ->
                     if (result) {
                         setResult(
@@ -218,17 +226,26 @@ class NoteEditActivity :
                     } else R.string.failed_msg.getString().toast()
                 }
             } else {
-                showProgress(false)
-                setResult(RESULT_OK)
-                finish()
+                showProgress(false) {
+                    setResult(RESULT_OK)
+                    finish()
+                }
             }
         } else if (
             insertNote(
-                note.apply { imagePath = saveIcon(checkedTitle) },
-                intent?.extras?.getString(NoteEditViewModel.NOTE_DIR)
+                note.apply {
+                    imagePath = saveIcon(
+                        checkedTitle,
+                        binding.noteEditIcon.measuredWidth,
+                        binding.noteEditIcon.measuredHeight
+                    )
+                },
+                intent?.extras?.getString(NOTE_DIR)
             )
         ) {
-            finish()
+            showProgress(false) {
+                finish()
+            }
         } else R.string.failed_msg.getString().toast()
     }
 
@@ -258,28 +275,33 @@ class NoteEditActivity :
         Image.load(path).with(this@NoteEditActivity).into(binding.noteEditIcon)
     }
 
-    private suspend fun showProgress(isShow: Boolean) = withContext(Dispatchers.Main) {
-        binding.noteEditProgress.apply {
-            drawable?.let {
-                when (it) {
-                    is Animatable ->
-                        if (isShow) it.start().also { isVisible = true }
-                        else it.stop().also { changeIconAni(binding.noteEditProgress) }
+    private suspend fun showProgress(isShow: Boolean, doOnEnd: (() -> Unit)? = null) =
+        withMainContext {
+            binding.noteEditProgress.apply {
+                drawable?.let {
+                    when (it) {
+                        is Animatable ->
+                            if (isShow) it.start().also { isVisible = true }
+                            else it.stop().also { changeIconAni(binding.noteEditProgress, doOnEnd) }
+                    }
                 }
             }
         }
-    }
 
-    private suspend fun changeIconAni(view: ImageView) = withContext(Dispatchers.Main) {
-        AnimationHelper.apply {
-            animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
-                view.setImageDrawable(com.protone.component.R.drawable.ic_baseline_check_24.getDrawable())
-                animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true, doOnEnd = {
-                    alpha(view, 0f, play = true, doOnEnd = { view.isVisible = false })
-                })
-            }, play = true)
+    private suspend fun changeIconAni(view: ImageView, doOnEnd: (() -> Unit)? = null) =
+        withMainContext {
+            AnimationHelper.apply {
+                animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
+                    view.setImageDrawable(com.protone.component.R.drawable.ic_baseline_check_24.getDrawable())
+                    animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true, doOnEnd = {
+                        alpha(view, 0f, play = true, doOnEnd = {
+                            view.isVisible = false
+                            doOnEnd?.invoke()
+                        })
+                    })
+                }, play = true)
+            }
         }
-    }
 
     override suspend fun insertImage(media: GalleryMedia) =
         binding.noteEditRichNote.insertImage(

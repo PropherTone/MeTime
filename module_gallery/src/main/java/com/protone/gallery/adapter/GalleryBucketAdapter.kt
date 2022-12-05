@@ -30,14 +30,12 @@ class GalleryBucketAdapter(
         data class InsertBucket(val bucket: Pair<Uri, Array<String>>) : GalleryBucketEvent()
     }
 
-    private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
-
     override suspend fun onEventIO(data: GalleryBucketEvent) {
         when (data) {
             is GalleryBucketEvent.DeleteBucket -> {
-                galleries.find { it.second[0] == data.bucket.second[0] }?.let {
-                    val index = galleries.indexOf(it)
-                    galleries.removeAt(index)
+                mList.find { it.second[0] == data.bucket.second[0] }?.let {
+                    val index = mList.indexOf(it)
+                    mList.removeAt(index)
                     selectList.remove(it)
                     notifyItemRemovedCO(index)
                 }
@@ -46,11 +44,11 @@ class GalleryBucketAdapter(
                 if (data.bucket.second[0] != ALL_GALLERY &&
                     data.bucket.second[1].toInt() <= 0
                 ) {
-                    galleries.find { data.bucket.second[0] == it.second[0] }
+                    mList.find { data.bucket.second[0] == it.second[0] }
                         ?.let { deleteBucket(it) }
                     return
                 }
-                val iterator = galleries.iterator()
+                val iterator = mList.iterator()
                 var index = 0
                 while (iterator.hasNext()) {
                     if (iterator.next().second[0] == data.bucket.second[0]) {
@@ -59,7 +57,7 @@ class GalleryBucketAdapter(
                                 selectList[0] = data.bucket
                             }
                         }
-                        galleries[index] = data.bucket
+                        mList[index] = data.bucket
                         notifyItemChangedCO(index)
                         break
                     }
@@ -67,22 +65,22 @@ class GalleryBucketAdapter(
                 }
             }
             is GalleryBucketEvent.InsertBucket -> {
-                galleries.add(data.bucket)
-                notifyItemInsertedCO(galleries.size)
+                mList.add(data.bucket)
+                notifyItemInsertedCO(mList.size)
             }
         }
     }
 
-    override val select: (holder: Holder<GalleryBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect ->
-            holder.binding.bucketCheck.apply {
+    override val select: (GalleryBucketListLayoutBinding, Int, isSelect: Boolean) -> Unit =
+        { binding, _, isSelect ->
+            binding.bucketCheck.apply {
                 isChecked = isSelect
                 isVisible = isSelect
             }
         }
 
     override fun itemIndex(path: Pair<Uri, Array<String>>): Int {
-        return galleries.indexOf(path)
+        return mList.indexOf(path)
     }
 
     override fun onCreateViewHolder(
@@ -97,8 +95,8 @@ class GalleryBucketAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleryBucketListLayoutBinding>, position: Int) {
-        galleries[position].let { data ->
-            setSelect(holder, data in selectList)
+        mList[position].let { data ->
+            setSelect(holder.binding, position, data in selectList)
             holder.binding.apply {
                 root.setOnLongClickListener {
                     AlertDialog.Builder(context)
@@ -106,8 +104,8 @@ class GalleryBucketAdapter(
                         .setPositiveButton(
                             R.string.confirm
                         ) { dialog, _ ->
-                            galleryBucketAdapterDataProxy.deleteGalleryBucket(galleries[position].second[0])
-                            deleteBucket(galleries[position])
+                            galleryBucketAdapterDataProxy.deleteGalleryBucket(mList[position].second[0])
+                            deleteBucket(mList[position])
                             dialog.dismiss()
                         }.setNegativeButton(R.string.cancel) { dialog, _ ->
                             dialog.dismiss()
@@ -124,7 +122,7 @@ class GalleryBucketAdapter(
                     bucketName.text = sec[0]
                     bucketItemNumber.text = sec[1]
                     bucket.setOnClickListener {
-                        checkSelect(holder, data)
+                        checkSelect(position, data)
                         selectBucket(sec[0])
                     }
                 }
@@ -133,12 +131,11 @@ class GalleryBucketAdapter(
     }
 
     override fun checkSelect(
-        holder: Holder<GalleryBucketListLayoutBinding>,
-        item: Pair<Uri, Array<String>>
+        position: Int, item: Pair<Uri, Array<String>>
     ) {
         if (!multiChoose) clearSelected()
         selectList.add(item)
-        setSelect(holder, true)
+        notifyItemChanged(position, mutableListOf(SELECT))
     }
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
@@ -151,10 +148,6 @@ class GalleryBucketAdapter(
 
     fun insertBucket(item: Pair<Uri, Array<String>>) {
         emit(GalleryBucketEvent.InsertBucket(item))
-    }
-
-    override fun getItemCount(): Int {
-        return galleries.size
     }
 
     interface GalleryBucketAdapterDataProxy {

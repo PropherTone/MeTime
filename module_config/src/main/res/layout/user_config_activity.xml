@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.protone.config.activity.UserConfigActivity" />
+
+    </data>
+
+    <FrameLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:background="@color/blue_5"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/userRoot"
+                android:paddingBottom="@dimen/action_icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </ScrollView>
+
+        <com.protone.component.view.customView.blurView.SBlurView
+            android:id="@+id/blur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
+
+            <ImageView
+                android:id="@+id/user_leave"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon_p"
+                android:contentDescription="@string/action"
+                android:onClick="@{()-> activity.finish()}"
+                android:padding="@dimen/icon_padding_lite"
+                android:background="@drawable/background_ripple_glass"
+                android:src="@drawable/ic_round_keyboard_backspace_24_white" />
+
+        </com.protone.component.view.customView.blurView.SBlurView>
+
+    </FrameLayout>
+
+</layout>

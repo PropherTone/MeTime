@@ -17,15 +17,19 @@ import com.protone.gallery.databinding.PictureBoxAdapterLayoutBinding
 import com.protone.gallery.databinding.PictureBoxAdapterVideoLayoutBinding
 import kotlin.math.roundToInt
 
-class PictureBoxAdapter(context: Context, private val picUri: MutableList<GalleryMedia>) :
-    BaseAdapter<ViewDataBinding, Any>(context) {
+class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
+    BaseAdapter<GalleryMedia, ViewDataBinding, Any>(context) {
+
+    init {
+        mList.addAll(picUri)
+    }
 
     private val image = 0
     private val video = 1
     private val gif = 3
 
     override fun getItemViewType(position: Int): Int {
-        return if (picUri[position].name.contains("gif")) gif else if (picUri[position].isVideo) video else image
+        return if (mList[position].name.contains("gif")) gif else if (mList[position].isVideo) video else image
     }
 
     override fun onCreateViewHolder(
@@ -52,7 +56,7 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
                 }
             is PictureBoxAdapterLayoutBinding ->
                 (holder.binding as PictureBoxAdapterLayoutBinding).apply {
-                    image.setImageResource(picUri[position].uri)
+                    image.setImageResource(mList[position].uri)
                 }
             is PictureBoxAdapterVideoLayoutBinding ->
                 (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
@@ -62,7 +66,7 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
                     start.setOnClickListener {
                         start.isGone = true
                         videoCover.isGone = true
-                        videoPlayer.setVideoPath(picUri[holder.layoutPosition].uri)
+                        videoPlayer.setVideoPath(mList[holder.layoutPosition].uri)
                     }
                     videoPlayer.doOnCompletion {
                         videoPlayer.release()
@@ -89,13 +93,8 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
         super.onViewRecycled(holder)
     }
 
-
-    override fun getItemCount(): Int {
-        return picUri.size
-    }
-
     private fun loadingMedia(position: Int, view: ImageView) {
-        Image.load(picUri[position].path).with(context)
+        Image.load(mList[position].path).with(context)
             .setInterceptor(object : RequestInterceptor() {
                 override fun onLoadSuccess(result: LoadSuccessResult) {
                     result.resource?.apply {

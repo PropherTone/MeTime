@@ -1,8 +1,36 @@
 package com.protone.database.room
 
 import android.content.Context
+import com.protone.common.entity.GalleryMedia
+import com.protone.common.entity.Music
+import com.protone.common.entity.Note
 import com.protone.database.room.dao.*
 import com.wajahatkarim3.roomexplorer.RoomExplorer
+
+inline fun <T> List<T>.mapToLongList(block: (T) -> Long): List<Long> {
+    val list = mutableListOf<Long>()
+    this.forEach {
+        block(it).apply {
+            if (this != -1L) list.add(this)
+        }
+    }
+    return list
+}
+
+infix fun List<GalleryMedia>.mediasFilterBy(idList: List<Long>) =
+    if (this.size != idList.size)
+        this.filter { idList.contains(it.mediaId) }
+    else this
+
+infix fun List<Music>.musicsFilterBy(idList: List<Long>) =
+    if (this.size != idList.size)
+        this.filter { idList.contains(it.musicBaseId) }
+    else this
+
+infix fun List<Note>.notesFilterBy(idList: List<Long>) =
+    if (this.size != idList.size)
+        this.filter { idList.contains(it.noteId) }
+    else this
 
 fun getGalleryDAO(): SignedGalleryDAO {
     return DataBase.database.getGalleryDAO()
@@ -40,10 +68,10 @@ fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
     return DataBase.database.getMusicWithMusicBucketDAO()
 }
 
-fun shutdownDataBase(){
+fun shutdownDataBase() {
     DataBase.database.close()
 }
 
-fun showRoomDB(context: Context){
-    RoomExplorer.show(context,DataBase::class.java,"SeennDB")
+fun showRoomDB(context: Context) {
+    RoomExplorer.show(context, DataBase::class.java, "SeennDB")
 }

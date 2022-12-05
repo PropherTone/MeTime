@@ -31,26 +31,20 @@ class AddMusicListAdapter(
         if (multiChoose) launch(Dispatchers.Default) {
             selectList.addAll(adapterDataBaseProxy.getMusicWithMusicBucket(bucket))
             selectList.forEach {
-                musicList.indexOf(it).let { index ->
+                mList.indexOf(it).let { index ->
                     if (index != -1) notifyItemChangedCO(index)
                 }
             }
         }
     }
 
-    var musicList = mutableListOf<Music>()
-        set(value) {
-            field.clear()
-            field.addAll(value)
-        }
-
     private val viewQueue = PriorityQueue<Int>()
 
     private var onBusy = false
 
-    override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect ->
-            holder.binding.apply {
+    override val select: (MusicListLayoutBinding, Int, isSelect: Boolean) -> Unit =
+        { binding, _, isSelect ->
+            binding.apply {
                 clickAnimation(
                     isSelect,
                     musicListContainer,
@@ -69,7 +63,7 @@ class AddMusicListAdapter(
             }
         }
 
-    override fun itemIndex(path: Music): Int = musicList.indexOf(path)
+    override fun itemIndex(path: Music): Int = mList.indexOf(path)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -89,8 +83,8 @@ class AddMusicListAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder<MusicListLayoutBinding>, position: Int) {
         holder.binding.apply {
-            musicList[position].also { music ->
-                setSelect(holder, music in selectList)
+            mList[position].also { music ->
+                setSelect(holder.binding, position, music in selectList)
                 musicListContainer.setOnClickListener {
                     if (onBusy) return@setOnClickListener
                     onBusy = true
@@ -98,7 +92,7 @@ class AddMusicListAdapter(
                         if (mode == "SEARCH") {
                             adapterDataBaseProxy.play(music)
                             withContext(Dispatchers.Main) {
-                                checkSelect(holder, music)
+                                checkSelect(position, music)
                             }
                             onBusy = false
                             return@launch
@@ -111,13 +105,13 @@ class AddMusicListAdapter(
                                 bucket
                             )
                             withContext(Dispatchers.Main) {
-                                checkSelect(holder, music)
+                                checkSelect(position, music)
                             }
                             onBusy = false
                             return@launch
                         }
                         withContext(Dispatchers.Main) {
-                            checkSelect(holder, music)
+                            checkSelect(position, music)
                         }
                         musicListPlayState.drawable.let { d ->
                             when (d) {
@@ -162,7 +156,7 @@ class AddMusicListAdapter(
         while (!viewQueue.isEmpty()) {
             val poll = viewQueue.poll()
             if (poll != null) {
-                 notifyItemChangedCO(poll)
+                notifyItemChangedCO(poll)
             }
         }
     }
@@ -177,8 +171,6 @@ class AddMusicListAdapter(
             }
         }
     }
-
-    override fun getItemCount(): Int = musicList.size
 
     interface AddMusicListAdapterDataProxy {
         suspend fun getMusicWithMusicBucket(bucket: String): Collection<Music>

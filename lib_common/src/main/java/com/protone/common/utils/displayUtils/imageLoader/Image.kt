@@ -32,7 +32,7 @@ object Image : LoaderEngine {
 
     override fun load(byteArray: ByteArray?): ContextEngine = get().load(byteArray)
 
-    fun clearMem() {
+    fun clearMemory() {
         get().clearMem()
         imageLoader = null
     }

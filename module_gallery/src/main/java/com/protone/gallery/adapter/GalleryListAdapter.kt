@@ -25,7 +25,6 @@ class GalleryListAdapter(
 ) : SelectListAdapter<GalleryListAdapterLayoutBinding, GalleryMedia, GalleryListAdapter.GalleryListEvent>(
     context, true
 ) {
-    private val medias: MutableList<GalleryMedia> = mutableListOf()
 
     enum class MediaStatus {
         UPDATED,
@@ -44,10 +43,6 @@ class GalleryListAdapter(
         data class NoticeListItemInsert(val media: GalleryMedia) : GalleryListEvent()
     }
 
-    fun setMedias(list: MutableList<GalleryMedia>) {
-        medias.addAll(list)
-    }
-
     private var itemLength = 0
     private var onSelectMod = false
 
@@ -64,65 +59,65 @@ class GalleryListAdapter(
             }
             is GalleryListEvent.SelectAll -> {
                 onSelectMod = true
-                for (i in 0 until medias.size) {
-                    selectList.add(medias[i])
+                for (i in 0 until mList.size) {
+                    selectList.add(mList[i])
                     notifyItemChangedCO(i)
                 }
             }
             is GalleryListEvent.NoticeDataUpdate -> {
                 if (data.item == null) return
-                medias.clear()
-                medias.addAll(data.item)
+                mList.clear()
+                mList.addAll(data.item)
                 notifyDataSetChangedCO()
             }
             is GalleryListEvent.NoticeSelectChange -> {
-                val indexOf = medias.indexOf(data.item)
+                val indexOf = mList.indexOf(data.item)
                 if (indexOf != -1) {
                     onSelectMod = true
                     notifyItemChangedCO(indexOf)
                 }
             }
             is GalleryListEvent.RemoveMedia -> {
-                val index = medias.indexOf(data.galleryMedia)
+                val index = mList.indexOf(data.galleryMedia)
                 if (index != -1) {
-                    medias.removeAt(index)
+                    mList.removeAt(index)
                     if (selectList.contains(data.galleryMedia)) selectList.remove(data.galleryMedia)
                     notifyItemRemovedCO(index)
                 }
             }
             is GalleryListEvent.NoticeListItemUpdate -> {
-                val index = medias.indexOf(data.media)
+                val index = mList.indexOf(data.media)
                 if (index != -1) {
-                    medias[index] = data.media
+                    mList[index] = data.media
                     notifyItemChangedCO(index)
                 }
             }
             is GalleryListEvent.NoticeListItemDelete -> {
-                val index = medias.indexOf(data.media)
+                val index = mList.indexOf(data.media)
                 if (index != -1) {
-                    medias.removeAt(index)
+                    mList.removeAt(index)
                     notifyItemRemovedCO(index)
                 }
             }
             is GalleryListEvent.NoticeListItemInsert -> {
                 withContext(Dispatchers.Main) {
-                    medias.add(0, data.media)
+                    mList.add(0, data.media)
                     notifyItemInserted(0)
                 }
             }
         }
     }
 
-    override val select: (Holder<GalleryListAdapterLayoutBinding>, Boolean) -> Unit =
-        { holder, select ->
-            holder.binding.apply {
+    override val select: (GalleryListAdapterLayoutBinding, Int, Boolean) -> Unit =
+        { binding, _, select ->
+            binding.apply {
                 checkSeen.isVisible = select
                 checkCheck.isChecked = select
             }
         }
 
     override fun itemIndex(path: GalleryMedia): Int {
-        return medias.indexOf(path)
+        return mList.indexOf(path)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -164,22 +159,22 @@ class GalleryListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleryListAdapterLayoutBinding>, position: Int) {
-        setSelect(holder, medias[position] in selectList)
-        holder.binding.videoIcon.isGone = !medias[position].isVideo && !combine
+        setSelect(holder.binding, position, mList[position] in selectList)
+        holder.binding.videoIcon.isGone = !mList[position].isVideo && !combine
         holder.binding.imageView.let { image ->
-            Image.load(medias[position].thumbnailUri).with(context).into(image)
+            Image.load(mList[position].thumbnailUri).with(context).into(image)
             image.setOnClickListener {
                 if (onSelectMod) {
-                    checkSelect(holder, medias[position])
-                    onSelectListener?.select(medias[position])
+                    checkSelect(position, mList[position])
+                    onSelectListener?.select(mList[position])
                     onSelectListener?.select(selectList)
-                } else onSelectListener?.openView(medias[position])
+                } else onSelectListener?.openView(mList[position])
             }
             if (useSelect) {
                 image.setOnLongClickListener {
                     onSelectMod = true
-                    checkSelect(holder, medias[position])
-                    onSelectListener?.select(medias[position])
+                    checkSelect(position, mList[position])
+                    onSelectListener?.select(mList[position])
                     onSelectListener?.select(selectList)
                     true
                 }
@@ -217,10 +212,6 @@ class GalleryListAdapter(
 
     fun noticeListItemInsert(media: GalleryMedia) {
         emit(GalleryListEvent.NoticeListItemInsert(media))
-    }
-
-    override fun getItemCount(): Int {
-        return medias.size
     }
 
     private var onSelectListener: OnSelect? = null

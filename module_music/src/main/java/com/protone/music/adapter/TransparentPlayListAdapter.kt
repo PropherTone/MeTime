@@ -11,22 +11,23 @@ import com.protone.music.databinding.TpPlaylistAdapterLayoutBinding
 class TransparentPlayListAdapter(
     context: Context,
     onPlay: Music?,
-    private val playList: MutableList<Music>
+    playList: MutableList<Music>
 ) : SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music, Any>(context) {
-    override val select: (holder: Holder<TpPlaylistAdapterLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect ->
+    override val select: (TpPlaylistAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
+        { binding, _, isSelect ->
             if (isSelect) {
-                holder.binding.playListName.setBackgroundResource(R.drawable.round_background_tans_white_lite)
+                binding.playListName.setBackgroundResource(R.drawable.round_background_tans_white_lite)
             } else {
-                holder.binding.playListName.setBackgroundResource(R.drawable.round_background_fore_dark)
+                binding.playListName.setBackgroundResource(R.drawable.round_background_fore_dark)
             }
         }
 
     init {
+        mList.addAll(playList)
         onPlay?.let { selectList.add(it) }
     }
 
-    override fun itemIndex(path: Music): Int = playList.indexOf(path)
+    override fun itemIndex(path: Music): Int = mList.indexOf(path)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -38,24 +39,22 @@ class TransparentPlayListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<TpPlaylistAdapterLayoutBinding>, position: Int) {
-        playList[position].let { music ->
-            setSelect(holder, selectList.contains(music))
+        mList[position].let { music ->
+            setSelect(holder.binding, position, selectList.contains(music))
             holder.binding.playListName.text = music.title
             holder.binding.playListName.setOnClickListener {
                 if (selectList.contains(music)) return@setOnClickListener
-                checkSelect(holder, music)
+                checkSelect(position, music)
                 onPlayListClkListener?.onClk(music)
             }
         }
     }
 
-    override fun getItemCount(): Int = playList.size
-
     fun setOnPlay(music: Music) {
-        val oldIndex = playList.indexOf(selectList.first())
+        val oldIndex = mList.indexOf(selectList.first())
         selectList.clear()
         notifyItemChanged(oldIndex)
-        val newIndex = playList.indexOf(music)
+        val newIndex = mList.indexOf(music)
         if (newIndex != -1) {
             selectList.add(music)
             notifyItemChanged(newIndex)

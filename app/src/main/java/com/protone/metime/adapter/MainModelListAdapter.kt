@@ -24,9 +24,7 @@ import kotlinx.coroutines.withContext
 class MainModelListAdapter(
     context: Context,
     private val mainModelListAdapterDataProxy: MainModelListAdapterDataProxy
-) : BaseAdapter<ViewDataBinding, RecyclerView.ViewHolder>(context, false) {
-
-    private val itemList = mutableListOf<String>()
+) : BaseAdapter<String,ViewDataBinding, Any>(context, false) {
 
     companion object {
         const val TIME = 0x1F
@@ -38,7 +36,7 @@ class MainModelListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (itemList[position].substring(0, 5)) {
+        return when (mList[position].substring(0, 5)) {
             "tTime" -> TIME
             "music" -> MUSIC
             "photo" -> PHOTO
@@ -51,21 +49,21 @@ class MainModelListAdapter(
     suspend fun loadDataBelow() {
         mainModelListAdapterDataProxy.run {
             photoInTodayJson()?.let {
-                itemList.add("photo:${it}")
+                mList.add("photo:${it}")
                 withContext(Dispatchers.Main) {
-                    notifyItemInserted(itemList.size - 1)
+                    notifyItemInserted(mList.size - 1)
                 }
             }
             videoInTodayJson()?.let {
-                itemList.add("video:${it}")
+                mList.add("video:${it}")
                 withContext(Dispatchers.Main) {
-                    notifyItemInserted(itemList.size - 1)
+                    notifyItemInserted(mList.size - 1)
                 }
             }
             randomNoteJson()?.let {
-                itemList.add("tNote:${it}")
+                mList.add("tNote:${it}")
                 withContext(Dispatchers.Main) {
-                    notifyItemInserted(itemList.size - 1)
+                    notifyItemInserted(mList.size - 1)
                 }
             }
         }
@@ -111,16 +109,16 @@ class MainModelListAdapter(
     override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
         when (holder.binding) {
             is MusicCardBinding -> {
-//                val music = itemList[position].substring(6).toEntity(Music::class.java)
+//                val music = mList[position].substring(6).toEntity(Music::class.java)
             }
             is NoteCardBinding -> {
-                val note = itemList[position].substring(6).toEntity(Note::class.java)
+                val note = mList[position].substring(6).toEntity(Note::class.java)
                 Image.load(note.imagePath).with(context).into((holder.binding as NoteCardBinding).modelNoteIcon)
                 (holder.binding as NoteCardBinding).modelNoteTitle.text = note.title
             }
             is PhotoCardBinding -> {
                 val media =
-                    itemList[position].substring(6).toEntity(GalleryMedia::class.java)
+                    mList[position].substring(6).toEntity(GalleryMedia::class.java)
                 (holder.binding as PhotoCardBinding).photoCard.apply {
                     title = media.date.toDateString("yyyy/MM/dd E").toString()
                     Image.load(media.uri).with(context).into(photo)
@@ -131,7 +129,7 @@ class MainModelListAdapter(
             }
             is VideoCardBinding -> {
                 val media =
-                    itemList[position].substring(6).toEntity(GalleryMedia::class.java)
+                    mList[position].substring(6).toEntity(GalleryMedia::class.java)
                 (holder.binding as VideoCardBinding).videoPlayer.apply {
                     setVideoPath(media.uri)
                     setFullScreen {
@@ -142,7 +140,7 @@ class MainModelListAdapter(
                     media.date.toDateString("yyyy/MM/dd E").toString()
             }
             is DateLayoutBinding -> (holder.binding as DateLayoutBinding).modelTime.text =
-                itemList[position].substring(6)
+                mList[position].substring(6)
         }
     }
 
@@ -154,8 +152,6 @@ class MainModelListAdapter(
         fun onVideo(json: String)
         fun onMusic(json: String)
     }
-
-    override fun getItemCount(): Int = itemList.size
 
     interface MainModelListAdapterDataProxy {
         fun photoInTodayJson(): String?

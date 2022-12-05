@@ -20,14 +20,12 @@ class NoteTypeListAdapter(
         NoteTypeListAdapterDataProxy().block()
     }
 
-    private val noteDirList = arrayListOf<NoteDir>()
-
-    override val select: (holder: Holder<NoteTpyeListAdapterBinding>, isSelect: Boolean) -> Unit =
-        { holder, select ->
-            holder.binding.noteTypeSelectGuide.isGone = !select
+    override val select: (NoteTpyeListAdapterBinding, Int, isSelect: Boolean) -> Unit =
+        { binding, _, select ->
+            binding.noteTypeSelectGuide.isGone = !select
         }
 
-    override fun itemIndex(path: NoteDir): Int = noteDirList.indexOf(path)
+    override fun itemIndex(path: NoteDir): Int = mList.indexOf(path)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -42,20 +40,19 @@ class NoteTypeListAdapter(
         )
     }
 
-
     override fun onBindViewHolder(holder: Holder<NoteTpyeListAdapterBinding>, position: Int) {
-        setSelect(holder, noteDirList[position] in selectList)
+        setSelect(holder.binding, position, mList[position] in selectList)
         holder.binding.apply {
             root.setOnClickListener {
-                if (noteDirList[position] in selectList) return@setOnClickListener
-                checkSelect(holder, noteDirList[position])
-                onTypeSelected?.invoke(noteDirList[position])
+                if (mList[position] in selectList) return@setOnClickListener
+                checkSelect(position, mList[position])
+                onTypeSelected?.invoke(mList[position])
             }
             root.setOnLongClickListener {
                 AlertDialog.Builder(context).setPositiveButton(
                     context.getString(R.string.confirm)
                 ) { dialog, _ ->
-                    val noteType = noteDirList[position]
+                    val noteType = mList[position]
                     deleteNoteDir?.invoke(noteType)
                     notifyItemRemoved(position)
                     dialog.dismiss()
@@ -64,31 +61,29 @@ class NoteTypeListAdapter(
                 }.setTitle(R.string.delete.getString()).create().show()
                 return@setOnLongClickListener false
             }
-            noteTypeName.text = noteDirList[holder.layoutPosition].name
+            noteTypeName.text = mList[holder.layoutPosition].name
             noteTypeAddNote.setOnClickListener {
                 addNote?.invoke(noteTypeName.text.toString())
             }
         }
     }
 
-    override fun getItemCount(): Int = noteDirList.size
-
     fun insertNoteDir(noteDir: NoteDir) {
-        noteDirList.add(noteDir)
-        notifyItemInserted(noteDirList.size)
+        mList.add(noteDir)
+        notifyItemInserted(mList.size)
     }
 
     fun setNoteTypeList(list: List<NoteDir>) {
-        val size = noteDirList.size
-        noteDirList.clear()
+        val size = mList.size
+        mList.clear()
         notifyItemRangeRemoved(0, size)
         selectList.clear()
         NoteDir(R.string.all.getString(), "").let {
-            noteDirList.add(it)
+            mList.add(it)
             selectList.add(it)
         }
-        noteDirList.addAll(list)
-        notifyItemRangeInserted(0, noteDirList.size)
+        mList.addAll(list)
+        notifyItemRangeInserted(0, mList.size)
     }
 
     private var addNote: ((String?) -> Unit)? = null

@@ -12,37 +12,58 @@ import com.protone.component.R
 import com.protone.common.utils.displayUtils.AnimationHelper
 import kotlinx.coroutines.launch
 
-abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
+abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
     context: Context,
     handleEvent: Boolean = false
-) : BaseAdapter<V, D>(context, handleEvent) {
+) : BaseAdapter<Item, VB, Event>(context, handleEvent) {
 
-    var selectList = mutableListOf<T>()
+    var selectList = mutableListOf<Item>()
     var multiChoose = false
 
     var hasFixedSize = true
+
+    companion object {
+        const val SELECT = "SELECT"
+        const val UNSELECT = "UNSELECT"
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.setHasFixedSize(hasFixedSize)
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    open fun checkSelect(holder: Holder<V>, item: T) {
-        if (selectList.contains(item)) {
-            selectList.remove(item)
-            setSelect(holder, false)
+    override fun onBindViewHolder(holder: Holder<VB>, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isNotEmpty()) {
+            setSelect(
+                holder.binding,
+                position,
+                when (payloads[0]) {
+                    SELECT -> true
+                    UNSELECT -> false
+                    else -> false
+                }
+            )
         } else {
-            if (!multiChoose) clearSelected()
-            selectList.add(item)
-            setSelect(holder, true)
+            this.onBindViewHolder(holder, position)
         }
     }
 
-    abstract val select: (holder: Holder<V>, isSelect: Boolean) -> Unit
-    abstract fun itemIndex(path: T): Int
+    open fun checkSelect(position: Int, item: Item) {
+        if (selectList.contains(item)) {
+            selectList.remove(item)
+            notifyItemChanged(position, mutableListOf(UNSELECT))
+        } else {
+            if (!multiChoose) clearSelected()
+            selectList.add(item)
+            notifyItemChanged(position, mutableListOf(SELECT))
+        }
+    }
 
-    fun setSelect(holder: Holder<V>, state: Boolean) = launch {
-        select(holder, state)
+    abstract val select: (content: VB, position: Int, isSelect: Boolean) -> Unit
+    abstract fun itemIndex(path: Item): Int
+
+    fun setSelect(content: VB, position: Int, state: Boolean) = launch {
+        select(content, position, state)
     }
 
     fun clearSelected() {
@@ -51,7 +72,7 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
             selectList.clear()
             if (itemIndex != -1) {
                 launch {
-                    notifyItemChanged(itemIndex)
+                    notifyItemChanged(itemIndex, mutableListOf(UNSELECT))
                 }
             }
         }
@@ -63,7 +84,7 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
         }.toList()
         selectList.clear()
         list.forEach {
-            if (it != -1) notifyItemChanged(it)
+            if (it != -1) notifyItemChanged(it, mutableListOf(UNSELECT))
         }
     }
 

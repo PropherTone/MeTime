@@ -1,11 +1,10 @@
 package com.protone.component.view.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.protone.component.databinding.CheckListAdapterLayoutBinding
 import com.protone.common.context.newLayoutInflater
+import com.protone.component.databinding.CheckListAdapterLayoutBinding
 
 class CheckListAdapter(
     context: Context,
@@ -15,27 +14,19 @@ class CheckListAdapter(
     context
 ) {
 
-    var dataList: MutableList<String> = mutableListOf()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field.clear()
-            field.addAll(value)
-            notifyDataSetChanged()
-        }
-
     init {
         multiChoose = false
         if (dataList != null) {
-            this.dataList.addAll(dataList)
+            this.mList.addAll(dataList)
         }
     }
 
-    override val select: (holder: Holder<CheckListAdapterLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect ->
-            holder.binding.clCheck.isChecked = isSelect
+    override val select: (CheckListAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
+        { binding, _, isSelect ->
+            binding.clCheck.isChecked = isSelect
         }
 
-    override fun itemIndex(path: String): Int = dataList.indexOf(path)
+    override fun itemIndex(path: String): Int = mList.indexOf(path)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -44,20 +35,19 @@ class CheckListAdapter(
         Holder(CheckListAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false))
 
     override fun onBindViewHolder(holder: Holder<CheckListAdapterLayoutBinding>, position: Int) {
-        setSelect(holder,dataList[position] in selectList)
+        setSelect(holder.binding, position, mList[position] in selectList)
         holder.binding.apply {
             clCheck.isGone = !check
             root.setOnClickListener {
                 if (check) {
-                    checkSelect(holder, dataList[position])
-                } else startNote?.invoke(dataList[position])
+                    checkSelect(position, mList[position])
+                } else startNote?.invoke(mList[position])
             }
             clCheck.isClickable = false
-            clName.text = dataList[position]
+            clName.text = mList[position]
         }
     }
 
     var startNote: ((String) -> Unit)? = null
 
-    override fun getItemCount(): Int = dataList.size
 }

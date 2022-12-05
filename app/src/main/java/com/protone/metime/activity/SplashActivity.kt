@@ -20,12 +20,10 @@ class SplashActivity :
 
     override fun createView(): SplashActivityBinding {
         return SplashActivityBinding.inflate(layoutInflater, root, false).apply {
-            root.apply {
-                onGlobalLayout {
-                    MApplication.apply {
-                        screenHeight = measuredHeight
-                        screenWidth = measuredWidth
-                    }
+            root.onGlobalLayout {
+                MApplication.apply {
+                    screenHeight = measuredHeight
+                    screenWidth = measuredWidth
                 }
             }
         }

@@ -259,7 +259,7 @@ class GalleryFragment(
         if (viewModel.isBucketShowUp) return
         launch {
             binding.galleryList.swapAdapter(GalleryListAdapter(requireContext(), true).also {
-                data?.let { medias -> it.setMedias(medias) }
+                data?.let { medias -> it.setData(medias) }
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleryFragment)
             }, false)

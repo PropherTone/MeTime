@@ -24,6 +24,7 @@ import com.protone.component.broadcast.WorkReceiver
 import com.protone.component.broadcast.workLocalBroadCast
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
+import kotlin.system.measureTimeMillis
 
 class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
@@ -158,26 +159,21 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
     private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
         launchDefault {
-            val allSignedMedia = getAllSignedMedia() as MutableList
+            var allSignedMedia = getAllSignedMedia() as MutableList
             val sortMedias = async(Dispatchers.Default) {
-                val allGallery = getAllGallery() as MutableList<String>
-                sortGalleries(allGallery)
-                allGallery.forEach {
+                val uncheckedGalleries = getAllGallery() as MutableList<String>
+                sortGalleries(uncheckedGalleries)
+                uncheckedGalleries.forEach {
                     deleteSignedMediasByGalleryAsync(it)
                 }
-                flow {
-                    allSignedMedia.forEach {
-                        if (!isUriExist(it.uri)) {
-                            emit(it)
-                        }
-                    }
-                }.bufferCollect {
-                    deleteSignedMediaAsync(it)
-                    allSignedMedia.remove(it)
+                allSignedMedia.filter {
+                    !uncheckedGalleries.contains(it.bucket) && !isUriExist(it.uri)
+                }.apply {
+                    deleteSignedMediaMultiAsync(this)
                 }
             }
 
-            sortMedias.await()
+            allSignedMedia = sortMedias.await() as MutableList<GalleryMedia>
 
             fun sortMedia(
                 dao: DatabaseBridge.GalleryDAOBridge,
@@ -197,6 +193,44 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     dao.insertMediaAsync(it)
                 }
             }
+
+            val test = async(Dispatchers.IO) {
+                val durations = mutableListOf<Long>()
+                val medias = mutableListOf<GalleryMedia>()
+                repeat(10000) {
+                    medias.add(
+                        GalleryMedia(
+                            Uri.EMPTY,
+                            it.toString(),
+                            "123",
+                            "123",
+                            123L,
+                            null,
+                            null,
+                            123,
+                            123,
+                            null,
+                            0,
+                            false
+                        )
+                    )
+                }
+                durations.add(measureTimeMillis {
+                    insertSignedMediaMulti(medias.filter {
+                        it.name.toInt() % 2 == 0
+                    })
+                })
+                durations.add(measureTimeMillis {
+                    medias.forEach {
+                        if (it.name.toInt() % 2 == 0) {
+                            insertMediaAsync(it)
+                        }
+                    }
+                })
+                durations
+            }
+
+            Log.d(TAG, "updateGallery: ${test.await()}")
 
             val scanPicture = async(Dispatchers.Default) {
                 flow {
@@ -218,7 +252,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 }
             }
 
-            sortMedias.await()
             scanPicture.await()
             scanVideo.await()
         }

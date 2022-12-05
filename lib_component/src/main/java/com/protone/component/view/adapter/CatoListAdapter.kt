@@ -11,13 +11,12 @@ import com.protone.common.utils.displayUtils.imageLoader.Image
 import kotlinx.coroutines.launch
 
 class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListDataProxy) :
-    BaseAdapter<ViewDataBinding, String>(context) {
+    BaseAdapter<String,ViewDataBinding, Any>(context) {
 
-    private val catoList = mutableListOf<String>()
     private var itemClick: ((String) -> Unit)? = null
 
     override fun getItemViewType(position: Int): Int {
-        return if (catoList[position].contains("content://")) 1 else 0
+        return if (mList[position].contains("content://")) 1 else 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder<ViewDataBinding> =
@@ -34,33 +33,27 @@ class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListD
             when (this) {
                 is ImageCateLayoutBinding ->
                     launch {
-                        catoListDataProxy.getMedia(catoList[position])?.let { media ->
+                        catoListDataProxy.getMedia(mList[position])?.let { media ->
                             Image.load(media.uri).with(context).into(catoBack)
                             catoName.text = media.name
                             root.setOnClickListener {
-                                itemClick?.invoke(catoList[position])
+                                itemClick?.invoke(mList[position])
                             }
                         }
                     }
-                is TextCateLayoutBinding -> cato.text = catoList[position]
+                is TextCateLayoutBinding -> cato.text = mList[position]
             }
         }
     }
-
-    override fun getItemCount(): Int = catoList.size
 
     fun setItemClick(itemClick: (String) -> Unit) {
         this.itemClick = itemClick
     }
 
-    fun refresh(cateList: Collection<String>?) {
-        if (cateList == null) return
-        if (catoList.containsAll(cateList)) return
-        val size = catoList.size
-        catoList.clear()
-        notifyItemRangeRemoved(0, size)
-        catoList.addAll(cateList)
-        notifyItemRangeInserted(0, catoList.size)
+    fun refresh(cateList: List<String>?) {
+        cateList?.let {
+            notifyListChanged(it)
+        }
     }
 
     interface CatoListDataProxy {

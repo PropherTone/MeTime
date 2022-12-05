@@ -12,6 +12,7 @@ import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
+import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toJson
@@ -43,7 +44,7 @@ class NoteViewActivity :
     override suspend fun NoteViewViewModel.init() {
         bindMusicService { binder = it }
 
-        intent.extras?.getString(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)?.let {
+        intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)?.let {
             noteQueue.offer(it)
             initSeen(noteQueue.poll())
         }
@@ -109,7 +110,7 @@ class NoteViewActivity :
         val re = startActivityForResult(
             NoteEditActivity::class.intent.putExtras {
                 putString(
-                    NoteEditViewModel.NOTE,
+                    NOTE,
                     this@NoteViewActivity.intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
                 )
             }

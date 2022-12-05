@@ -7,9 +7,8 @@ import com.protone.component.databinding.LogListLayoutBinding
 import com.protone.common.baseType.getFileName
 import com.protone.common.context.newLayoutInflater
 
-class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding, Any>(context) {
+class LogListAdapter(context: Context) : BaseAdapter<String,LogListLayoutBinding, Any>(context) {
 
-    private val logs = mutableListOf<String>()
     var logEvent: LogEvent? = null
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -26,23 +25,21 @@ class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding, Any>(
 
     override fun onBindViewHolder(holder: Holder<LogListLayoutBinding>, position: Int) {
         holder.binding.apply {
-            logName.text = logs[position].getFileName()
+            logName.text = mList[position].getFileName()
             logShare.setOnClickListener {
-                logEvent?.shareLog(logs[position])
+                logEvent?.shareLog(mList[position])
             }
             logWatch.setOnClickListener {
-                logEvent?.viewLog(logs[position])
+                logEvent?.viewLog(mList[position])
             }
         }
     }
 
-    override fun getItemCount(): Int = logs.size
-
     fun initLogs(data: MutableList<String>) {
         data.forEach {
-            if (!logs.contains(it)) {
-                logs.add(it)
-                notifyItemInserted(logs.size)
+            if (!mList.contains(it)) {
+                mList.add(it)
+                notifyItemInserted(mList.size)
             }
         }
     }

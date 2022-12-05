@@ -2,6 +2,10 @@ package com.protone.metime.activity
 
 import androidx.activity.viewModels
 import androidx.core.view.isGone
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
@@ -132,7 +136,7 @@ class MainActivity :
                         startActivity(RouterPath.MusicRouterPath.Main)
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig -> {
-//                    startActivity(UserConfigActivity::class.intent)
+                    startActivity(RouterPath.ConfigRouterPath.UserConfig)
                 }
             }
         }

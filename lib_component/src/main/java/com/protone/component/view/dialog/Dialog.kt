@@ -145,16 +145,12 @@ fun Activity.checkListDialog(
 suspend fun Activity.imageListDialog(
     dataList: MutableList<Uri>
 ) = onResult(Dispatchers.Main) { co ->
-    val binding = ImageListDialogLayoutBinding.inflate(
-        newLayoutInflater,
-        root,
-        false
-    )
+    val binding = ImageListDialogLayoutBinding.inflate(newLayoutInflater, root, false)
     val create = AlertDialog.Builder(this@imageListDialog).setView(binding.root).create()
     binding.apply {
         listList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = object : BaseAdapter<PhotoCardLayoutBinding, Any>(context) {
+            adapter = object : BaseAdapter<Uri, PhotoCardLayoutBinding, Any>(context) {
 
                 override fun onCreateViewHolder(
                     parent: ViewGroup,
@@ -167,13 +163,13 @@ suspend fun Activity.imageListDialog(
                     holder: Holder<PhotoCardLayoutBinding>,
                     position: Int
                 ) {
-                    Image.load(dataList[position]).with(context).into(holder.binding.photoCardPhoto)
+                    Image.load(mList[position]).with(context).into(holder.binding.photoCardPhoto)
                     val i = position + 1
                     holder.binding.photoCardTitle.text = i.toString()
                 }
 
-                override fun getItemCount(): Int = dataList.size
-
+            }.apply {
+                notifyListChanged(dataList)
             }
         }
         listConfirm.setOnClickListener {

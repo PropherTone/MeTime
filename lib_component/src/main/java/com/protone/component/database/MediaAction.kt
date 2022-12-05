@@ -9,7 +9,9 @@ sealed class MediaAction {
         data class OnMusicBucketUpdated(val musicBucket: MusicBucket) : MusicDataAction()
         data class OnMusicBucketDeleted(val musicBucket: MusicBucket) : MusicDataAction()
         data class OnMusicInserted(val music: Music) : MusicDataAction()
+        data class OnMusicsInserted(val musics: List<Music>) : MusicDataAction()
         data class OnMusicDeleted(val music: Music) : MusicDataAction()
+        data class OnMusicsDeleted(val musics: List<Music>) : MusicDataAction()
         data class OnMusicUpdate(val music: Music) : MusicDataAction()
         data class OnMusicWithMusicBucketInserted(val musicWithMusicBucket: MusicWithMusicBucket) : MusicDataAction()
         data class OnMusicWithMusicBucketDeleted(val musicID: Long) : MusicDataAction()
@@ -26,8 +28,11 @@ sealed class MediaAction {
 
     sealed class GalleryDataAction : MediaAction() {
         data class OnGalleryMediaDeleted(val media: GalleryMedia) : GalleryDataAction()
+        data class OnGalleryMediasDeleted(val medias: List<GalleryMedia>) : GalleryDataAction()
         data class OnGalleryMediaInserted(val media: GalleryMedia) : GalleryDataAction()
+        data class OnGalleryMediasInserted(val medias: List<GalleryMedia>) : GalleryDataAction()
         data class OnGalleryMediaUpdated(val media: GalleryMedia) : GalleryDataAction()
+        data class OnGalleryMediasUpdated(val medias: List<GalleryMedia>) : GalleryDataAction()
         data class OnGalleryDeleted(val gallery: String) : GalleryDataAction()
         data class OnGalleryBucketInserted(val galleryBucket: GalleryBucket) : GalleryDataAction()
         data class OnGalleryBucketDeleted(val galleryBucket: GalleryBucket) : GalleryDataAction()

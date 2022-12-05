@@ -263,7 +263,7 @@ class MusicActivity :
                         }
                     }
                 }
-                musicBuckets = allMusicBucket
+                setData(allMusicBucket)
                 getBucket(lastBucket)?.let {
                     if (binding.musicBucketName.text != it.name) {
                         sendViewEvent(MusicModel.MusicEvent.SetBucketCover(it.name))

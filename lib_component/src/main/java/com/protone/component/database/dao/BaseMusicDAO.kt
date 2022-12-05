@@ -9,6 +9,7 @@ import com.protone.common.entity.MusicWithMusicBucket
 import com.protone.database.room.getMusicBucketDAO
 import com.protone.database.room.getMusicDAO
 import com.protone.database.room.getMusicWithMusicBucketDAO
+import com.protone.database.room.musicsFilterBy
 
 abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
 
@@ -21,18 +22,39 @@ abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
         withIOContext { musicDAO.getMusicByUri(uri) }
 
     suspend fun insertMusic(music: Music) = withIOContext {
-        sendEvent(MediaAction.MusicDataAction.OnMusicInserted(music))
-        musicDAO.insertMusic(music)
+        musicDAO.insertMusic(music).apply {
+            sendEvent(MediaAction.MusicDataAction.OnMusicInserted(music))
+        }
+    }
+
+    suspend fun insertMusicMulti(musics: List<Music>) = withIOContext {
+        if (musics.isEmpty()) return@withIOContext emptyList()
+        musicDAO.insertMusicMulti(musics).apply {
+            sendEvent(
+                MediaAction.MusicDataAction.OnMusicsInserted(musics musicsFilterBy this)
+            )
+        }
+    }
+
+    suspend fun deleteMusicMulti(musics: List<Music>) = withIOContext {
+        if (musics.isEmpty()) return@withIOContext emptyList()
+        musicDAO.deleteMusicMulti(musics).apply {
+            sendEvent(
+                MediaAction.MusicDataAction.OnMusicsDeleted(musics musicsFilterBy this)
+            )
+        }
     }
 
     suspend fun deleteMusic(music: Music) = withIOContext {
-        sendEvent(MediaAction.MusicDataAction.OnMusicDeleted(music))
-        musicDAO.deleteMusic(music)
+        musicDAO.deleteMusic(music).apply {
+            sendEvent(MediaAction.MusicDataAction.OnMusicDeleted(music))
+        }
     }
 
     suspend fun updateMusic(music: Music): Int = withIOContext {
-        sendEvent(MediaAction.MusicDataAction.OnMusicUpdate(music))
-        musicDAO.updateMusic(music)
+        musicDAO.updateMusic(music).apply {
+            sendEvent(MediaAction.MusicDataAction.OnMusicUpdate(music))
+        }
     }
 
     /*MusicBucket*****************************************************/
@@ -66,7 +88,11 @@ abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
 
     suspend fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? =
         withIOContext {
-            sendEvent(MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(musicWithMusicBucket))
+            sendEvent(
+                MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(
+                    musicWithMusicBucket
+                )
+            )
             musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
         }
 

@@ -27,20 +27,14 @@ class NoteEditViewModel : BaseViewModel() {
         object PickIcon : NoteEvent()
     }
 
-    companion object {
-        const val NOTE_DIR = "NoteType"
-        const val NOTE = "Note"
-        const val CONTENT_TITLE = "NoteContentTitle"
-    }
-
     var iconUri: Uri? = null
     var noteByName: Note? = null
     var allNote: MutableList<String>? = null
     var onEdit = false
     var medias = arrayListOf<GalleryMedia>()
 
-    suspend fun saveIcon(name: String) = withContext(Dispatchers.IO) {
-        iconUri?.imageSaveToDisk(name, null).let {
+    suspend fun saveIcon(name: String, w: Int, h: Int) = withContext(Dispatchers.IO) {
+        iconUri?.imageSaveToDisk(name, null, w, h).let {
             if (!it.isNullOrEmpty()) {
                 it
             } else {
@@ -62,13 +56,14 @@ class NoteEditViewModel : BaseViewModel() {
         musicByUri?.title ?: "^ ^"
     }
 
-    suspend fun copyNote(inNote: Note, note: Note) = withContext(Dispatchers.Default) {
-        inNote.title = note.title
-        inNote.text = note.text
-        inNote.richCode = note.richCode
-        inNote.time = note.time
-        inNote.imagePath = if (iconUri != null) saveIcon(note.title) else inNote.imagePath
-    }
+    suspend fun copyNote(inNote: Note, note: Note, w: Int, h: Int) =
+        withContext(Dispatchers.Default) {
+            inNote.title = note.title
+            inNote.text = note.text
+            inNote.richCode = note.richCode
+            inNote.time = note.time
+            inNote.imagePath = if (iconUri != null) saveIcon(note.title, w, h) else inNote.imagePath
+        }
 
     suspend fun updateNote(note: Note) = noteDAO.updateNote(note)
 
@@ -84,7 +79,7 @@ class NoteEditViewModel : BaseViewModel() {
                     }
                 }
                 medias.forEach {
-                    galleryDAO.insertGalleriesWithNotes(GalleriesWithNotes(it.uri, result.second))
+                    galleryDAO.insertGalleriesWithNotes(GalleriesWithNotes(it.mediaId, result.second))
                 }
                 true
             } else {

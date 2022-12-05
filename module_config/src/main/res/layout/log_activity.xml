@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.protone.config.activity.LogActivity" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/main_background">
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_icon"
+
+            android:elevation="@dimen/small_elevation"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="@dimen/action_icon"
+                android:layout_height="@dimen/action_icon"
+                android:layout_gravity="start|bottom"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->activity.finish()}"
+                android:padding="@dimen/main_padding"
+                android:src="@drawable/ic_round_arrow_left__white_24" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_icon"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:letterSpacing="0.02"
+                android:text="@string/log"
+                android:textColor="@color/white"
+                android:textSize="@dimen/title_text"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/action_menu"
+                android:layout_width="@dimen/action_icon"
+                android:layout_height="@dimen/action_icon"
+                android:layout_gravity="bottom|end"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->activity.action()}"
+                android:padding="@dimen/main_padding"
+                android:src="@drawable/ic_baseline_more_horiz_24_white" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/log_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

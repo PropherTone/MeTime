@@ -1,17 +1,13 @@
 package com.protone.common.entity
 
 import android.net.Uri
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.protone.common.utils.converters.ListTypeConverter
 import com.protone.common.utils.converters.UriTypeConverter
 
 @Entity
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleryMedia(
-    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "media_uri")
     val uri: Uri,
     @ColumnInfo(name = "name")
@@ -37,6 +33,10 @@ data class GalleryMedia(
     @ColumnInfo(name = "isVideo")
     val isVideo: Boolean,
 ) {
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "mediaId")
+    var mediaId: Long = 0L
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

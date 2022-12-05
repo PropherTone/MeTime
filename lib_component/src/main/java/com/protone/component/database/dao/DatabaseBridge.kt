@@ -1,5 +1,6 @@
 package com.protone.component.database.dao
 
+import android.util.Log
 import com.protone.component.database.MediaAction
 import com.protone.common.entity.*
 
@@ -26,37 +27,19 @@ class DatabaseBridge : DatabaseHelper() {
 
     inner class MusicDAOBridge : BaseMusicDAO() {
 
-        override fun sendEvent(mediaAction: MediaAction.MusicDataAction) {
+        override suspend fun sendEvent(mediaAction: MediaAction.MusicDataAction) {
             sendMusicAction(mediaAction)
         }
 
-        fun insertMusicMultiAsync(music: List<Music>) {
+        fun insertMusicMultiAsync(musics: List<Music>) {
             execute {
-                music.forEach {
-                    insertMusic(it)
-                }
+                insertMusicMulti(musics)
             }
         }
 
-        suspend fun insertMusicMulti(music: List<Music>) {
-            music.forEach {
-                insertMusic(it)
-            }
-        }
-
-        fun deleteMusicMultiAsync(music: List<Music>) {
-            if (music.isEmpty()) return
+        fun deleteMusicMultiAsync(musics: List<Music>) {
             execute {
-                music.forEach {
-                    deleteMusic(it)
-                }
-            }
-        }
-
-        suspend fun deleteMusicMulti(music: List<Music>) {
-            if (music.isEmpty()) return
-            music.forEach {
-                deleteMusic(it)
+                deleteMusicMulti(musics)
             }
         }
 
@@ -156,15 +139,13 @@ class DatabaseBridge : DatabaseHelper() {
 
     inner class GalleryDAOBridge : BaseGalleryDAO() {
 
-        override fun sendEvent(mediaAction: MediaAction.GalleryDataAction) {
+        override suspend fun sendEvent(mediaAction: MediaAction.GalleryDataAction) {
             sendGalleryAction(mediaAction)
         }
 
-        fun deleteSignedMediaMultiAsync(list: MutableList<GalleryMedia>) {
+        fun deleteSignedMediaMultiAsync(list: List<GalleryMedia>) {
             execute {
-                list.forEach {
-                    deleteSignedMediaByUri(it.uri)
-                }
+                deleteSignedMediaMulti(list)
             }
         }
 
@@ -179,15 +160,19 @@ class DatabaseBridge : DatabaseHelper() {
         }
 
         fun updateMediaMultiAsync(list: MutableList<GalleryMedia>) {
-            execute { list.forEach { updateSignedMedia(it) } }
+            execute { updateSignedMediaMulti(list) }
         }
 
-        fun insertMediaAsync(media: GalleryMedia) = execute {
-            insertSignedMedia(media)
+        fun insertMediaAsync(media: GalleryMedia) {
+            execute {
+                insertSignedMedia(media)
+            }
         }
 
-        fun deleteSignedMediasByGalleryAsync(gallery: String) = execute {
-            deleteSignedMediasByGallery(gallery)
+        fun deleteSignedMediasByGalleryAsync(gallery: String) {
+            execute {
+                deleteSignedMediasByGallery(gallery)
+            }
         }
 
         fun deleteGalleryBucketAsync(galleryBucket: GalleryBucket) {
@@ -234,7 +219,7 @@ class DatabaseBridge : DatabaseHelper() {
 
     inner class NoteDAOBridge : BaseNoteDAO() {
 
-        override fun sendEvent(mediaAction: MediaAction.NoteDataAction) {
+        override suspend fun sendEvent(mediaAction: MediaAction.NoteDataAction) {
             sendNoteAction(mediaAction)
         }
 

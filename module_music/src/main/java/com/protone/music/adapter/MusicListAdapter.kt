@@ -11,7 +11,7 @@ import com.protone.component.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.music.databinding.MusicListLayoutBinding
 
-class MusicListAdapter(context: Context, private val musicList: MutableList<Music>) :
+class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
     SelectListAdapter<MusicListLayoutBinding, Music, MusicListAdapter.MusicListEvent>(
         context,
         true
@@ -22,13 +22,17 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
         data class InsertMusics(val musics: Collection<Music>) : MusicListEvent()
     }
 
+    init {
+        mList.addAll(musicList)
+    }
+
     var clickCallback: ((Music) -> Unit?)? = null
 
     private var playPosition = -1
 
-    override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect ->
-            holder.binding.apply {
+    override val select: (MusicListLayoutBinding, Int, isSelect: Boolean) -> Unit =
+        { binding, _, isSelect ->
+            binding.apply {
                 clickAnimation(
                     isSelect,
                     musicListContainer,
@@ -47,24 +51,24 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
     override suspend fun onEventIO(data: MusicListEvent) {
         when (data) {
             is MusicListEvent.PlayPosition -> {
-                if (musicList.size <= 0) return
-                if (musicList.contains(data.music)) {
+                if (mList.size <= 0) return
+                if (mList.contains(data.music)) {
                     clearAllSelected()
                     selectList.add(data.music)
-                    playPosition = musicList.indexOf(data.music)
+                    playPosition = mList.indexOf(data.music)
                     notifyItemChangedCO(playPosition)
                 }
             }
             is MusicListEvent.InsertMusics -> {
                 if (data.musics.isEmpty()) return
-                val oldSize = musicList.size - 1
-                musicList.addAll(data.musics)
-                notifyItemRangeInsertedCO(oldSize, musicList.size - 1)
+                val oldSize = mList.size - 1
+                mList.addAll(data.musics)
+                notifyItemRangeInsertedCO(oldSize, mList.size - 1)
             }
         }
     }
 
-    override fun itemIndex(path: Music): Int = musicList.indexOf(path)
+    override fun itemIndex(path: Music): Int = mList.indexOf(path)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -82,8 +86,8 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder<MusicListLayoutBinding>, position: Int) {
         holder.binding.apply {
-            musicList[position].let { music ->
-                setSelect(holder, selectList.contains(music))
+            mList[position].let { music ->
+                setSelect(holder.binding, position, selectList.contains(music))
                 musicListContainer.setOnClickListener {
                     if (selectList.contains(music)) return@setOnClickListener
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
@@ -111,16 +115,14 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
         }
     }
 
-    override fun getItemCount(): Int = musicList.size
-
     fun getPlayingPosition(): Int {
-        if (musicList.size <= 0) return -1
-        return musicList.indexOf(selectList.getOrNull(0) ?: musicList[0])
+        if (mList.size <= 0) return -1
+        return mList.indexOf(selectList.getOrNull(0) ?: mList[0])
     }
 
     fun getPlayingMusic(): Music? = selectList.getOrNull(0)
 
-    fun getPlayList() = musicList.toMutableList()
+    fun getPlayList() = mList.toMutableList()
 
     fun playPosition(music: Music) {
         if (selectList.contains(music)) return

@@ -109,6 +109,15 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         startActivity(intent)
     }
 
+    inline fun <T> startActivityWithGainData(
+        data: T,
+        routerPath: String,
+        crossinline postCard: Postcard.() -> Postcard
+    ) {
+        IntentDataHolder.put(data)
+        ARouter.getInstance().build(routerPath).postCard().navigation()
+    }
+
     inline fun <reified T> getGainData(): T? {
         return IntentDataHolder.get().let {
             if (it is T) {

@@ -7,12 +7,12 @@ import com.protone.common.utils.converters.ListTypeConverter
 import com.protone.common.utils.converters.UriTypeConverter
 
 @Entity(
-    primaryKeys = ["media_uri", "noteId"],
+    primaryKeys = ["mediaId", "noteId"],
     foreignKeys = [
         ForeignKey(
             entity = GalleryMedia::class,
-            parentColumns = ["media_uri"],
-            childColumns = ["media_uri"],
+            parentColumns = ["mediaId"],
+            childColumns = ["mediaId"],
             onDelete = CASCADE
         ),
         ForeignKey(
@@ -23,15 +23,15 @@ import com.protone.common.utils.converters.UriTypeConverter
         )
     ], indices = [
         Index(
-            value = ["noteId", "media_uri"],
+            value = ["noteId", "mediaId"],
             unique = true
         )
     ]
 )
 @TypeConverters(ListTypeConverter::class, UriTypeConverter::class)
 data class GalleriesWithNotes(
-    @ColumnInfo(name = "media_uri")
-    val uri: Uri,
+    @ColumnInfo(name = "mediaId")
+    val mediaId: Long,
     @ColumnInfo(name = "noteId")
     val noteId: Long
 )

@@ -3,9 +3,13 @@ package com.protone.common.utils.displayUtils
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.app.Activity
+import android.app.Application
+import android.os.Bundle
 import android.view.View
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
+import com.protone.common.context.MApplication
 
 object AnimationHelper {
 

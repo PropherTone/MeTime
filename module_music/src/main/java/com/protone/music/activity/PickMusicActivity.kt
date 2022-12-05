@@ -182,11 +182,11 @@ class PickMusicActivity :
         bucket,
         mode,
         proxy
-    ).apply { musicList = musics }
+    ).apply { setData(musics) }
 
     private fun getList(): MutableList<Music>? = binding.addMBList.adapter.let {
         if (it is AddMusicListAdapter) {
-            return it.musicList
+            return it.mList
         } else null
     }
 

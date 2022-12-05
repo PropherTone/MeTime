@@ -77,6 +77,17 @@ class RouterPath {
                     putString(NOTE_NAME, noteName)
                 })
         }
+
+        object NoteEditWire {
+            const val CONTENT_TITLE = "NoteContentTitle"
+            const val NOTE_DIR = "NoteType"
+            const val NOTE = "Note"
+
+            fun Postcard.noteEditPostcard(title: String): Postcard =
+                with(Bundle().apply {
+                    putString(CONTENT_TITLE, title)
+                })
+        }
     }
 
     object MusicRouterPath {
@@ -98,5 +109,11 @@ class RouterPath {
                     putString(MODE, mode)
                 })
         }
+    }
+
+    object ConfigRouterPath {
+        private const val Home = "/Config"
+        const val UserConfig = "$Home/UserConfgi"
+        const val Log = "$Home/Log"
     }
 }
