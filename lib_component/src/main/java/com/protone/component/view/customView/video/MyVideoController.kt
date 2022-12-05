@@ -54,8 +54,8 @@ class MyVideoController @JvmOverloads constructor(
         Image.load(path).with(context).into(binding.vVideoCover)
     }
 
-    private var isPlaying = false
-        set(value) {
+    var isPlaying = false
+        private set(value) {
             binding.vStart.setImageDrawable(
                 if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
                 else R.drawable.ic_baseline_pause_24_white.getDrawable()

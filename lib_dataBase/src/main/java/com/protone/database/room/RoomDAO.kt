@@ -7,7 +7,7 @@ import com.protone.common.entity.Note
 import com.protone.database.room.dao.*
 import com.wajahatkarim3.roomexplorer.RoomExplorer
 
-inline fun <T> List<T>.mapToLongList(block: (T) -> Long): List<Long> {
+inline fun <reified T> List<T>.mapToLongList(block: (T) -> Long): List<Long> {
     val list = mutableListOf<Long>()
     this.forEach {
         block(it).apply {

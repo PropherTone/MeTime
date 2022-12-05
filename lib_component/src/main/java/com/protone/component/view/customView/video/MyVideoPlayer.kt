@@ -35,8 +35,16 @@ class MyVideoPlayer @JvmOverloads constructor(
             field = value
         }
 
+    val isPlaying get() = videoController.isPlaying
+
     fun setFullScreen(listener: () -> Unit) {
         videoController.fullScreen(listener)
+    }
+
+    private var onClick: () -> Unit = {}
+
+    fun setOnClickEvent(block: () -> Unit) {
+        onClick = block
     }
 
     private var mediaPlayer: MediaPlayer? = null
@@ -74,7 +82,10 @@ class MyVideoPlayer @JvmOverloads constructor(
             LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         )
         setOnClickListener {
-            videoController.isVisible = !videoController.isVisible
+            onClick()
+            if (videoController.isPlaying) {
+                videoController.isVisible = !videoController.isVisible
+            }
         }
     }
 

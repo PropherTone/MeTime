@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.R
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.getString
+import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.onGlobalLayout
@@ -71,7 +72,7 @@ class GalleryFragment(
         viewModel = model
         viewModel.apply {
             attachFragEvent(onAttach)
-            launch(Dispatchers.Default) {
+            launchDefault {
                 fragEvent.bufferCollect {
                     when (it) {
                         is GalleryFragmentViewModel.FragEvent.AddBucket -> {

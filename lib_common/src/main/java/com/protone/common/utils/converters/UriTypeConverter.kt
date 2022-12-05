@@ -8,12 +8,12 @@ import com.protone.common.utils.json.toUriJson
 class UriTypeConverter{
 
     @TypeConverter
-    fun stringToObject(value: String): Uri {
-        return value.toUri()
+    fun stringToObject(value: String?): Uri? {
+        return value?.toUri()
     }
 
     @TypeConverter
-    fun objectToString(uri: Uri): String {
-        return uri.toUriJson()
+    fun objectToString(uri: Uri?): String? {
+        return uri?.toUriJson()
     }
 }

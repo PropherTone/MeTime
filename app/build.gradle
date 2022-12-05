@@ -50,6 +50,7 @@ dependencies {
         implementation project(path: ':module_note')
         implementation project(path: ':module_gallery')
         implementation project(path: ':module_music')
+        implementation project(path: ':module_config')
     }
 
     testImplementation 'junit:junit:4.13.2'

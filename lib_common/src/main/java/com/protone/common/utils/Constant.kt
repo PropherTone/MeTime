@@ -113,7 +113,7 @@ class RouterPath {
 
     object ConfigRouterPath {
         private const val Home = "/Config"
-        const val UserConfig = "$Home/UserConfgi"
+        const val UserConfig = "$Home/UserConfig"
         const val Log = "$Home/Log"
     }
 }

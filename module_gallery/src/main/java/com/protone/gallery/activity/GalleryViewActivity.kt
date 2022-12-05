@@ -137,7 +137,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     private fun GalleryViewViewModel.setMediaInfo(position: Int) {
-        if (position > 0 && position < galleryMedias.size - 1) {
+        if (position >= 0 && position < galleryMedias.size) {
             galleryMedias[position].let { m ->
                 setMediaInfo(
                     m.name,

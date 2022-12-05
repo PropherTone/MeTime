@@ -159,7 +159,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
     private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
         launchDefault {
-            var allSignedMedia = getAllSignedMedia() as MutableList
+            val allSignedMedia = getAllSignedMedia() as MutableList
             val sortMedias = async(Dispatchers.Default) {
                 val uncheckedGalleries = getAllGallery() as MutableList<String>
                 sortGalleries(uncheckedGalleries)
@@ -173,7 +173,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 }
             }
 
-            allSignedMedia = sortMedias.await() as MutableList<GalleryMedia>
+            allSignedMedia.removeAll(sortMedias.await())
 
             fun sortMedia(
                 dao: DatabaseBridge.GalleryDAOBridge,
@@ -193,44 +193,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     dao.insertMediaAsync(it)
                 }
             }
-
-            val test = async(Dispatchers.IO) {
-                val durations = mutableListOf<Long>()
-                val medias = mutableListOf<GalleryMedia>()
-                repeat(10000) {
-                    medias.add(
-                        GalleryMedia(
-                            Uri.EMPTY,
-                            it.toString(),
-                            "123",
-                            "123",
-                            123L,
-                            null,
-                            null,
-                            123,
-                            123,
-                            null,
-                            0,
-                            false
-                        )
-                    )
-                }
-                durations.add(measureTimeMillis {
-                    insertSignedMediaMulti(medias.filter {
-                        it.name.toInt() % 2 == 0
-                    })
-                })
-                durations.add(measureTimeMillis {
-                    medias.forEach {
-                        if (it.name.toInt() % 2 == 0) {
-                            insertMediaAsync(it)
-                        }
-                    }
-                })
-                durations
-            }
-
-            Log.d(TAG, "updateGallery: ${test.await()}")
 
             val scanPicture = async(Dispatchers.Default) {
                 flow {
