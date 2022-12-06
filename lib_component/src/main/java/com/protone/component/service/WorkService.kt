@@ -13,7 +13,6 @@ import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchIO
 import com.protone.common.baseType.toast
 import com.protone.common.context.workIntentFilter
-import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
 import com.protone.common.media.*
@@ -22,9 +21,13 @@ import com.protone.common.utils.TAG
 import com.protone.component.broadcast.MediaContentObserver
 import com.protone.component.broadcast.WorkReceiver
 import com.protone.component.broadcast.workLocalBroadCast
-import kotlinx.coroutines.*
+import com.protone.component.database.MediaAction
+import com.protone.component.database.dao.DatabaseBridge
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flow
-import kotlin.system.measureTimeMillis
 
 class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
@@ -175,47 +178,39 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
             allSignedMedia.removeAll(sortMedias.await())
 
-            fun sortMedia(
-                dao: DatabaseBridge.GalleryDAOBridge,
-                allSignedMedia: List<GalleryMedia>?,
-                it: GalleryMedia
-            ) {
+            val updateList = mutableListOf<GalleryMedia>()
+            val insertList = mutableListOf<GalleryMedia>()
+            fun sortMedia(allSignedMedia: List<GalleryMedia>?, it: GalleryMedia) {
                 if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
                     allSignedMedia.indexOf(it).let { index ->
                         if (index != -1) {
                             if (allSignedMedia[index] == it) return@let
-                            dao.updateSignedMediaAsync(it)
+                            updateList.add(it)
                         } else {
-                            dao.insertMediaAsync(it)
+                            insertList.add(it)
                         }
                     }
                 } else {
-                    dao.insertMediaAsync(it)
+                    insertList.add(it)
                 }
             }
 
             val scanPicture = async(Dispatchers.Default) {
-                flow {
-                    scanPicture { _, galleryMedia ->
-                        emit(galleryMedia)
-                    }
-                }.bufferCollect {
-                    sortMedia(this@run, allSignedMedia, it)
+                scanPicture { _, galleryMedia ->
+                    sortMedia(allSignedMedia, galleryMedia)
                 }
             }
 
             val scanVideo = async(Dispatchers.Default) {
-                flow {
-                    scanVideo { _, galleryMedia ->
-                        emit(galleryMedia)
-                    }
-                }.bufferCollect {
-                    sortMedia(this@run, allSignedMedia, it)
+                scanVideo { _, galleryMedia ->
+                    sortMedia(allSignedMedia, galleryMedia)
                 }
             }
 
             scanPicture.await()
             scanVideo.await()
+            insertSignedMediaMulti(insertList)
+            updateSignedMediaMulti(updateList)
         }
     }
 

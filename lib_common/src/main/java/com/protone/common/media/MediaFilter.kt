@@ -190,7 +190,7 @@ inline fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
     }
 }
 
-fun sortGalleries(galleries:MutableList<String>) {
+fun sortGalleries(galleries: MutableList<String>) {
     val externalUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val quarryArray = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
     val lastGalleries = mutableListOf<String>()
@@ -252,9 +252,10 @@ inline fun scanPicture(function: ((Uri, GalleryMedia) -> Unit)) {
                 dateModifiedTime,
                 thumbnailUri, 0,
                 false
-            ).let { gm ->
-                function.invoke(gm.uri, gm)
+            ).run {
+                function.invoke(uri, this)
             }
+
         }
     }
 }

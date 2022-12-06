@@ -72,19 +72,25 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
         }
     }
 
-    suspend fun deleteSignedMediaMulti(medias: List<GalleryMedia>) = withIOContext {
-        signedGalleryDAO.deleteSignedMediaMulti(medias).apply {
-            sendEvent(
-                MediaAction.GalleryDataAction.OnGalleryMediasDeleted(medias mediasFilterBy this)
-            )
+    suspend fun deleteSignedMediaMulti(medias: List<GalleryMedia>): List<Long>? {
+        if (medias.isEmpty()) return null
+        return withIOContext {
+            signedGalleryDAO.deleteSignedMediaMulti(medias).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnGalleryMediasDeleted(medias mediasFilterBy this)
+                )
+            }
         }
     }
 
-    suspend fun insertSignedMediaMulti(medias: List<GalleryMedia>) = withIOContext {
-        signedGalleryDAO.insertSignedMediaMulti(medias).apply {
-            sendEvent(
-                MediaAction.GalleryDataAction.OnGalleryMediasInserted(medias mediasFilterBy this)
-            )
+    suspend fun insertSignedMediaMulti(medias: List<GalleryMedia>): List<Long>? {
+        if (medias.isEmpty()) return null
+        return withIOContext {
+            signedGalleryDAO.insertSignedMediaMulti(medias).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnGalleryMediasInserted(medias mediasFilterBy this)
+                )
+            }
         }
     }
 
@@ -100,11 +106,14 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
         }
     }
 
-    suspend fun updateSignedMediaMulti(medias: List<GalleryMedia>) = withIOContext {
-        signedGalleryDAO.updateSignedMediaMulti(medias).apply {
-            sendEvent(
-                MediaAction.GalleryDataAction.OnGalleryMediasUpdated(medias mediasFilterBy this)
-            )
+    suspend fun updateSignedMediaMulti(medias: List<GalleryMedia>): List<Long>? {
+        if (medias.isEmpty()) return null
+        return withIOContext {
+            signedGalleryDAO.updateSignedMediaMulti(medias).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnGalleryMediasUpdated(medias mediasFilterBy this)
+                )
+            }
         }
     }
 
@@ -113,8 +122,9 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
 
     suspend fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) =
         withIOContext {
-            galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes)
-            sendEvent(MediaAction.GalleryDataAction.OnGalleriesWithNotesInserted(galleriesWithNotes))
+            galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes).apply {
+                sendEvent(MediaAction.GalleryDataAction.OnGalleriesWithNotesInserted(galleriesWithNotes))
+            }
         }
 
     suspend fun getNotesWithGallery(uri: Uri): List<Note> = withIOContext {
@@ -139,12 +149,14 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
         }
 
     suspend fun insertGalleryBucket(galleryBucket: GalleryBucket) = withIOContext {
-        galleryBucketDAO.insertGalleryBucket(galleryBucket)
-        sendEvent(MediaAction.GalleryDataAction.OnGalleryBucketInserted(galleryBucket))
+        galleryBucketDAO.insertGalleryBucket(galleryBucket).apply {
+            sendEvent(MediaAction.GalleryDataAction.OnGalleryBucketInserted(galleryBucket))
+        }
     }
 
     suspend fun deleteGalleryBucket(galleryBucket: GalleryBucket) = withIOContext {
-        galleryBucketDAO.deleteGalleryBucket(galleryBucket)
-        sendEvent(MediaAction.GalleryDataAction.OnGalleryBucketDeleted(galleryBucket))
+        galleryBucketDAO.deleteGalleryBucket(galleryBucket).apply {
+            sendEvent(MediaAction.GalleryDataAction.OnGalleryBucketDeleted(galleryBucket))
+        }
     }
 }

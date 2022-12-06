@@ -72,65 +72,69 @@ class GalleryFragment(
         viewModel = model
         viewModel.apply {
             attachFragEvent(onAttach)
-            launchDefault {
-                fragEvent.bufferCollect {
-                    when (it) {
-                        is GalleryFragmentViewModel.FragEvent.AddBucket -> {
-                            insertNewMedias(it.name, it.list)
-                        }
-                        is GalleryFragmentViewModel.FragEvent.SelectAll -> {
-                            getListAdapter().selectAll()
-                            onSelectMod = true
-                        }
-                        is GalleryFragmentViewModel.FragEvent.OnActionBtn -> {
-                            onSelectMod = true
-                        }
-                        is GalleryFragmentViewModel.FragEvent.IntoBox -> {
-                            IntentDataHolder.put(
-                                (if (getListAdapter().selectList.size > 0) {
-                                    getListAdapter().selectList
-                                } else {
-                                    getGallery(getGalleryName())
-                                        ?: getGallery(ALL_GALLERY)
-                                })
-                            )
-                            startActivity(PictureBoxActivity::class.intent)
-                        }
-                        is GalleryFragmentViewModel.FragEvent.OnNewBucket -> {
-                            insertBucket(it.pairs)
-                        }
-                        is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
-                            refreshBucket(it.galleryMedia)
-                            if (onTargetGallery(it.galleryMedia.bucket)) {
-                                noticeListUpdate(
-                                    it.galleryMedia,
-                                    GalleryListAdapter.MediaStatus.DELETED
-                                )
-                            }
-                        }
-                        is GalleryFragmentViewModel.FragEvent.OnMediaInserted -> {
-                            refreshBucket(it.galleryMedia)
-                            if (onTargetGallery(it.galleryMedia.bucket)) {
-                                noticeListUpdate(
-                                    it.galleryMedia,
-                                    GalleryListAdapter.MediaStatus.INSERTED
-                                )
-                            }
-                        }
-                        is GalleryFragmentViewModel.FragEvent.OnMediaUpdated -> {
-                            if (onTargetGallery(it.galleryMedia.bucket)) {
-                                noticeListUpdate(
-                                    it.galleryMedia,
-                                    GalleryListAdapter.MediaStatus.UPDATED
-                                )
-                            }
-                        }
-                        else -> Unit
-                    }
-                }
-            }
+            observeEvent()
             isVideo = this@GalleryFragment.isVideo
             isLock = this@GalleryFragment.isLock
+        }
+    }
+
+    private fun GalleryFragmentViewModel.observeEvent() {
+        launchDefault {
+            fragEvent.bufferCollect {
+                when (it) {
+                    is GalleryFragmentViewModel.FragEvent.AddBucket -> {
+                        insertNewMedias(it.name, it.list)
+                    }
+                    is GalleryFragmentViewModel.FragEvent.SelectAll -> {
+                        getListAdapter().selectAll()
+                        onSelectMod = true
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnActionBtn -> {
+                        onSelectMod = true
+                    }
+                    is GalleryFragmentViewModel.FragEvent.IntoBox -> {
+                        IntentDataHolder.put(
+                            (if (getListAdapter().selectList.size > 0) {
+                                getListAdapter().selectList
+                            } else {
+                                getGallery(getGalleryName())
+                                    ?: getGallery(ALL_GALLERY)
+                            })
+                        )
+                        startActivity(PictureBoxActivity::class.intent)
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnNewBucket -> {
+                        insertBucket(it.pairs)
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
+                        refreshBucket(it.galleryMedia)
+                        if (onTargetGallery(it.galleryMedia.bucket)) {
+                            noticeListUpdate(
+                                it.galleryMedia,
+                                GalleryListAdapter.MediaStatus.DELETED
+                            )
+                        }
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnMediaInserted -> {
+                        refreshBucket(it.galleryMedia)
+                        if (onTargetGallery(it.galleryMedia.bucket)) {
+                            noticeListUpdate(
+                                it.galleryMedia,
+                                GalleryListAdapter.MediaStatus.INSERTED
+                            )
+                        }
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnMediaUpdated -> {
+                        if (onTargetGallery(it.galleryMedia.bucket)) {
+                            noticeListUpdate(
+                                it.galleryMedia,
+                                GalleryListAdapter.MediaStatus.UPDATED
+                            )
+                        }
+                    }
+                    else -> Unit
+                }
+            }
         }
     }
 
@@ -187,6 +191,7 @@ class GalleryFragment(
     }
 
     override fun onDestroy() {
+        binding.unbind()
         cancel()
         super.onDestroy()
     }
@@ -202,14 +207,14 @@ class GalleryFragment(
         }
         galleryBucket.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = GalleryBucketAdapter(
-                context,
-                object : GalleryBucketAdapter.GalleryBucketAdapterDataProxy {
-                    override fun deleteGalleryBucket(bucket: String) {
-                        viewModel.deleteGalleryBucket(bucket)
-                    }
+            adapter = GalleryBucketAdapter(context) {
+                selectBucket {
+                    onGallerySelected(it)
                 }
-            ) { onGallerySelected(it) }
+                deleteGalleryBucket {
+                    viewModel.deleteGalleryBucket(it)
+                }
+            }
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(
                     outRect: Rect,

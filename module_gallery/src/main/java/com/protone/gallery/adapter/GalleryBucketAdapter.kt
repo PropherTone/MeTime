@@ -12,17 +12,21 @@ import com.protone.common.context.MApplication
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.R
+import com.protone.common.entity.GalleryBucket
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryBucketListLayoutBinding
 
 class GalleryBucketAdapter(
     context: Context,
-    private val galleryBucketAdapterDataProxy: GalleryBucketAdapterDataProxy,
-    private val selectBucket: (String) -> Unit
+    block: GalleryBucketAdapterDataProxy.() -> Unit
 ) : SelectListAdapter<GalleryBucketListLayoutBinding, Pair<Uri, Array<String>>, GalleryBucketAdapter.GalleryBucketEvent>(
     context, true
 ) {
+
+    init {
+        GalleryBucketAdapterDataProxy().block()
+    }
 
     sealed class GalleryBucketEvent {
         data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleryBucketEvent()
@@ -104,7 +108,7 @@ class GalleryBucketAdapter(
                         .setPositiveButton(
                             R.string.confirm
                         ) { dialog, _ ->
-                            galleryBucketAdapterDataProxy.deleteGalleryBucket(mList[position].second[0])
+                            deleteGalleryBucket(mList[position].second[0])
                             deleteBucket(mList[position])
                             dialog.dismiss()
                         }.setNegativeButton(R.string.cancel) { dialog, _ ->
@@ -150,7 +154,17 @@ class GalleryBucketAdapter(
         emit(GalleryBucketEvent.InsertBucket(item))
     }
 
-    interface GalleryBucketAdapterDataProxy {
-        fun deleteGalleryBucket(bucket: String)
+    private var deleteGalleryBucket: (String) -> Unit = {}
+    private var selectBucket: (String) -> Unit = {}
+
+    inner class GalleryBucketAdapterDataProxy {
+
+        fun deleteGalleryBucket(block: (String) -> Unit) {
+            deleteGalleryBucket = block
+        }
+
+        fun selectBucket(block: (String) -> Unit) {
+            selectBucket = block
+        }
     }
 }
