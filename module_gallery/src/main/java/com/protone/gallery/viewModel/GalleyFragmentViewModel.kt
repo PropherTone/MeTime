@@ -1,6 +1,7 @@
 package com.protone.gallery.viewModel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
@@ -10,11 +11,11 @@ import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
+import com.protone.common.utils.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GalleryFragmentViewModel : ViewModel() {
@@ -27,8 +28,11 @@ class GalleryFragmentViewModel : ViewModel() {
         object OnActionBtn : FragEvent()
         object IntoBox : FragEvent()
 
-        data class AddBucket(val name: String, val list: MutableList<GalleryMedia>) : FragEvent()
-        data class OnNewBucket(val pairs: Pair<Uri, Array<String>>) : FragEvent()
+        data class AddGalleryBucket(val name: String, val list: MutableList<GalleryMedia>) :
+            FragEvent()
+
+        data class OnNewGalleryBucket(val pairs: Pair<Uri, Array<String>>) : FragEvent()
+        data class OnGalleryRemoved(val pairs: Pair<Uri, Array<String>>) : FragEvent()
 
         data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : FragEvent()
 
@@ -77,7 +81,7 @@ class GalleryFragmentViewModel : ViewModel() {
             }
             galleryMap[ALL_GALLERY] = signedMedias
             sendEvent(
-                FragEvent.OnNewBucket(
+                FragEvent.OnNewGalleryBucket(
                     Pair(
                         if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
                         arrayOf(ALL_GALLERY, signedMedias.size.toString())
@@ -90,7 +94,7 @@ class GalleryFragmentViewModel : ViewModel() {
                             as MutableList<GalleryMedia>)
                         .also { list ->
                             sendEvent(
-                                FragEvent.OnNewBucket(
+                                FragEvent.OnNewGalleryBucket(
                                     Pair(
                                         if (list.size > 0) list[0].uri else Uri.EMPTY,
                                         arrayOf(it, list.size.toString())
@@ -110,7 +114,12 @@ class GalleryFragmentViewModel : ViewModel() {
                 if (re) {
                     if (!isLock) {
                         sendEvent(
-                            FragEvent.OnNewBucket((Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE"))))
+                            FragEvent.OnNewGalleryBucket(
+                                (Pair(
+                                    Uri.EMPTY,
+                                    arrayOf(reName, "PRIVATE")
+                                ))
+                            )
                         )
                         galleryMap[reName] = mutableListOf()
                     } else {
@@ -148,7 +157,14 @@ class GalleryFragmentViewModel : ViewModel() {
                 .galleryDAOBridge
                 .getAllGalleryBucket(isVideo) as MutableList<GalleryBucket>?)
                 ?.forEach {
-                    sendEvent(FragEvent.OnNewBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE"))))
+                    sendEvent(
+                        FragEvent.OnNewGalleryBucket(
+                            Pair(
+                                Uri.EMPTY,
+                                arrayOf(it.type, "PRIVATE")
+                            )
+                        )
+                    )
                     galleryMap[it.type] = mutableListOf()
                 }
             isDataSorted = true
@@ -156,7 +172,8 @@ class GalleryFragmentViewModel : ViewModel() {
     }
 
     private fun observeGallery() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launchDefault {
+            Log.d(TAG, "observeGallery: launch")
             fun sortDeleteMedia(
                 media: GalleryMedia,
                 map: MutableMap<String?, MutableList<GalleryMedia>>
@@ -175,7 +192,7 @@ class GalleryFragmentViewModel : ViewModel() {
             ) {
                 if (map[media.bucket] == null) {
                     map[media.bucket] = mutableListOf<GalleryMedia>().also { it.add(media) }
-                    FragEvent.OnNewBucket(
+                    FragEvent.OnNewGalleryBucket(
                         Pair(
                             media.uri,
                             arrayOf(media.bucket, map[media.bucket]?.size.toString())
@@ -223,7 +240,9 @@ class GalleryFragmentViewModel : ViewModel() {
             }
 
             DatabaseBridge.instance.galleryMessenger.bufferCollect {
+                Log.d(TAG, "observeGallery: $it")
                 while (!isDataSorted) delay(200)
+                Log.d(TAG, "observeGallery2: $it")
                 when (it) {
                     is MediaAction.GalleryDataAction.OnGalleryMediaDeleted -> {
                         if (it.media.isVideo != isVideo) return@bufferCollect
@@ -241,6 +260,21 @@ class GalleryFragmentViewModel : ViewModel() {
                     }
                     is MediaAction.GalleryDataAction.OnGalleryMediaUpdated -> {
                         onGalleryMediaUpdated(isVideo, it.media, galleryMap, ALL_GALLERY)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryDeleted -> {
+                        galleryMap.remove(it.gallery)?.let { _ ->
+                            sendEvent(
+                                FragEvent.OnGalleryRemoved(
+                                    Pair(Uri.EMPTY, arrayOf(it.gallery))
+                                )
+                            )
+                        }
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryBucketInserted -> {
+                        TODO("OnGalleryBucketInserted")
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryBucketDeleted -> {
+                        TODO("OnGalleryBucketDeleted")
                     }
                     else -> Unit
                 }

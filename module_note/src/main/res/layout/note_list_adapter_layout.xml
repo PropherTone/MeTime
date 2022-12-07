@@ -12,9 +12,12 @@
         <ImageView
             android:id="@+id/note_back"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:foreground="@drawable/trans_dark2_ripple"
             android:contentDescription="@string/icon"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/note_title"

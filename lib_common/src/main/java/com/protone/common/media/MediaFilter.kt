@@ -205,7 +205,7 @@ fun sortGalleries(galleries: MutableList<String>) {
     }
 }
 
-inline fun scanPicture(function: ((Uri, GalleryMedia) -> Unit)) {
+inline fun scanPicture(function: ((Uri, GalleryMedia) -> Unit)): MutableList<GalleryMedia> {
     val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val queryArray = arrayOf(
         MediaStore.Images.Media.DISPLAY_NAME,
@@ -217,6 +217,7 @@ inline fun scanPicture(function: ((Uri, GalleryMedia) -> Unit)) {
         MediaStore.Images.Thumbnails._ID,
         MediaStore.Images.Media.DATA
     )
+    val list = mutableListOf<GalleryMedia>()
     scan(
         externalContentUri, queryArray,
     ) {
@@ -253,14 +254,16 @@ inline fun scanPicture(function: ((Uri, GalleryMedia) -> Unit)) {
                 thumbnailUri, 0,
                 false
             ).run {
+                list.add(this)
                 function.invoke(uri, this)
             }
 
         }
     }
+    return list
 }
 
-inline fun scanVideo(function: ((Uri, GalleryMedia) -> Unit)) {
+inline fun scanVideo(function: ((Uri, GalleryMedia) -> Unit)): MutableList<GalleryMedia> {
     val externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val query = arrayOf(
         MediaStore.Video.Media.DISPLAY_NAME,
@@ -273,6 +276,7 @@ inline fun scanVideo(function: ((Uri, GalleryMedia) -> Unit)) {
         MediaStore.Video.Media.DURATION,
         MediaStore.Video.Media.DATA
     )
+    val list = mutableListOf<GalleryMedia>()
     scan(
         externalContentUri, query,
     ) {
@@ -311,10 +315,12 @@ inline fun scanVideo(function: ((Uri, GalleryMedia) -> Unit)) {
                 thumbnailUri, duration,
                 true
             ).let { gm ->
+                list.add(gm)
                 function.invoke(gm.uri, gm)
             }
         }
     }
+    return list
 }
 
 fun isUriExist(uri: Uri): Boolean {

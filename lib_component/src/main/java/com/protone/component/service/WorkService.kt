@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flow
+import kotlin.system.measureTimeMillis
 
 class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
@@ -36,7 +37,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         private const val UPDATE_GALLERY = 2
     }
 
-    private val activeTimer = ActiveTimer().apply {
+    private val activeTimer = ActiveTimer(1200L).apply {
         addFunction(UPDATE_MUSIC) { this@WorkService.updateMusic() }
         addFunction(UPDATE_GALLERY) { this@WorkService.updateGallery() }
     }
@@ -163,23 +164,9 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
         launchDefault {
             val allSignedMedia = getAllSignedMedia() as MutableList
-            val sortMedias = async(Dispatchers.Default) {
-                val uncheckedGalleries = getAllGallery() as MutableList<String>
-                sortGalleries(uncheckedGalleries)
-                uncheckedGalleries.forEach {
-                    deleteSignedMediasByGalleryAsync(it)
-                }
-                allSignedMedia.filter {
-                    !uncheckedGalleries.contains(it.bucket) && !isUriExist(it.uri)
-                }.apply {
-                    deleteSignedMediaMultiAsync(this)
-                }
-            }
-
-            allSignedMedia.removeAll(sortMedias.await())
-
             val updateList = mutableListOf<GalleryMedia>()
             val insertList = mutableListOf<GalleryMedia>()
+
             fun sortMedia(allSignedMedia: List<GalleryMedia>?, it: GalleryMedia) {
                 if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
                     allSignedMedia.indexOf(it).let { index ->
@@ -195,20 +182,40 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 }
             }
 
-            val scanPicture = async(Dispatchers.Default) {
-                scanPicture { _, galleryMedia ->
-                    sortMedia(allSignedMedia, galleryMedia)
+            val pictures = scanPicture { _, _ -> }
+            val videos = scanVideo { _, _ -> }
+
+            val sortMedias = async(Dispatchers.Default) {
+                val uncheckedGalleries = getAllGallery() as MutableList<String>
+                sortGalleries(uncheckedGalleries)
+                uncheckedGalleries.forEach {
+                    deleteSignedMediasByGalleryAsync(it)
+                }
+                allSignedMedia.filter {
+                    !uncheckedGalleries.contains(it.bucket)
+                            && (pictures.find { gm -> gm.uri == it.uri } != null
+                            && videos.find { gm -> gm.uri == it.uri } != null)
+                }.apply {
+                    deleteSignedMediaMultiAsync(this)
                 }
             }
 
-            val scanVideo = async(Dispatchers.Default) {
-                scanVideo { _, galleryMedia ->
-                    sortMedia(allSignedMedia, galleryMedia)
+            allSignedMedia.removeAll(sortMedias.await())
+
+            val pictureJob = async(Dispatchers.Default) {
+                pictures.forEach {
+                    sortMedia(allSignedMedia, it)
+                }
+            }
+            val videoJob = async(Dispatchers.Default) {
+                videos.forEach {
+                    sortMedia(allSignedMedia, it)
                 }
             }
 
-            scanPicture.await()
-            scanVideo.await()
+            pictureJob.await()
+            videoJob.await()
+
             insertSignedMediaMulti(insertList)
             updateSignedMediaMulti(updateList)
         }

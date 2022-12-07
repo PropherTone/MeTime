@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.exitProcess
 
 abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>(
     handleEvent: Boolean
@@ -79,7 +80,10 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
     private val activityOperationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                ACTIVITY_FINISH -> finish()
+                ACTIVITY_FINISH -> {
+                    finish()
+                    exitProcess(0)
+                }
                 ACTIVITY_RESTART -> {}
             }
         }

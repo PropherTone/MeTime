@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
+import com.protone.common.utils.TAG
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.json.toJson
 import com.protone.component.view.dialog.titleDialog
@@ -40,7 +42,6 @@ import com.protone.gallery.adapter.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.databinding.GalleryFragmentLayoutBinding
 import com.protone.gallery.viewModel.GalleryFragmentViewModel
-import com.protone.gallery.viewModel.GalleryViewViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -73,6 +74,7 @@ class GalleryFragment(
         viewModel.apply {
             attachFragEvent(onAttach)
             observeEvent()
+            Log.d(TAG, "onAttach: ")
             isVideo = this@GalleryFragment.isVideo
             isLock = this@GalleryFragment.isLock
         }
@@ -81,8 +83,9 @@ class GalleryFragment(
     private fun GalleryFragmentViewModel.observeEvent() {
         launchDefault {
             fragEvent.bufferCollect {
+                Log.d(TAG, "observeEvent: $it")
                 when (it) {
-                    is GalleryFragmentViewModel.FragEvent.AddBucket -> {
+                    is GalleryFragmentViewModel.FragEvent.AddGalleryBucket -> {
                         insertNewMedias(it.name, it.list)
                     }
                     is GalleryFragmentViewModel.FragEvent.SelectAll -> {
@@ -103,8 +106,11 @@ class GalleryFragment(
                         )
                         startActivity(PictureBoxActivity::class.intent)
                     }
-                    is GalleryFragmentViewModel.FragEvent.OnNewBucket -> {
-                        insertBucket(it.pairs)
+                    is GalleryFragmentViewModel.FragEvent.OnNewGalleryBucket -> {
+                        getBucketAdapter().insertBucket(it.pairs)
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnGalleryRemoved -> {
+                        getBucketAdapter().deleteBucket(it.pairs)
                     }
                     is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
                         refreshBucket(it.galleryMedia)
@@ -233,10 +239,6 @@ class GalleryFragment(
         viewModel.rightGallery = gallery
         binding.galleryShowBucket.negative()
         noticeListUpdate(viewModel.getGallery(gallery))
-    }
-
-    private fun insertBucket(pairs: Pair<Uri, Array<String>>) {
-        getBucketAdapter().insertBucket(pairs)
     }
 
     private fun refreshBucket(media: GalleryMedia): Unit = viewModel.run {

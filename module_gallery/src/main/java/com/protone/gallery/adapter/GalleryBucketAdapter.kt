@@ -108,7 +108,7 @@ class GalleryBucketAdapter(
                         .setPositiveButton(
                             R.string.confirm
                         ) { dialog, _ ->
-                            deleteGalleryBucket(mList[position].second[0])
+                            deleteGalleryBucket?.invoke(mList[position].second[0])
                             deleteBucket(mList[position])
                             dialog.dismiss()
                         }.setNegativeButton(R.string.cancel) { dialog, _ ->
@@ -127,7 +127,7 @@ class GalleryBucketAdapter(
                     bucketItemNumber.text = sec[1]
                     bucket.setOnClickListener {
                         checkSelect(position, data)
-                        selectBucket(sec[0])
+                        selectBucket?.invoke(sec[0])
                     }
                 }
             }
@@ -139,10 +139,10 @@ class GalleryBucketAdapter(
     ) {
         if (!multiChoose) clearSelected()
         selectList.add(item)
-        notifyItemChanged(position, mutableListOf(SELECT))
+        notifyItemChanged(position, (SELECT))
     }
 
-    private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
+    fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
         emit(GalleryBucketEvent.DeleteBucket(bucket))
     }
 
@@ -154,8 +154,8 @@ class GalleryBucketAdapter(
         emit(GalleryBucketEvent.InsertBucket(item))
     }
 
-    private var deleteGalleryBucket: (String) -> Unit = {}
-    private var selectBucket: (String) -> Unit = {}
+    private var deleteGalleryBucket: ((String) -> Unit)? = null
+    private var selectBucket: ((String) -> Unit)? = null
 
     inner class GalleryBucketAdapterDataProxy {
 

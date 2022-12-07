@@ -80,10 +80,10 @@ class NoteListListAdapter(
 
     override fun onBindViewHolder(holder: Holder<NoteListAdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
-            root.setOnClickListener {
+            noteBack.setOnClickListener {
                 onNote?.invoke(currentList[holder.layoutPosition].title)
             }
-            root.setOnLongClickListener {
+            noteBack.setOnLongClickListener {
                 onDelete?.invoke(currentList[holder.layoutPosition])
                 true
             }
