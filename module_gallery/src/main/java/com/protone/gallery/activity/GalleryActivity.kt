@@ -60,16 +60,21 @@ class GalleryActivity :
                 val lock = userConfig.lockGallery.isNotEmpty()
                 when (chooseType) {
                     CHOOSE_PHOTO ->
-                        fs.add(GalleryFragment(false, lock, false) { f -> setMailer(frag1 = f) })
+                        fs.add(GalleryFragment().onInit(false, lock, false) { f ->
+                            setMailer(frag1 = f)
+                        })
                     CHOOSE_VIDEO ->
-                        fs.add(GalleryFragment(true, lock, false) { f -> setMailer(frag2 = f) })
+                        fs.add(GalleryFragment().onInit(true, lock, false) { f ->
+                            setMailer(frag2 = f)
+                        })
                     else -> {
-                        fs.add(GalleryFragment(false, lock, combine) { f -> setMailer(frag1 = f) })
-                        if (!combine) fs.add(GalleryFragment(
-                            true,
-                            lock,
-                            false
-                        ) { f -> setMailer(frag2 = f) })
+                        fs.add(GalleryFragment().onInit(false, lock, combine) { f ->
+                            setMailer(frag1 = f)
+                        })
+                        if (!combine) fs.add(GalleryFragment()
+                            .onInit(true, lock, false) { f ->
+                                setMailer(frag2 = f)
+                            })
                     }
                 }
             }

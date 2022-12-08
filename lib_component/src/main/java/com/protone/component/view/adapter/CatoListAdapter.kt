@@ -52,7 +52,7 @@ class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListD
 
     fun refresh(cateList: List<String>?) {
         cateList?.let {
-            notifyListChanged(it)
+            notifyListChangedCO(it)
         }
     }
 

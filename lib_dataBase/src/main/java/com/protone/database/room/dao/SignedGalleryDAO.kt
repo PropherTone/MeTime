@@ -25,20 +25,29 @@ interface SignedGalleryDAO {
     @Query("SELECT * FROM GalleryMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo ORDER BY dateModified DESC")
     fun getAllMediaByGallery(name: String, isVideo: Boolean): List<GalleryMedia>?
 
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo")
+    fun getMediaCountByGallery(name: String, isVideo: Boolean): Int
+
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket LIKE :name")
+    fun getMediaCountByGallery(name: String): Int
+
+    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia)")
+    fun getNewestMedia(): Uri?
+
     @Query("SELECT * FROM GalleryMedia WHERE bucket LIKE :name ORDER BY dateModified DESC")
     fun getAllMediaByGallery(name: String): List<GalleryMedia>?
-
-    @Query("DELETE FROM GalleryMedia WHERE media_uri LIKE :uri")
-    fun deleteSignedMediaByUri(uri: Uri)
-
-    @Query("DELETE FROM GalleryMedia WHERE bucket LIKE :gallery")
-    fun deleteSignedMediasByGallery(gallery: String)
 
     @Query("SELECT * FROM GalleryMedia WHERE media_uri LIKE :uri")
     fun getSignedMedia(uri: Uri): GalleryMedia?
 
     @Query("SELECT * FROM GalleryMedia WHERE path LIKE :path")
     fun getSignedMedia(path: String): GalleryMedia?
+
+    @Query("DELETE FROM GalleryMedia WHERE media_uri LIKE :uri")
+    fun deleteSignedMediaByUri(uri: Uri)
+
+    @Query("DELETE FROM GalleryMedia WHERE bucket LIKE :gallery")
+    fun deleteSignedMediasByGallery(gallery: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSignedMedia(media: GalleryMedia): Long
@@ -57,7 +66,7 @@ interface SignedGalleryDAO {
     }
 
     @Update
-    fun updateSignedMedia(galleryMedia: GalleryMedia) : Int
+    fun updateSignedMedia(galleryMedia: GalleryMedia): Int
 
     @Transaction
     fun updateSignedMediaMulti(galleryMedias: List<GalleryMedia>): List<Long> {

@@ -1,36 +1,35 @@
 package com.protone.common.entity
 
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
 import com.protone.common.utils.converters.ListTypeConverter
 import com.protone.common.utils.converters.UriTypeConverter
 
 @Entity(
-    primaryKeys = ["mediaId", "noteId"],
+    primaryKeys = ["mediaId", "galleryBucketId"],
     foreignKeys = [
         ForeignKey(
             entity = GalleryMedia::class,
             parentColumns = ["mediaId"],
             childColumns = ["mediaId"],
-            onDelete = CASCADE
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = Note::class,
-            parentColumns = ["noteId"],
-            childColumns = ["noteId"],
-            onDelete = CASCADE
+            entity = GalleryBucket::class,
+            parentColumns = ["galleryBucketId"],
+            childColumns = ["galleryBucketId"],
+            onDelete = ForeignKey.CASCADE
         )
     ], indices = [
         Index(
-            value = ["noteId", "mediaId"],
+            value = ["galleryBucketId", "mediaId"],
             unique = true
         )
     ]
 )
 @TypeConverters(ListTypeConverter::class, UriTypeConverter::class)
-data class GalleriesWithNotes(
+data class MediaWithGalleryBucket(
     @ColumnInfo(name = "mediaId")
     val mediaId: Long,
-    @ColumnInfo(name = "noteId")
-    val noteId: Long
+    @ColumnInfo(name = "galleryBucketId")
+    val galleryBucketId: Long
 )

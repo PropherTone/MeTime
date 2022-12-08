@@ -162,6 +162,7 @@ internal class GlideLoaderEngine : AbstractLoaderEngine<RequestBuilder<Drawable>
 
     override fun into(target: ImageView) {
         manager?.into(target)
+        manager = null
     }
 
     override fun clearCache() {

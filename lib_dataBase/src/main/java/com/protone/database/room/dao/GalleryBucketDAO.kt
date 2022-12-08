@@ -19,5 +19,9 @@ interface GalleryBucketDAO {
     fun deleteGalleryBucket(galleryBucket: GalleryBucket)
 
     @Query("SELECT * FROM GalleryBucket WHERE image LIKE :isVideo")
-    fun getAllGalleryBucket(isVideo : Boolean): List<GalleryBucket>?
+    fun getAllGalleryBucket(isVideo: Boolean): List<GalleryBucket>?
+
+    @Query("SELECT * FROM GalleryBucket")
+    fun getAllGalleryBucket(): List<GalleryBucket>?
+
 }

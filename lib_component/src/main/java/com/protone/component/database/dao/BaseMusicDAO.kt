@@ -11,8 +11,9 @@ import com.protone.database.room.getMusicDAO
 import com.protone.database.room.getMusicWithMusicBucketDAO
 import com.protone.database.room.musicsFilterBy
 
-abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
+sealed class BaseMusicDAO : MusicDAO()
 
+sealed class MusicDAO : MusicBucketDAO() {
     private val musicDAO = getMusicDAO()
 
     suspend fun getAllMusic(): List<Music>? =
@@ -56,8 +57,9 @@ abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
             sendEvent(MediaAction.MusicDataAction.OnMusicUpdate(music))
         }
     }
+}
 
-    /*MusicBucket*****************************************************/
+sealed class MusicBucketDAO : MusicWithMusicBucketDAO() {
     private val musicBucketDAO = getMusicBucketDAO()
 
     suspend fun getAllMusicBucket(): List<MusicBucket>? = withIOContext {
@@ -82,8 +84,9 @@ abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
         sendEvent(MediaAction.MusicDataAction.OnMusicBucketDeleted(musicBucket))
         musicBucketDAO.deleteMusicBucket(musicBucket)
     }
+}
 
-    /*MusicWithMusicBucket*****************************************************/
+sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
     private val musicWithMusicBucketDAO = getMusicWithMusicBucketDAO()
 
     suspend fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? =
@@ -111,5 +114,5 @@ abstract class BaseMusicDAO : BaseDAO<MediaAction.MusicDataAction>() {
         withIOContext {
             musicWithMusicBucketDAO.getMusicBucketWithMusic(musicID) ?: mutableListOf()
         }
-
 }
+

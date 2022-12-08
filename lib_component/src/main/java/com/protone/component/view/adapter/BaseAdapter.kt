@@ -25,7 +25,7 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
 
     val mList = mutableListOf<Item>()
 
-    fun setData(collection: Collection<Item>) {
+    open fun setData(collection: Collection<Item>) {
         mList.clear()
         mList.addAll(collection)
     }
@@ -40,13 +40,13 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         diff = adapterDiff
     }
 
-    open suspend fun onEventIO(data: Event) {}
+    open suspend fun handleEventAsynchronous(data: Event) {}
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         if (handleEvent) launchDefault {
             adapterFlow.bufferCollect {
-                onEventIO(it)
+                handleEventAsynchronous(it)
             }
         }
     }
@@ -64,7 +64,7 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
 
     override fun getItemCount(): Int = mList.size
 
-    fun notifyListChanged(collection: List<Item>) {
+    fun notifyListChangedCO(collection: List<Item>) {
         launchDefault {
             diff?.apply {
                 DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -108,40 +108,40 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         }
     }
 
-    suspend fun notifyItemChangedCO(position: Int): Unit = withContext(Dispatchers.Main) {
+    suspend fun notifyItemChangedCO(position: Int): Unit = withMainContext {
         notifyItemChanged(position)
     }
 
-    suspend fun notifyItemInsertedCO(position: Int): Unit = withContext(Dispatchers.Main) {
+    suspend fun notifyItemInsertedCO(position: Int): Unit = withMainContext {
         notifyItemInserted(position)
     }
 
-    suspend fun notifyItemRemovedCO(position: Int): Unit = withContext(Dispatchers.Main) {
+    suspend fun notifyItemRemovedCO(position: Int): Unit = withMainContext {
         notifyItemRemoved(position)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    suspend fun notifyDataSetChangedCO(): Unit = withContext(Dispatchers.Main) {
+    suspend fun notifyDataSetChangedCO(): Unit = withMainContext {
         notifyDataSetChanged()
     }
 
     suspend fun notifyItemRangeInsertedCO(positionStart: Int, itemCount: Int): Unit =
-        withContext(Dispatchers.Main) {
+        withMainContext {
             notifyItemRangeInserted(positionStart, itemCount)
         }
 
     suspend fun notifyItemRangeRemovedCO(positionStart: Int, itemCount: Int): Unit =
-        withContext(Dispatchers.Main) {
+        withMainContext {
             notifyItemRangeRemoved(positionStart, itemCount)
         }
 
     suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int): Unit =
-        withContext(Dispatchers.Main) {
+        withMainContext {
             notifyItemRangeChanged(positionStart, itemCount)
         }
 
     suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int, payload: Any?): Unit =
-        withContext(Dispatchers.Main) {
+        withMainContext {
             notifyItemRangeChanged(positionStart, itemCount, payload)
         }
 }

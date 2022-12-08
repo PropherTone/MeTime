@@ -215,7 +215,7 @@ class GalleryViewActivity : BaseMediaActivity<
     private suspend fun setNotes(notes: MutableList<String>) = withContext(Dispatchers.Main) {
         binding.galleryVLinks.isGone = notes.isEmpty()
         if (binding.galleryVLinks.adapter is CheckListAdapter)
-            (binding.galleryVLinks.adapter as CheckListAdapter).notifyListChanged(notes)
+            (binding.galleryVLinks.adapter as CheckListAdapter).notifyListChangedCO(notes)
     }
 
     private suspend fun refreshCate(cate: List<String>?) = withContext(Dispatchers.Main) {

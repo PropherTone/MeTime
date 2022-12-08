@@ -1,8 +1,7 @@
 package com.protone.component.database.dao
 
-import android.util.Log
-import com.protone.component.database.MediaAction
 import com.protone.common.entity.*
+import com.protone.component.database.MediaAction
 
 class DatabaseBridge : DatabaseHelper() {
 
@@ -18,6 +17,7 @@ class DatabaseBridge : DatabaseHelper() {
                 return helperImpl!!
             }
 
+        @Volatile
         private var helperImpl: DatabaseBridge? = null
     }
 

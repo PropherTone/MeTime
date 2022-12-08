@@ -169,7 +169,7 @@ suspend fun Activity.imageListDialog(
                 }
 
             }.apply {
-                notifyListChanged(dataList)
+                notifyListChangedCO(dataList)
             }
         }
         listConfirm.setOnClickListener {

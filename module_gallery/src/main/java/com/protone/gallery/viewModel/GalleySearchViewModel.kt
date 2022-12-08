@@ -1,6 +1,7 @@
 package com.protone.gallery.viewModel
 
 import androidx.lifecycle.viewModelScope
+import com.protone.common.baseType.launchDefault
 import com.protone.common.entity.GalleryMedia
 import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +26,8 @@ class GallerySearchViewModel : BaseViewModel() {
 
     fun query(input: String) {
         if (input.isEmpty()) return
-        viewModelScope.launch(Dispatchers.Default) {
-            launch(Dispatchers.Default) {
+        viewModelScope.launchDefault {
+            launchDefault {
                 data.filter {
                     it.name.contains(input, true)
                 }.let { nameFilterList ->
@@ -34,7 +35,7 @@ class GallerySearchViewModel : BaseViewModel() {
                     cancel()
                 }
             }
-            launch(Dispatchers.Default) {
+            launchDefault {
                 data.filter {
                     it.cate?.any { name -> name.contains(input, true) } == true
                 }.let { catoFilterList ->
@@ -42,7 +43,7 @@ class GallerySearchViewModel : BaseViewModel() {
                     cancel()
                 }
             }
-            launch(Dispatchers.Default) {
+            launchDefault {
                 data.filter {
                     val notesWithGallery = galleryDAO.getNotesWithGallery(it.uri)
                         .map { note -> note.title }

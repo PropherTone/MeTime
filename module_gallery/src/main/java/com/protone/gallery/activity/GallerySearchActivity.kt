@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.R
 import com.protone.common.baseType.getString
+import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.launchMain
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.linkInput
@@ -67,7 +69,7 @@ class GallerySearchActivity : BaseMediaActivity<
     }
 
     private fun newAdapter(list: MutableList<GalleryMedia>) = GalleryListAdapter(
-        this@GallerySearchActivity, true
+        this@GallerySearchActivity, true, itemCount = 0
     ).also {
         it.setData(list)
         it.multiChoose = true
@@ -185,7 +187,7 @@ class GallerySearchActivity : BaseMediaActivity<
     }
 
     override fun popIntoBox() {
-        launch(Dispatchers.IO) {
+        launchDefault {
             viewModel.apply {
                 putGainIntentData(selectList)
                 startActivity(PictureBoxActivity::class.intent)
@@ -195,7 +197,7 @@ class GallerySearchActivity : BaseMediaActivity<
 
     override fun onGalleryResult(list: MutableList<GalleryMedia>) {
         if (list.isEmpty()) return
-        launch(Dispatchers.Main) {
+        launchMain {
             if (binding.resultGalleries.isGone) {
                 listGone(binding.resultGalleries)
             }
@@ -207,7 +209,7 @@ class GallerySearchActivity : BaseMediaActivity<
 
     override fun onCatoResult(list: MutableList<GalleryMedia>) {
         if (list.isEmpty()) return
-        launch(Dispatchers.Main) {
+        launchMain {
             if (binding.resultCato.isGone) {
                 listGone(binding.resultCato)
             }
@@ -219,7 +221,7 @@ class GallerySearchActivity : BaseMediaActivity<
 
     override fun onNoteResult(list: MutableList<GalleryMedia>) {
         if (list.isEmpty()) return
-        launch(Dispatchers.Main) {
+        launchMain {
             if (binding.resultNotes.isGone) {
                 listGone(binding.resultNotes)
             }

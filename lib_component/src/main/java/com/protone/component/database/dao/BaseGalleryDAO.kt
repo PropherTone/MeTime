@@ -13,8 +13,9 @@ import com.protone.database.room.getGalleryBucketDAO
 import com.protone.database.room.getGalleryDAO
 import com.protone.database.room.mediasFilterBy
 
-sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
+sealed class BaseGalleryDAO : SignedGalleryDAO()
 
+sealed class SignedGalleryDAO : GalleriesWithNotesDAO() {
     private val signedGalleryDAO = getGalleryDAO()
 
     suspend fun getAllSignedMedia(): List<GalleryMedia>? = withIOContext {
@@ -37,6 +38,21 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
     suspend fun getAllMediaByGallery(name: String, isVideo: Boolean): List<GalleryMedia>? =
         withIOContext {
             signedGalleryDAO.getAllMediaByGallery(name, isVideo)
+        }
+
+    suspend fun getMediaCountByGallery(name: String, isVideo: Boolean): Int =
+        withIOContext {
+            signedGalleryDAO.getMediaCountByGallery(name, isVideo)
+        }
+
+    suspend fun getMediaCountByGallery(name: String): Int =
+        withIOContext {
+            signedGalleryDAO.getMediaCountByGallery(name)
+        }
+
+    suspend fun getNewestMedia(): Uri? =
+        withIOContext {
+            signedGalleryDAO.getNewestMedia()
         }
 
     suspend fun getAllMediaByGallery(name: String): List<GalleryMedia>? =
@@ -116,14 +132,19 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
             }
         }
     }
+}
 
-    /*GalleriesWithNotes********************************************************/
+sealed class GalleriesWithNotesDAO : GalleryBucketDAO() {
     private val galleriesWithNotesDAO = getGalleriesWithNotesDAO()
 
     suspend fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) =
         withIOContext {
             galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes).apply {
-                sendEvent(MediaAction.GalleryDataAction.OnGalleriesWithNotesInserted(galleriesWithNotes))
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnGalleriesWithNotesInserted(
+                        galleriesWithNotes
+                    )
+                )
             }
         }
 
@@ -136,7 +157,9 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
             galleriesWithNotesDAO.getGalleriesWithNote(noteId) ?: mutableListOf()
         }
 
-    /*GalleryBucket********************************************************/
+}
+
+sealed class GalleryBucketDAO : BaseDAO<MediaAction.GalleryDataAction>() {
     private val galleryBucketDAO = getGalleryBucketDAO()
 
     suspend fun getGalleryBucket(name: String): GalleryBucket? = withIOContext {
@@ -146,6 +169,11 @@ sealed class BaseGalleryDAO : BaseDAO<MediaAction.GalleryDataAction>() {
     suspend fun getAllGalleryBucket(isVideo: Boolean): List<GalleryBucket>? =
         withIOContext {
             galleryBucketDAO.getAllGalleryBucket(isVideo)
+        }
+
+    suspend fun getAllGalleryBucket(): List<GalleryBucket>? =
+        withIOContext {
+            galleryBucketDAO.getAllGalleryBucket()
         }
 
     suspend fun insertGalleryBucket(galleryBucket: GalleryBucket) = withIOContext {

@@ -45,12 +45,7 @@ import com.protone.gallery.viewModel.GalleryFragmentViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class GalleryFragment(
-    private val isVideo: Boolean,
-    private val isLock: Boolean,
-    private val combine: Boolean,
-    private val onAttach: (MutableSharedFlow<GalleryFragmentViewModel.FragEvent>) -> Unit
-) : Fragment(), CoroutineScope by MainScope(),
+class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     GalleryListAdapter.OnSelect {
 
     private lateinit var viewModel: GalleryFragmentViewModel
@@ -67,17 +62,32 @@ class GalleryFragment(
 
     private lateinit var toolButtonAnimator: ValueAnimator
 
+    private var init: (() -> Unit)? = null
+
+    fun onInit(
+        isVideo: Boolean,
+        isLock: Boolean,
+        combine: Boolean,
+        onAttach: (MutableSharedFlow<GalleryFragmentViewModel.FragEvent>) -> Unit
+    ): GalleryFragment {
+        init = {
+            viewModel.apply {
+                this.isVideo = isVideo
+                this.isLock = isLock
+                this.combine = combine
+                this.onAttach = onAttach
+            }
+        }
+        return this
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val model: GalleryFragmentViewModel by viewModels()
         viewModel = model
-        viewModel.apply {
-            attachFragEvent(onAttach)
-            observeEvent()
-            Log.d(TAG, "onAttach: ")
-            isVideo = this@GalleryFragment.isVideo
-            isLock = this@GalleryFragment.isLock
-        }
+        init?.invoke()
+        init = null
+        viewModel.observeEvent()
     }
 
     private fun GalleryFragmentViewModel.observeEvent() {
@@ -107,10 +117,10 @@ class GalleryFragment(
                         startActivity(PictureBoxActivity::class.intent)
                     }
                     is GalleryFragmentViewModel.FragEvent.OnNewGalleryBucket -> {
-                        getBucketAdapter().insertBucket(it.pairs)
+                        getBucketAdapter().insertBucket(it.gallery)
                     }
                     is GalleryFragmentViewModel.FragEvent.OnGalleryRemoved -> {
-                        getBucketAdapter().deleteBucket(it.pairs)
+                        getBucketAdapter().deleteBucket(it.gallery)
                     }
                     is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
                         refreshBucket(it.galleryMedia)
@@ -163,7 +173,7 @@ class GalleryFragment(
 
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
-                            onGallerySelected(ALL_GALLERY)
+                            onGallerySelected(ALL_GALLERY, 100)
                         }
                         viewModel.isBucketShowUp = false
                         galleryToolButton.isVisible = onSelectMod
@@ -173,11 +183,13 @@ class GalleryFragment(
                 })
             }
             gallerySearch.setOnClickListener {
-                val gallery = viewModel.getGalleryName()
-                IntentDataHolder.put(viewModel.getGallery(gallery))
-                startActivity(GallerySearchActivity::class.intent.putExtras {
-                    putString("gallery", gallery)
-                })
+                launchDefault {
+                    val gallery = viewModel.getGalleryName()
+                    IntentDataHolder.put(viewModel.getGallery(gallery))
+                    startActivity(GallerySearchActivity::class.intent.putExtras {
+                        putString("gallery", gallery)
+                    })
+                }
             }
             galleryToolButton.setOnClickListener {
                 if (!viewModel.isBucketShowUp) {
@@ -192,7 +204,7 @@ class GalleryFragment(
             }
         }
         initList()
-        viewModel.sortData(combine)
+        viewModel.sortData()
         return binding.root
     }
 
@@ -205,7 +217,7 @@ class GalleryFragment(
     private fun initList() = binding.run {
         galleryList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleryListAdapter(context, true).also {
+            adapter = GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleryFragment)
             }
@@ -214,8 +226,8 @@ class GalleryFragment(
         galleryBucket.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
-                selectBucket {
-                    onGallerySelected(it)
+                selectBucket { gallery ->
+                    onGallerySelected(gallery.name, gallery.size)
                 }
                 deleteGalleryBucket {
                     viewModel.deleteGalleryBucket(it)
@@ -235,16 +247,25 @@ class GalleryFragment(
         }
     }
 
-    private fun onGallerySelected(gallery: String) {
+    private fun onGallerySelected(gallery: String, size: Int) {
         viewModel.rightGallery = gallery
         binding.galleryShowBucket.negative()
-        noticeListUpdate(viewModel.getGallery(gallery))
+        if (viewModel.isBucketShowUp) return
+        launch {
+            binding.galleryList.swapAdapter(
+                GalleryListAdapter(requireContext(), true, itemCount = size).also {
+                    it.multiChoose = true
+                    it.setOnSelectListener(this@GalleryFragment)
+                }, false
+            )
+            viewModel.getGallery(gallery)?.let { data -> getListAdapter().setData(data) }
+        }
     }
 
     private fun refreshBucket(media: GalleryMedia): Unit = viewModel.run {
         getBucketAdapter().apply {
-            refreshBucket(getBucket(media.bucket))
-            refreshBucket(getBucket(ALL_GALLERY))
+            getBucket(media.bucket)?.let { refreshBucket(it) }
+            getBucket(ALL_GALLERY)?.let { refreshBucket(it) }
         }
     }
 
@@ -263,22 +284,9 @@ class GalleryFragment(
         }
     }
 
-    private fun noticeListUpdate(data: MutableList<GalleryMedia>?) {
-        if (viewModel.isBucketShowUp) return
-        launch {
-            binding.galleryList.swapAdapter(GalleryListAdapter(requireContext(), true).also {
-                data?.let { medias -> it.setData(medias) }
-                it.multiChoose = true
-                it.setOnSelectListener(this@GalleryFragment)
-            }, false)
-        }
-    }
+    private fun getBucketAdapter() = binding.galleryBucket.adapter as GalleryBucketAdapter
 
-    private fun getBucketAdapter() =
-        binding.galleryBucket.adapter as GalleryBucketAdapter
-
-    private fun getListAdapter() =
-        binding.galleryList.adapter as GalleryListAdapter
+    private fun getListAdapter() = binding.galleryList.adapter as GalleryListAdapter
 
     override fun select(galleryMedia: GalleryMedia) = Unit
 

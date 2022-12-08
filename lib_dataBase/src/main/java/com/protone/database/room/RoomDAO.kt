@@ -68,6 +68,10 @@ fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
     return DataBase.database.getMusicWithMusicBucketDAO()
 }
 
+fun getMediaWithGalleryBucketDAO(): MediaWithGalleryBucketDAO {
+    return DataBase.database.getMediaWithGalleryBucketDAO()
+}
+
 fun shutdownDataBase() {
     DataBase.database.close()
 }

@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import com.protone.common.context.MApplication
 import com.protone.common.entity.*
 import com.protone.database.room.dao.*
+import java.lang.ref.SoftReference
 import java.lang.ref.WeakReference
 
 @Database(
@@ -18,8 +19,8 @@ import java.lang.ref.WeakReference
         GalleryBucket::class,
         GalleriesWithNotes::class,
         NoteDirWithNotes::class,
-        MusicWithMusicBucket::class
-    ],
+        MusicWithMusicBucket::class,
+        MediaWithGalleryBucket::class],
     version = 1,
     exportSchema = false
 )
@@ -33,17 +34,18 @@ internal abstract class DataBase : RoomDatabase() {
     internal abstract fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO
     internal abstract fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO
     internal abstract fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO
+    internal abstract fun getMediaWithGalleryBucketDAO(): MediaWithGalleryBucketDAO
 
     companion object {
         @JvmStatic
         val database: DataBase
             @Synchronized get() {
                 return databaseImpl?.get() ?: init().apply {
-                    databaseImpl = WeakReference(this)
+                    databaseImpl = SoftReference(this)
                 }
             }
 
-        private var databaseImpl: WeakReference<DataBase>? = null
+        private var databaseImpl: SoftReference<DataBase>? = null
 
         private fun init(): DataBase {
             return Room.databaseBuilder(

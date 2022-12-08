@@ -40,7 +40,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     var clickCallback: ((MusicBucket) -> Unit)? = null
 
-    override suspend fun onEventIO(data: MusicBucketAEvent) {
+    override suspend fun handleEventAsynchronous(data: MusicBucketAEvent) {
         when (data) {
             is MusicBucketAEvent.AddBucket -> {
                 withContext(Dispatchers.Main) {

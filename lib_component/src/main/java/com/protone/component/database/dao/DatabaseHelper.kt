@@ -18,14 +18,14 @@ abstract class DatabaseHelper {
     private val executorService by lazy { CoroutineScope(Dispatchers.IO) }
     fun getScope() = executorService
 
-    private val _musicMessenger = MutableSharedFlow<MediaAction.MusicDataAction>()
-    val musicMessenger = _musicMessenger.asSharedFlow()
+    private val _musicMessenger by lazy { MutableSharedFlow<MediaAction.MusicDataAction>() }
+    val musicMessenger by lazy { _musicMessenger.asSharedFlow() }
 
-    private val _noteMessenger = MutableSharedFlow<MediaAction.NoteDataAction>()
-    val noteMessenger = _noteMessenger.asSharedFlow()
+    private val _noteMessenger by lazy { MutableSharedFlow<MediaAction.NoteDataAction>() }
+    val noteMessenger by lazy { _noteMessenger.asSharedFlow() }
 
-    private val _galleryMessenger = MutableSharedFlow<MediaAction.GalleryDataAction>()
-    val galleryMessenger = _galleryMessenger.asSharedFlow()
+    private val _galleryMessenger by lazy { MutableSharedFlow<MediaAction.GalleryDataAction>() }
+    val galleryMessenger by lazy { _galleryMessenger.asSharedFlow() }
 
     protected suspend fun sendMusicAction(musicDataAction: MediaAction.MusicDataAction) {
         _musicMessenger.emit(musicDataAction)

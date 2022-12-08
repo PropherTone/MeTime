@@ -9,8 +9,8 @@ import android.widget.ImageView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.common.context.MApplication
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.view.adapter.SelectListAdapter
@@ -21,7 +21,9 @@ import kotlinx.coroutines.withContext
 class GalleryListAdapter(
     context: Context,
     private val useSelect: Boolean = true,
-    private val combine: Boolean = false
+    private val combine: Boolean = false,
+    private var itemCount: Int,
+    private val preLoad: Int = 5
 ) : SelectListAdapter<GalleryListAdapterLayoutBinding, GalleryMedia, GalleryListAdapter.GalleryListEvent>(
     context, true
 ) {
@@ -46,8 +48,10 @@ class GalleryListAdapter(
     private var itemLength = 0
     private var onSelectMod = false
 
+    private var layoutManager: LinearLayoutManager? = null
+
     @SuppressLint("NotifyDataSetChanged")
-    override suspend fun onEventIO(data: GalleryListEvent) {
+    override suspend fun handleEventAsynchronous(data: GalleryListEvent) {
         when (data) {
             is GalleryListEvent.QuiteSelectAll -> {
                 if (!onSelectMod) return
@@ -66,9 +70,7 @@ class GalleryListAdapter(
             }
             is GalleryListEvent.NoticeDataUpdate -> {
                 if (data.item == null) return
-                mList.clear()
-                mList.addAll(data.item)
-                notifyDataSetChangedCO()
+                notifyListChangedCO(data.item)
             }
             is GalleryListEvent.NoticeSelectChange -> {
                 val indexOf = mList.indexOf(data.item)
@@ -122,7 +124,9 @@ class GalleryListAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        itemLength = MApplication.screenWidth / 4 - recyclerView.paddingEnd
+        layoutManager =
+            recyclerView.layoutManager.takeIf { it is LinearLayoutManager } as LinearLayoutManager
+        itemLength = (recyclerView.width - recyclerView.paddingEnd - recyclerView.paddingStart) / 4
         recyclerView.layoutAnimationListener = object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
                 recyclerView.suppressLayout(true)
@@ -159,6 +163,11 @@ class GalleryListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleryListAdapterLayoutBinding>, position: Int) {
+        if (position >= mList.size) {
+            //TODO 实现加载效果
+            holder.binding.imageView.setImageResource(com.protone.component.R.drawable.main_background)
+            return
+        }
         setSelect(holder.binding, position, mList[position] in selectList)
         holder.binding.videoIcon.isGone = !mList[position].isVideo && !combine
         holder.binding.imageView.let { image ->
@@ -179,6 +188,29 @@ class GalleryListAdapter(
                     true
                 }
             }
+        }
+    }
+
+    override fun getItemCount(): Int = itemCount
+
+    override fun setData(collection: Collection<GalleryMedia>) {
+        super.setData(collection)
+        if (mList.size > itemCount) {
+            itemCount = mList.size
+        }
+        layoutManager?.let {
+            notifyItemRangeChanged(
+                it.findFirstVisibleItemPosition().let { first ->
+                    if (first <= 0) 0
+                    else if (first >= preLoad) first - preLoad
+                    else first
+                },
+                it.findLastVisibleItemPosition().let { last ->
+                    if (last >= itemCount) itemCount
+                    else if (last <= itemCount - preLoad) last + preLoad
+                    else last
+                }
+            )
         }
     }
 

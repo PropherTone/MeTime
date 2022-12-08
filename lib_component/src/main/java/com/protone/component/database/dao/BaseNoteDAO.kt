@@ -10,8 +10,9 @@ import com.protone.database.room.getNoteDirWithNoteDAO
 import com.protone.database.room.getNoteTypeDAO
 import kotlinx.coroutines.flow.Flow
 
-sealed class BaseNoteDAO : BaseDAO<MediaAction.NoteDataAction>() {
+sealed class BaseNoteDAO : NoteDAO()
 
+sealed class NoteDAO : NoteDirWithNoteDAO() {
     private val noteDAO = getNoteDAO()
 
     suspend fun getAllNote(): List<Note>? = withIOContext {
@@ -48,8 +49,9 @@ sealed class BaseNoteDAO : BaseDAO<MediaAction.NoteDataAction>() {
             this
         }
     }
+}
 
-    /*NoteDirWithNote***********************************************************/
+sealed class NoteDirWithNoteDAO : NoteTypeDAO() {
     private val noteDirWithNoteDAO = getNoteDirWithNoteDAO()
 
     suspend fun insertNoteDirWithNote(noteDirWithNotes: NoteDirWithNotes) =
@@ -68,8 +70,9 @@ sealed class BaseNoteDAO : BaseDAO<MediaAction.NoteDataAction>() {
 
     fun getNotesWithNoteDirFlow(noteDirId: Long): Flow<List<Note>?> =
         noteDirWithNoteDAO.getNotesWithNoteDirFlow(noteDirId)
+}
 
-    /*NoteType***********************************************************/
+sealed class NoteTypeDAO : BaseDAO<MediaAction.NoteDataAction>() {
     private val noteTypeDAO = getNoteTypeDAO()
 
     suspend fun getNoteDir(name: String): NoteDir? =
@@ -89,5 +92,5 @@ sealed class BaseNoteDAO : BaseDAO<MediaAction.NoteDataAction>() {
     }
 
     fun getALLNoteDirFlow(): Flow<List<NoteDir>?> = noteTypeDAO.getALLNoteDirFlow()
-
 }
+

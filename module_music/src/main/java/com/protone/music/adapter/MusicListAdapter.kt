@@ -48,7 +48,7 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
             }
         }
 
-    override suspend fun onEventIO(data: MusicListEvent) {
+    override suspend fun handleEventAsynchronous(data: MusicListEvent) {
         when (data) {
             is MusicListEvent.PlayPosition -> {
                 if (mList.size <= 0) return

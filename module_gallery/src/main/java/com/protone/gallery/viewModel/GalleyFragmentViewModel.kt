@@ -2,26 +2,38 @@ package com.protone.gallery.viewModel
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
 import com.protone.common.baseType.*
-import com.protone.component.database.MediaAction
-import com.protone.component.database.dao.DatabaseBridge
+import com.protone.common.entity.Gallery
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.TAG
+import com.protone.component.BaseViewModel
+import com.protone.component.database.MediaAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 
-class GalleryFragmentViewModel : ViewModel() {
+class GalleryFragmentViewModel : BaseViewModel() {
 
     private val _fragFlow = MutableSharedFlow<FragEvent>()
     val fragEvent get() = _fragFlow.asSharedFlow()
+
+    var isVideo: Boolean = false
+    var isLock: Boolean = false
+    var combine: Boolean = false
+    var onAttach: ((MutableSharedFlow<FragEvent>) -> Unit)? = null
+
+    var rightGallery: String = ""
+    var isBucketShowUp = true
+    private var isDataSorted = false
+
+    private val galleryMap = mutableMapOf<String?, MutableList<GalleryMedia>>()
+    private val galleryData = mutableListOf<Gallery>()
 
     sealed class FragEvent {
         object SelectAll : FragEvent()
@@ -31,8 +43,8 @@ class GalleryFragmentViewModel : ViewModel() {
         data class AddGalleryBucket(val name: String, val list: MutableList<GalleryMedia>) :
             FragEvent()
 
-        data class OnNewGalleryBucket(val pairs: Pair<Uri, Array<String>>) : FragEvent()
-        data class OnGalleryRemoved(val pairs: Pair<Uri, Array<String>>) : FragEvent()
+        data class OnNewGalleryBucket(val gallery: Gallery) : FragEvent()
+        data class OnGalleryRemoved(val gallery: Gallery) : FragEvent()
 
         data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : FragEvent()
 
@@ -41,133 +53,79 @@ class GalleryFragmentViewModel : ViewModel() {
         data class OnMediaUpdated(val galleryMedia: GalleryMedia) : FragEvent()
     }
 
-    var rightGallery: String = ""
+    suspend fun getGallery(gallery: String) = withIOContext {
+        galleryDAO.run {
+            if (combine) getAllMediaByGallery(gallery) else getAllMediaByGallery(gallery, isVideo)
+        }
+    }
 
-    var isVideo: Boolean = false
+    suspend fun getGallerySize(name: String): Int = galleryDAO.run {
+        if (combine) getMediaCountByGallery(name) else getMediaCountByGallery(name, isVideo)
+    }
 
-    var isLock: Boolean = false
-    var isBucketShowUp = true
-    private var isDataSorted = false
+    suspend fun getAllGalleryBucket() = galleryDAO.run {
+        if (combine) getAllGalleryBucket() else getAllGalleryBucket(isVideo)
+    }
 
-    private val galleryMap = mutableMapOf<String?, MutableList<GalleryMedia>>()
+    fun getGalleryName() = if (rightGallery == "") ALL_GALLERY else rightGallery
 
-    fun getGallery(gallery: String) = galleryMap[gallery]
-
-    fun getGalleryName() = if (rightGallery == "") {
-        ALL_GALLERY
-    } else rightGallery
-
-    fun getBucket(bucket: String) = Pair(
-        if ((getGallery(bucket)?.size ?: 0) > 0) {
-            getGallery(bucket)?.get(0)?.uri ?: Uri.EMPTY
-        } else Uri.EMPTY,
-        arrayOf(bucket, (getGallery(bucket)?.size ?: 0).toString())
-    )
+    fun getBucket(bucket: String) = galleryData.find { it.name == bucket }
 
     fun onTargetGallery(bucket: String): Boolean {
         return bucket == rightGallery || rightGallery == ALL_GALLERY
     }
 
-    fun sortData(combine: Boolean) = viewModelScope.launchDefault {
-        galleryMap[ALL_GALLERY] = mutableListOf()
-        DatabaseBridge.instance.galleryDAOBridge.run {
+    private suspend fun Gallery.cacheAndNotice() {
+        galleryData.add(this)
+        sendEvent(FragEvent.OnNewGalleryBucket(this))
+    }
+
+    fun sortData() = viewModelScope.launchDefault {
+        galleryDAO.run {
             observeGallery()
-            val signedMedias =
-                (if (combine) getAllSignedMedia() else getAllMediaByType(isVideo))
-                        as MutableList<GalleryMedia>?
-            if (signedMedias == null) {
+            val galleries =
+                (if (combine) getAllGallery() else getAllGallery(isVideo)) as MutableList<String>?
+            if (galleries == null) {
                 R.string.none.getString().toast()
                 return@launchDefault
             }
-            galleryMap[ALL_GALLERY] = signedMedias
-            sendEvent(
-                FragEvent.OnNewGalleryBucket(
-                    Pair(
-                        if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
-                        arrayOf(ALL_GALLERY, signedMedias.size.toString())
-                    )
-                )
-            )
-            (if (combine) getAllGallery() else getAllGallery(isVideo))?.forEach {
-                galleryMap[it] =
-                    ((if (combine) getAllMediaByGallery(it) else getAllMediaByGallery(it, isVideo))
-                            as MutableList<GalleryMedia>)
-                        .also { list ->
-                            sendEvent(
-                                FragEvent.OnNewGalleryBucket(
-                                    Pair(
-                                        if (list.size > 0) list[0].uri else Uri.EMPTY,
-                                        arrayOf(it, list.size.toString())
-                                    )
-                                )
-                            )
-                        }
+
+            galleries.forEach {
+                Gallery(it, getGallerySize(it), getNewestMedia()).cacheAndNotice()
             }
-            if (!isLock) sortPrivateData(signedMedias) else isDataSorted = true
+            if (!isLock) sortPrivateData() else isDataSorted = true
+        }
+    }
+
+    private fun sortPrivateData() {
+        viewModelScope.launchDefault {
+            getAllGalleryBucket()?.forEach {
+                Gallery(it.type, 0, null).cacheAndNotice()
+            }
+            isDataSorted = true
         }
     }
 
     fun addBucket(name: String) {
-        DatabaseBridge.instance
-            .galleryDAOBridge
-            .insertGalleryBucketCB(GalleryBucket(name, isVideo)) { re, reName ->
-                if (re) {
-                    if (!isLock) {
-                        sendEvent(
-                            FragEvent.OnNewGalleryBucket(
-                                (Pair(
-                                    Uri.EMPTY,
-                                    arrayOf(reName, "PRIVATE")
-                                ))
-                            )
-                        )
-                        galleryMap[reName] = mutableListOf()
-                    } else {
-                        R.string.locked.getString().toast()
-                    }
+        galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideo)) { re, reName ->
+            if (re) {
+                if (!isLock) {
+                    sendEvent(FragEvent.OnNewGalleryBucket(Gallery(reName, 0, null)))
+                    galleryMap[reName] = mutableListOf()
                 } else {
-                    R.string.failed_msg.getString().toast()
+                    R.string.locked.getString().toast()
                 }
-            }
-    }
-
-    fun deleteGalleryBucket(bucket: String) {
-        viewModelScope.launchIO {
-            DatabaseBridge.instance.galleryDAOBridge.run {
-                getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
+            } else {
+                R.string.failed_msg.getString().toast()
             }
         }
     }
 
-    fun attachFragEvent(onAttach: (MutableSharedFlow<FragEvent>) -> Unit) {
-        onAttach.invoke(_fragFlow)
-    }
-
-    private fun sortPrivateData(signedMedias: MutableList<GalleryMedia>) {
-        viewModelScope.launchDefault {
-            signedMedias.forEach {
-                it.type?.forEach { type ->
-                    if (galleryMap[type] == null) {
-                        galleryMap[type] = mutableListOf()
-                    }
-                    galleryMap[type]?.add(it)
-                }
+    fun deleteGalleryBucket(bucket: String) {
+        viewModelScope.launchIO {
+            galleryDAO.run {
+                getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
             }
-            (DatabaseBridge.instance
-                .galleryDAOBridge
-                .getAllGalleryBucket(isVideo) as MutableList<GalleryBucket>?)
-                ?.forEach {
-                    sendEvent(
-                        FragEvent.OnNewGalleryBucket(
-                            Pair(
-                                Uri.EMPTY,
-                                arrayOf(it.type, "PRIVATE")
-                            )
-                        )
-                    )
-                    galleryMap[it.type] = mutableListOf()
-                }
-            isDataSorted = true
         }
     }
 
@@ -193,10 +151,7 @@ class GalleryFragmentViewModel : ViewModel() {
                 if (map[media.bucket] == null) {
                     map[media.bucket] = mutableListOf<GalleryMedia>().also { it.add(media) }
                     FragEvent.OnNewGalleryBucket(
-                        Pair(
-                            media.uri,
-                            arrayOf(media.bucket, map[media.bucket]?.size.toString())
-                        )
+                        Gallery(media.bucket, getGallerySize(media.bucket), media.uri)
                     ).let { sendEvent(it) }
                 } else map[media.bucket]?.add(media)
             }
@@ -239,13 +194,13 @@ class GalleryFragmentViewModel : ViewModel() {
                     }
             }
 
-            DatabaseBridge.instance.galleryMessenger.bufferCollect {
+            observeGalleryData {
                 Log.d(TAG, "observeGallery: $it")
                 while (!isDataSorted) delay(200)
                 Log.d(TAG, "observeGallery2: $it")
                 when (it) {
                     is MediaAction.GalleryDataAction.OnGalleryMediaDeleted -> {
-                        if (it.media.isVideo != isVideo) return@bufferCollect
+                        if (it.media.isVideo != isVideo) return@observeGalleryData
                         sortDeleteMedia(it.media, galleryMap)
                         sendEvent(FragEvent.OnMediaDeleted(it.media))
                     }
@@ -263,11 +218,7 @@ class GalleryFragmentViewModel : ViewModel() {
                     }
                     is MediaAction.GalleryDataAction.OnGalleryDeleted -> {
                         galleryMap.remove(it.gallery)?.let { _ ->
-                            sendEvent(
-                                FragEvent.OnGalleryRemoved(
-                                    Pair(Uri.EMPTY, arrayOf(it.gallery))
-                                )
-                            )
+                            sendEvent(FragEvent.OnGalleryRemoved(Gallery(it.gallery, 0, null)))
                         }
                     }
                     is MediaAction.GalleryDataAction.OnGalleryBucketInserted -> {
@@ -286,14 +237,11 @@ class GalleryFragmentViewModel : ViewModel() {
         _fragFlow.emit(fragEvent)
     }
 
-    suspend fun insertNewMedias(gallery: String, list: MutableList<GalleryMedia>) =
-        withContext(Dispatchers.Default) {
-            if (!isLock) {
-                if (galleryMap[gallery] == null) {
-                    galleryMap[gallery] = mutableListOf()
-                }
-                galleryMap[gallery]?.addAll(list)
-            }
+    suspend fun insertNewMedias(gallery: String, list: MutableList<GalleryMedia>) {
+        withDefaultContext {
+            TODO("insertNewMedias")
         }
+    }
+
 
 }
