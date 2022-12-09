@@ -165,7 +165,7 @@ class GalleryListAdapter(
     override fun onBindViewHolder(holder: Holder<GalleryListAdapterLayoutBinding>, position: Int) {
         if (position >= mList.size) {
             //TODO 实现加载效果
-            holder.binding.imageView.setImageResource(com.protone.component.R.drawable.main_background)
+            holder.binding.imageView.setImageResource(com.protone.component.R.drawable.none_state_background)
             return
         }
         setSelect(holder.binding, position, mList[position] in selectList)
@@ -203,12 +203,12 @@ class GalleryListAdapter(
                 it.findFirstVisibleItemPosition().let { first ->
                     if (first <= 0) 0
                     else if (first >= preLoad) first - preLoad
-                    else first
+                    else 0
                 },
                 it.findLastVisibleItemPosition().let { last ->
                     if (last >= itemCount) itemCount
                     else if (last <= itemCount - preLoad) last + preLoad
-                    else last
+                    else itemCount
                 }
             )
         }

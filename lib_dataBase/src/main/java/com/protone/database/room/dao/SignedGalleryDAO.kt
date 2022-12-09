@@ -2,6 +2,7 @@ package com.protone.database.room.dao
 
 import android.net.Uri
 import androidx.room.*
+import com.protone.common.entity.Gallery
 import com.protone.common.utils.converters.UriTypeConverter
 import com.protone.common.entity.GalleryMedia
 import com.protone.database.room.mapToLongList
@@ -28,11 +29,26 @@ interface SignedGalleryDAO {
     @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo")
     fun getMediaCountByGallery(name: String, isVideo: Boolean): Int
 
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE isVideo LIKE :isVideo")
+    fun getMediaCount(isVideo: Boolean): Int
+
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia")
+    fun getMediaCount(): Int
+
     @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket LIKE :name")
     fun getMediaCountByGallery(name: String): Int
 
+    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia WHERE bucket LIKE :gallery)")
+    fun getNewestMediaInGallery(gallery: String): Uri?
+
     @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia)")
     fun getNewestMedia(): Uri?
+
+    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia WHERE bucket LIKE :gallery AND isVideo LIKE :isVideo)")
+    fun getNewestMediaInGallery(gallery: String, isVideo: Boolean): Uri?
+
+    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia WHERE isVideo LIKE :isVideo)")
+    fun getNewestMedia(isVideo: Boolean): Uri?
 
     @Query("SELECT * FROM GalleryMedia WHERE bucket LIKE :name ORDER BY dateModified DESC")
     fun getAllMediaByGallery(name: String): List<GalleryMedia>?

@@ -258,7 +258,9 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                     it.setOnSelectListener(this@GalleryFragment)
                 }, false
             )
-            viewModel.getGallery(gallery)?.let { data -> getListAdapter().setData(data) }
+            viewModel.getGallery(gallery)?.let { data ->
+                getListAdapter().setData(data)
+            }
         }
     }
 

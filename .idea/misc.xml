@@ -5,11 +5,14 @@
       <map>
         <entry key="..\:/AndroidStudioProject/MeTime/app/src/main/res/layout/gallery_detail_layout.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/app/src/main/res/layout/video_card.xml" value="0.358695652173913" />
+        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/main_background.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/none_state_background.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/trans_dark2_ripple.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/trans_dark_ripple.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/trans_ripple.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/layout/video_player_layout.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_detail_layout.xml" value="0.358695652173913" />
+        <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_fragment_layout.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_view_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_note/src/main/res/layout/note_list_adapter_layout.xml" value="0.15729166666666666" />

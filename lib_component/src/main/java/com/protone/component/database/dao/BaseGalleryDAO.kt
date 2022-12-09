@@ -1,7 +1,6 @@
 package com.protone.component.database.dao
 
 import android.net.Uri
-import android.util.Log
 import com.protone.common.baseType.withIOContext
 import com.protone.component.database.MediaAction
 import com.protone.common.entity.GalleriesWithNotes
@@ -45,15 +44,32 @@ sealed class SignedGalleryDAO : GalleriesWithNotesDAO() {
             signedGalleryDAO.getMediaCountByGallery(name, isVideo)
         }
 
+    suspend fun getMediaCount(isVideo: Boolean): Int =
+        withIOContext {
+            signedGalleryDAO.getMediaCount(isVideo)
+        }
+
+    suspend fun getMediaCount(): Int = withIOContext { signedGalleryDAO.getMediaCount() }
+
     suspend fun getMediaCountByGallery(name: String): Int =
         withIOContext {
             signedGalleryDAO.getMediaCountByGallery(name)
         }
 
-    suspend fun getNewestMedia(): Uri? =
+    suspend fun getNewestMediaInGallery(gallery: String): Uri? =
         withIOContext {
-            signedGalleryDAO.getNewestMedia()
+            signedGalleryDAO.getNewestMediaInGallery(gallery)
         }
+
+    suspend fun getNewestMedia(): Uri? = withIOContext { signedGalleryDAO.getNewestMedia() }
+
+    suspend fun getNewestMediaInGallery(gallery: String, isVideo: Boolean): Uri? =
+        withIOContext {
+            signedGalleryDAO.getNewestMediaInGallery(gallery, isVideo)
+        }
+
+    suspend fun getNewestMedia(isVideo: Boolean): Uri? =
+        withIOContext { signedGalleryDAO.getNewestMedia(isVideo) }
 
     suspend fun getAllMediaByGallery(name: String): List<GalleryMedia>? =
         withIOContext {

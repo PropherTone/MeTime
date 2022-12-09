@@ -1,6 +1,5 @@
 package com.protone.gallery.viewModel
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
@@ -12,11 +11,9 @@ import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.TAG
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.withContext
 
 class GalleryFragmentViewModel : BaseViewModel() {
 
@@ -55,15 +52,24 @@ class GalleryFragmentViewModel : BaseViewModel() {
 
     suspend fun getGallery(gallery: String) = withIOContext {
         galleryDAO.run {
-            if (combine) getAllMediaByGallery(gallery) else getAllMediaByGallery(gallery, isVideo)
+            when {
+                combine && gallery == ALL_GALLERY -> getAllSignedMedia()
+                combine -> getAllMediaByGallery(gallery)
+                gallery == ALL_GALLERY -> getAllMediaByType(isVideo)
+                else -> getAllMediaByGallery(gallery, isVideo)
+            }
         }
     }
 
-    suspend fun getGallerySize(name: String): Int = galleryDAO.run {
+    private suspend fun getGallerySize(name: String): Int = galleryDAO.run {
         if (combine) getMediaCountByGallery(name) else getMediaCountByGallery(name, isVideo)
     }
 
-    suspend fun getAllGalleryBucket() = galleryDAO.run {
+    private suspend fun getGallerySize(): Int = galleryDAO.run {
+        if (combine) getMediaCount() else getMediaCount(isVideo)
+    }
+
+    private suspend fun getAllGalleryBucket() = galleryDAO.run {
         if (combine) getAllGalleryBucket() else getAllGalleryBucket(isVideo)
     }
 
@@ -90,8 +96,19 @@ class GalleryFragmentViewModel : BaseViewModel() {
                 return@launchDefault
             }
 
+            Gallery(
+                ALL_GALLERY,
+                getGallerySize(),
+                if (combine) getNewestMedia() else getNewestMedia(isVideo)
+            ).cacheAndNotice()
+
             galleries.forEach {
-                Gallery(it, getGallerySize(it), getNewestMedia()).cacheAndNotice()
+                Gallery(
+                    it,
+                    getGallerySize(it),
+                    if (combine) getNewestMediaInGallery(it)
+                    else getNewestMediaInGallery(it, isVideo)
+                ).cacheAndNotice()
             }
             if (!isLock) sortPrivateData() else isDataSorted = true
         }

@@ -66,6 +66,14 @@ class TableCardView @JvmOverloads constructor(
         TableAnimationTool(this)
     }
 
+    fun doAfterShow(block: () -> Unit) {
+        tableTool.doAfterShow = block
+    }
+
+    fun doAfterHide(block: () -> Unit) {
+        tableTool.doAfterHide = block
+    }
+
     fun show(
         onStart: Runnable? = null,
         onEnd: Runnable? = null,
@@ -90,6 +98,9 @@ class TableAnimationTool(private val view: View) {
 
     var interpolator = DecelerateInterpolator()
 
+    var doAfterShow: () -> Unit = {}
+    var doAfterHide: () -> Unit = {}
+
     fun show(
         onStart: Runnable? = null,
         onEnd: Runnable? = null,
@@ -97,8 +108,12 @@ class TableAnimationTool(private val view: View) {
     ) {
         view.animate().setInterpolator(interpolator)
             .translationY(0f + topBlock)
-            .withEndAction(onEnd)
-            .withStartAction(onStart)
+            .withEndAction {
+                onEnd?.run()
+            }
+            .withStartAction {
+                onStart?.run()
+            }
             .setUpdateListener(update)
             .start()
     }
