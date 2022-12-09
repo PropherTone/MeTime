@@ -34,10 +34,11 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
 
     override fun onBindViewHolder(holder: Holder<VB>, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
+            if (payloads.first() !is String) return
             setSelect(
                 holder.binding,
                 position,
-                when (payloads[0]) {
+                when (payloads.first()) {
                     SELECT -> true
                     UNSELECT -> false
                     else -> false
@@ -84,7 +85,9 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
         }.toList()
         selectList.clear()
         list.forEach {
-            if (it != -1) notifyItemChanged(it, UNSELECT)
+            if (it != -1) launch {
+                notifyItemChanged(it, UNSELECT)
+            }
         }
     }
 

@@ -57,9 +57,6 @@ class GalleryListAdapter(
                 if (!onSelectMod) return
                 onSelectMod = false
                 clearAllSelected()
-                withContext(Dispatchers.Main) {
-                    onSelectListener?.select(selectList)
-                }
             }
             is GalleryListEvent.SelectAll -> {
                 onSelectMod = true

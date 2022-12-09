@@ -1,7 +1,9 @@
 package com.protone.database.room.dao
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 
@@ -14,6 +16,7 @@ interface MediaWithGalleryBucketDAO {
                 " ON GalleryMedia.mediaId = MediaWithGalleryBucket.mediaId" +
                 " WHERE MediaWithGalleryBucket.galleryBucketId LIKE :bucketId"
     )
+    @RewriteQueriesToDropUnusedColumns
     fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia>
 
     @Query(

@@ -108,8 +108,10 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         }
     }
 
-    suspend fun notifyItemChangedCO(position: Int): Unit = withMainContext {
-        notifyItemChanged(position)
+    suspend fun notifyItemChangedCO(position: Int, payload: Any? = null): Unit = withMainContext {
+        if (payload != null)
+            notifyItemChanged(position, payload)
+        else notifyItemChanged(position)
     }
 
     suspend fun notifyItemInsertedCO(position: Int): Unit = withMainContext {
@@ -135,13 +137,15 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
             notifyItemRangeRemoved(positionStart, itemCount)
         }
 
-    suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int): Unit =
+    suspend fun notifyItemRangeChangedCO(
+        positionStart: Int,
+        itemCount: Int,
+        payload: Any? = null
+    ): Unit =
         withMainContext {
-            notifyItemRangeChanged(positionStart, itemCount)
+            if (payload == null)
+                notifyItemRangeChanged(positionStart, itemCount)
+            else notifyItemRangeChanged(positionStart, itemCount)
         }
 
-    suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int, payload: Any?): Unit =
-        withMainContext {
-            notifyItemRangeChanged(positionStart, itemCount, payload)
-        }
 }

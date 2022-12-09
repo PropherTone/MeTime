@@ -120,7 +120,7 @@ class GalleryActivity :
         viewModel.chooseData?.let {
             if (it.size <= 0) return
             moveTo(binding.galleryBar, it[0].isVideo, it) { target, list ->
-                viewModel.addBucket(target, list)
+                viewModel.addToBucket(target, list)
             }
         }
     }

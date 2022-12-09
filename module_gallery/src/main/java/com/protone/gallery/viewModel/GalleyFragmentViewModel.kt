@@ -1,6 +1,5 @@
 package com.protone.gallery.viewModel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
 import com.protone.common.baseType.*
@@ -8,12 +7,13 @@ import com.protone.common.entity.Gallery
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
-import com.protone.common.utils.TAG
+import com.protone.common.utils.EventCachePool
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.flow
 
 class GalleryFragmentViewModel : BaseViewModel() {
 
@@ -29,7 +29,6 @@ class GalleryFragmentViewModel : BaseViewModel() {
     var isBucketShowUp = true
     private var isDataSorted = false
 
-    private val galleryMap = mutableMapOf<String?, MutableList<GalleryMedia>>()
     private val galleryData = mutableListOf<Gallery>()
 
     sealed class FragEvent {
@@ -37,17 +36,56 @@ class GalleryFragmentViewModel : BaseViewModel() {
         object OnActionBtn : FragEvent()
         object IntoBox : FragEvent()
 
-        data class AddGalleryBucket(val name: String, val list: MutableList<GalleryMedia>) :
+        data class AddToGalleryBucket(val name: String, val list: MutableList<GalleryMedia>) :
             FragEvent()
 
-        data class OnNewGalleryBucket(val gallery: Gallery) : FragEvent()
+        data class OnNewGallery(val gallery: Gallery) : FragEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : FragEvent()
+        data class OnGalleryUpdated(val gallery: Gallery) : FragEvent()
+
+        data class OnNewGalleries(val gallery: List<Gallery>) : FragEvent()
+        data class OnGalleriesRemoved(val gallery: List<Gallery>) : FragEvent()
+        data class OnGalleriesUpdated(val gallery: List<Gallery>) : FragEvent()
 
         data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : FragEvent()
 
         data class OnMediaDeleted(val galleryMedia: GalleryMedia) : FragEvent()
         data class OnMediaInserted(val galleryMedia: GalleryMedia) : FragEvent()
         data class OnMediaUpdated(val galleryMedia: GalleryMedia) : FragEvent()
+
+        data class OnMediasDeleted(val galleryMedia: List<GalleryMedia>) : FragEvent()
+        data class OnMediasInserted(val galleryMedia: List<GalleryMedia>) : FragEvent()
+        data class OnMediasUpdated(val galleryMedia: List<GalleryMedia>) : FragEvent()
+    }
+
+    private val pool = EventCachePool.get<FragEvent>(duration = 500L).apply {
+        viewModelScope.launchDefault {
+            suspend fun buildEvent(
+                increase: Boolean,
+                data: List<FragEvent>,
+                galleries: List<Gallery>
+            ): FragEvent? {
+                val bucket =
+                    if (increase) (data.first() as FragEvent.OnMediaInserted).galleryMedia.bucket
+                    else (data.first() as FragEvent.OnMediaDeleted).galleryMedia.bucket
+                return galleries.find { gallery -> gallery.name == bucket }?.let { gallery ->
+                    if (increase) gallery.size += data.size else gallery.size -= data.size
+                    gallery.uri = getNewestMedia(bucket)
+                    FragEvent.OnGalleryUpdated(gallery)
+                }
+            }
+            handlerEvent {
+                if (it.isNotEmpty()) when (it.first()) {
+                    is FragEvent.OnMediaDeleted -> {
+                        buildEvent(false, it, galleryData)
+                    }
+                    is FragEvent.OnMediaInserted -> {
+                        buildEvent(true, it, galleryData)
+                    }
+                    else -> null
+                }?.let { event -> sendEvent(event, true) }
+            }
+        }
     }
 
     suspend fun getGallery(gallery: String) = withIOContext {
@@ -73,17 +111,18 @@ class GalleryFragmentViewModel : BaseViewModel() {
         if (combine) getAllGalleryBucket() else getAllGalleryBucket(isVideo)
     }
 
+    private suspend fun getNewestMedia(gallery: String) = galleryDAO.run {
+        if (combine) getNewestMediaInGallery(gallery)
+        else getNewestMediaInGallery(gallery, isVideo)
+    }
+
     fun getGalleryName() = if (rightGallery == "") ALL_GALLERY else rightGallery
 
     fun getBucket(bucket: String) = galleryData.find { it.name == bucket }
 
-    fun onTargetGallery(bucket: String): Boolean {
-        return bucket == rightGallery || rightGallery == ALL_GALLERY
-    }
-
     private suspend fun Gallery.cacheAndNotice() {
         galleryData.add(this)
-        sendEvent(FragEvent.OnNewGalleryBucket(this))
+        sendEvent(FragEvent.OnNewGallery(this), true)
     }
 
     fun sortData() = viewModelScope.launchDefault {
@@ -103,12 +142,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
             ).cacheAndNotice()
 
             galleries.forEach {
-                Gallery(
-                    it,
-                    getGallerySize(it),
-                    if (combine) getNewestMediaInGallery(it)
-                    else getNewestMediaInGallery(it, isVideo)
-                ).cacheAndNotice()
+                Gallery(it, getGallerySize(it), getNewestMedia(it)).cacheAndNotice()
             }
             if (!isLock) sortPrivateData() else isDataSorted = true
         }
@@ -127,8 +161,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
         galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideo)) { re, reName ->
             if (re) {
                 if (!isLock) {
-                    sendEvent(FragEvent.OnNewGalleryBucket(Gallery(reName, 0, null)))
-                    galleryMap[reName] = mutableListOf()
+                    Gallery(reName, 0, null).cacheAndNotice()
                 } else {
                     R.string.locked.getString().toast()
                 }
@@ -148,101 +181,66 @@ class GalleryFragmentViewModel : BaseViewModel() {
 
     private fun observeGallery() {
         viewModelScope.launchDefault {
-            Log.d(TAG, "observeGallery: launch")
-            fun sortDeleteMedia(
+            suspend fun sortDeleteMedia(
                 media: GalleryMedia,
-                map: MutableMap<String?, MutableList<GalleryMedia>>
+                rightGallery: String
             ) {
-                if (map[media.bucket]?.remove(media) == true
-                    && (map[media.bucket]?.size ?: 0) <= 0
-                ) {
-                    map.remove(media.bucket)
-                }
-                map[ALL_GALLERY]?.remove(media)
-            }
-
-            suspend fun insertNewMedia(
-                map: MutableMap<String?, MutableList<GalleryMedia>>,
-                media: GalleryMedia
-            ) {
-                if (map[media.bucket] == null) {
-                    map[media.bucket] = mutableListOf<GalleryMedia>().also { it.add(media) }
-                    FragEvent.OnNewGalleryBucket(
-                        Gallery(media.bucket, getGallerySize(media.bucket), media.uri)
-                    ).let { sendEvent(it) }
-                } else map[media.bucket]?.add(media)
+                if (media.isVideo != isVideo && media.bucket != rightGallery) return
+                sendEvent(FragEvent.OnMediaDeleted(media), false)
             }
 
             suspend fun onGalleryMediaInserted(
                 isVideo: Boolean,
-                galleryMedia: GalleryMedia,
-                map: MutableMap<String?, MutableList<GalleryMedia>>,
-                gallery: String
+                media: GalleryMedia,
+                rightGallery: String
             ) {
-                if (galleryMedia.isVideo != isVideo) return
-                insertNewMedia(map, galleryMedia)
-                map[gallery]?.add(galleryMedia)
-                sendEvent(FragEvent.OnMediaInserted(galleryMedia))
+                if (media.isVideo != isVideo && media.bucket != rightGallery) return
+                sendEvent(FragEvent.OnMediaInserted(media), false)
             }
 
             suspend fun onGalleryMediaUpdated(
                 isVideo: Boolean,
-                galleryMedia: GalleryMedia,
-                map: MutableMap<String?, MutableList<GalleryMedia>>,
-                gallery: String
+                media: GalleryMedia,
+                rightGallery: String
             ) {
-                if (galleryMedia.isVideo != isVideo) return
-                map[gallery]?.first { sortMedia -> galleryMedia.uri == sortMedia.uri }
-                    ?.let { sortedMedia ->
-                        val allIndex = map[gallery]?.indexOf(sortedMedia)
-                        if (allIndex != null && allIndex != -1) {
-                            map[gallery]?.set(allIndex, galleryMedia)
-                            val index = map[sortedMedia.bucket]?.indexOf(sortedMedia)
-                            if (sortedMedia.bucket != galleryMedia.bucket) {
-                                map[sortedMedia.bucket]?.remove(sortedMedia)
-                                insertNewMedia(map, galleryMedia)
-                                sendEvent(FragEvent.OnMediaInserted(galleryMedia))
-                                return@let
-                            } else if (index != null && index != -1) {
-                                map[sortedMedia.bucket]?.set(index, sortedMedia)
-                            }
-                            sendEvent(FragEvent.OnMediaUpdated(galleryMedia))
-                        }
-                    }
+                if (media.isVideo != isVideo && media.bucket != rightGallery) return
+                sendEvent(FragEvent.OnMediaUpdated(media), true)
             }
 
             observeGalleryData {
-                Log.d(TAG, "observeGallery: $it")
                 while (!isDataSorted) delay(200)
-                Log.d(TAG, "observeGallery2: $it")
                 when (it) {
                     is MediaAction.GalleryDataAction.OnGalleryMediaDeleted -> {
-                        if (it.media.isVideo != isVideo) return@observeGalleryData
-                        sortDeleteMedia(it.media, galleryMap)
-                        sendEvent(FragEvent.OnMediaDeleted(it.media))
+                        sortDeleteMedia(it.media, rightGallery)
                     }
                     is MediaAction.GalleryDataAction.OnGalleryMediasInserted -> it.medias.forEach { media ->
-                        onGalleryMediaInserted(isVideo, media, galleryMap, ALL_GALLERY)
+                        onGalleryMediaInserted(isVideo, media, rightGallery)
                     }
                     is MediaAction.GalleryDataAction.OnGalleryMediaInserted -> {
-                        onGalleryMediaInserted(isVideo, it.media, galleryMap, ALL_GALLERY)
+                        onGalleryMediaInserted(isVideo, it.media, rightGallery)
                     }
                     is MediaAction.GalleryDataAction.OnGalleryMediasUpdated -> it.medias.forEach { media ->
-                        onGalleryMediaUpdated(isVideo, media, galleryMap, ALL_GALLERY)
+                        onGalleryMediaUpdated(isVideo, media, rightGallery)
                     }
                     is MediaAction.GalleryDataAction.OnGalleryMediaUpdated -> {
-                        onGalleryMediaUpdated(isVideo, it.media, galleryMap, ALL_GALLERY)
+                        onGalleryMediaUpdated(isVideo, it.media, rightGallery)
                     }
                     is MediaAction.GalleryDataAction.OnGalleryDeleted -> {
-                        galleryMap.remove(it.gallery)?.let { _ ->
-                            sendEvent(FragEvent.OnGalleryRemoved(Gallery(it.gallery, 0, null)))
+                        galleryData.find { gallery -> gallery.name == it.gallery }?.let { gallery ->
+                            galleryData.remove(gallery)
+                            sendEvent(FragEvent.OnGalleryRemoved(gallery), true)
                         }
                     }
                     is MediaAction.GalleryDataAction.OnGalleryBucketInserted -> {
-                        TODO("OnGalleryBucketInserted")
+                        Gallery(it.galleryBucket.type, 0, null, true).cacheAndNotice()
                     }
                     is MediaAction.GalleryDataAction.OnGalleryBucketDeleted -> {
-                        TODO("OnGalleryBucketDeleted")
+                        galleryData.find { gallery ->
+                            gallery.name == it.galleryBucket.type
+                        }?.let { gallery ->
+                            galleryData.remove(gallery)
+                            sendEvent(FragEvent.OnGalleryRemoved(gallery), true)
+                        }
                     }
                     else -> Unit
                 }
@@ -250,8 +248,9 @@ class GalleryFragmentViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun sendEvent(fragEvent: FragEvent) {
-        _fragFlow.emit(fragEvent)
+    suspend fun sendEvent(fragEvent: FragEvent, immediate: Boolean) {
+        if (immediate) _fragFlow.emit(fragEvent)
+        else pool.holdEvent(fragEvent)
     }
 
     suspend fun insertNewMedias(gallery: String, list: MutableList<GalleryMedia>) {

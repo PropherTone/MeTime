@@ -3,9 +3,15 @@ package com.protone.common.utils
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 
-class ActiveTimer(private val delay: Long = 500L) {
+class ActiveTimer(lifecycleOwner: LifecycleOwner? = null, private val delay: Long = 500L) {
     private var timerHandler: Handler? = Handler(Looper.getMainLooper()) {
+        if (lifecycleOwner?.lifecycle?.currentState == Lifecycle.State.DESTROYED) {
+            destroy()
+            return@Handler true
+        }
         funcMap[it.what]?.invoke(it.obj)
         false
     }
@@ -33,6 +39,7 @@ class ActiveTimer(private val delay: Long = 500L) {
     }
 
     fun destroy() {
+        funcMap.clear()
         timerHandler?.removeCallbacksAndMessages(null)
         timerHandler = null
     }

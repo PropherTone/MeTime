@@ -29,6 +29,11 @@ class GalleryBucketAdapter(
         GalleryBucketAdapterDataProxy().block()
     }
 
+    private enum class ItemState {
+        SIZE_CHANGED,
+        URI_CHANGED
+    }
+
     sealed class GalleryBucketEvent {
         data class DeleteBucket(val bucket: Gallery) : GalleryBucketEvent()
         data class RefreshBucket(val bucket: Gallery) : GalleryBucketEvent()
@@ -46,13 +51,6 @@ class GalleryBucketAdapter(
                 }
             }
             is GalleryBucketEvent.RefreshBucket -> {
-                if (data.bucket.name != ALL_GALLERY &&
-                    data.bucket.size <= 0
-                ) {
-                    mList.find { data.bucket.name == it.name }
-                        ?.let { deleteBucket(it) }
-                    return
-                }
                 val iterator = mList.iterator()
                 var index = 0
                 while (iterator.hasNext()) {
@@ -62,8 +60,14 @@ class GalleryBucketAdapter(
                                 selectList[0] = data.bucket
                             }
                         }
-                        mList[index] = data.bucket
-                        notifyItemChangedCO(index)
+                        notifyItemChangedCO(
+                            index,
+                            when {
+                                mList[index].size != data.bucket.size -> ItemState.SIZE_CHANGED
+                                mList[index].uri != data.bucket.uri -> ItemState.URI_CHANGED
+                                else -> null
+                            }.apply { mList[index] = data.bucket }
+                        )
                         break
                     }
                     index++
@@ -97,6 +101,29 @@ class GalleryBucketAdapter(
                 root.updateLayoutParams { height = MApplication.screenHeight / 10 }
                 bucketThumb.scaleType = ImageView.ScaleType.CENTER_CROP
             })
+    }
+
+    override fun onBindViewHolder(
+        holder: Holder<GalleryBucketListLayoutBinding>,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isNotEmpty()) {
+            when (payloads.first()) {
+                ItemState.SIZE_CHANGED -> holder.binding.apply {
+                    bucketItemNumber.text = mList[position].size.toString()
+                }
+                ItemState.URI_CHANGED -> holder.binding.apply {
+                    bucketThumb.let { thumb ->
+                        if (thumb.tag != mList[position].uri) {
+                            thumb.tag = mList[position].uri
+                            Image.load(mList[position].uri).with(context).into(thumb)
+                        }
+                    }
+                }
+            }
+        }
+        super.onBindViewHolder(holder, position, payloads)
     }
 
     override fun onBindViewHolder(holder: Holder<GalleryBucketListLayoutBinding>, position: Int) {

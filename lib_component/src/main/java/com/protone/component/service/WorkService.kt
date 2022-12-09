@@ -37,7 +37,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         private const val UPDATE_GALLERY = 2
     }
 
-    private val activeTimer = ActiveTimer(1200L).apply {
+    private val activeTimer = ActiveTimer(this, 1200L).apply {
         addFunction(UPDATE_MUSIC) { this@WorkService.updateMusic() }
         addFunction(UPDATE_GALLERY) { this@WorkService.updateGallery() }
     }

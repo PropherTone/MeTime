@@ -3,7 +3,6 @@ package com.protone.gallery.fragment
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Rect
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -95,7 +94,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
             fragEvent.bufferCollect {
                 Log.d(TAG, "observeEvent: $it")
                 when (it) {
-                    is GalleryFragmentViewModel.FragEvent.AddGalleryBucket -> {
+                    is GalleryFragmentViewModel.FragEvent.AddToGalleryBucket -> {
                         insertNewMedias(it.name, it.list)
                     }
                     is GalleryFragmentViewModel.FragEvent.SelectAll -> {
@@ -116,38 +115,44 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                         )
                         startActivity(PictureBoxActivity::class.intent)
                     }
-                    is GalleryFragmentViewModel.FragEvent.OnNewGalleryBucket -> {
+                    is GalleryFragmentViewModel.FragEvent.OnNewGallery -> {
                         getBucketAdapter().insertBucket(it.gallery)
                     }
                     is GalleryFragmentViewModel.FragEvent.OnGalleryRemoved -> {
                         getBucketAdapter().deleteBucket(it.gallery)
                     }
                     is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
-                        refreshBucket(it.galleryMedia)
-                        if (onTargetGallery(it.galleryMedia.bucket)) {
-                            noticeListUpdate(
-                                it.galleryMedia,
-                                GalleryListAdapter.MediaStatus.DELETED
-                            )
-                        }
+                        noticeListUpdate(
+                            it.galleryMedia,
+                            GalleryListAdapter.MediaStatus.DELETED
+                        )
                     }
                     is GalleryFragmentViewModel.FragEvent.OnMediaInserted -> {
-                        refreshBucket(it.galleryMedia)
-                        if (onTargetGallery(it.galleryMedia.bucket)) {
-                            noticeListUpdate(
-                                it.galleryMedia,
-                                GalleryListAdapter.MediaStatus.INSERTED
-                            )
-                        }
+                        noticeListUpdate(
+                            it.galleryMedia,
+                            GalleryListAdapter.MediaStatus.INSERTED
+                        )
                     }
                     is GalleryFragmentViewModel.FragEvent.OnMediaUpdated -> {
-                        if (onTargetGallery(it.galleryMedia.bucket)) {
-                            noticeListUpdate(
-                                it.galleryMedia,
-                                GalleryListAdapter.MediaStatus.UPDATED
-                            )
+                        noticeListUpdate(
+                            it.galleryMedia,
+                            GalleryListAdapter.MediaStatus.UPDATED
+                        )
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnGalleryUpdated -> {
+                        viewModel.run {
+                            getBucketAdapter().apply {
+                                refreshBucket(it.gallery)
+                                getBucket(ALL_GALLERY)?.let { gallery -> refreshBucket(gallery) }
+                            }
                         }
                     }
+                    is GalleryFragmentViewModel.FragEvent.OnNewGalleries -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnGalleriesRemoved -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnGalleriesUpdated -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnMediasDeleted -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnMediasInserted -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnMediasUpdated -> {}
                     else -> Unit
                 }
             }
@@ -248,26 +253,18 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     }
 
     private fun onGallerySelected(gallery: String, size: Int) {
-        viewModel.rightGallery = gallery
-        binding.galleryShowBucket.negative()
-        if (viewModel.isBucketShowUp) return
+        if (viewModel.rightGallery == gallery) return
         launch {
+            viewModel.rightGallery = gallery
+            binding.galleryShowBucket.negative()
+            if (viewModel.isBucketShowUp) return@launch
             binding.galleryList.swapAdapter(
                 GalleryListAdapter(requireContext(), true, itemCount = size).also {
                     it.multiChoose = true
                     it.setOnSelectListener(this@GalleryFragment)
                 }, false
             )
-            viewModel.getGallery(gallery)?.let { data ->
-                getListAdapter().setData(data)
-            }
-        }
-    }
-
-    private fun refreshBucket(media: GalleryMedia): Unit = viewModel.run {
-        getBucketAdapter().apply {
-            getBucket(media.bucket)?.let { refreshBucket(it) }
-            getBucket(ALL_GALLERY)?.let { refreshBucket(it) }
+            viewModel.getGallery(gallery)?.let { getListAdapter().setData(it) }
         }
     }
 
@@ -294,7 +291,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
     override fun select(galleryMedia: MutableList<GalleryMedia>) {
         launch {
-            viewModel.sendEvent(GalleryFragmentViewModel.FragEvent.OnSelect(galleryMedia))
+            viewModel.sendEvent(GalleryFragmentViewModel.FragEvent.OnSelect(galleryMedia), true)
         }
     }
 
