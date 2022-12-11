@@ -16,10 +16,10 @@ interface NoteDAO {
     @Insert
     fun insertNote(note: Note): Long
 
-    @Query("SELECT * FROM Note WHERE Note_Title LIKE :name")
+    @Query("SELECT * FROM Note WHERE Note_Title IS :name")
     fun getNoteByName(name: String): Note?
 
-    @Query("SELECT * FROM Note WHERE noteId LIKE :id")
+    @Query("SELECT * FROM Note WHERE noteId IS :id")
     fun getNoteById(id: Long): Note?
 
     @Update

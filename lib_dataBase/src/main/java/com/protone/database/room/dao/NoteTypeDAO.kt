@@ -13,7 +13,7 @@ interface NoteTypeDAO {
     @Insert
     fun insertNoteDir(noteDir: NoteDir)
 
-    @Query("SELECT * FROM NoteDir WHERE name LIKE :name")
+    @Query("SELECT * FROM NoteDir WHERE name IS :name")
     fun getNoteDir(name: String): NoteDir?
 
     @Delete

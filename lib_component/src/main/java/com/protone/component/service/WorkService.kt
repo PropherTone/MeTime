@@ -21,14 +21,9 @@ import com.protone.common.utils.TAG
 import com.protone.component.broadcast.MediaContentObserver
 import com.protone.component.broadcast.WorkReceiver
 import com.protone.component.broadcast.workLocalBroadCast
-import com.protone.component.database.MediaAction
 import com.protone.component.database.dao.DatabaseBridge
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
-import kotlin.system.measureTimeMillis
 
 class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
@@ -37,7 +32,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         private const val UPDATE_GALLERY = 2
     }
 
-    private val activeTimer = ActiveTimer(this, 1200L).apply {
+    private val activeTimer = ActiveTimer(this, 2048L).apply {
         addFunction(UPDATE_MUSIC) { this@WorkService.updateMusic() }
         addFunction(UPDATE_GALLERY) { this@WorkService.updateGallery() }
     }
@@ -162,28 +157,19 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     }
 
     private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
+        Log.d(TAG, "updateGallery: ")
         launchDefault {
-            val allSignedMedia = getAllSignedMedia() as MutableList
-            val updateList = mutableListOf<GalleryMedia>()
-            val insertList = mutableListOf<GalleryMedia>()
-
-            fun sortMedia(allSignedMedia: List<GalleryMedia>?, it: GalleryMedia) {
-                if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
-                    allSignedMedia.indexOf(it).let { index ->
-                        if (index != -1) {
-                            if (allSignedMedia[index] == it) return@let
-                            updateList.add(it)
-                        } else {
-                            insertList.add(it)
-                        }
-                    }
-                } else {
-                    insertList.add(it)
-                }
+            val allSignedMedia = getAllSignedMedia() as MutableList?
+            val scanPicture = async(Dispatchers.Default) {
+                scanPicture { _, _ -> }
+            }
+            val scanVideo = async(Dispatchers.Default) {
+                scanVideo { _, _ -> }
             }
 
-            val pictures = scanPicture { _, _ -> }
-            val videos = scanVideo { _, _ -> }
+            val medias = scanPicture.await().apply {
+                addAll(scanVideo.await())
+            }
 
             val sortMedias = async(Dispatchers.Default) {
                 val uncheckedGalleries = getAllGallery() as MutableList<String>
@@ -191,30 +177,37 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 uncheckedGalleries.forEach {
                     deleteSignedMediasByGalleryAsync(it)
                 }
-                allSignedMedia.filter {
-                    !uncheckedGalleries.contains(it.bucket)
-                            && (pictures.find { gm -> gm.uri == it.uri } != null
-                            && videos.find { gm -> gm.uri == it.uri } != null)
-                }.apply {
+                allSignedMedia?.filter {
+                    uncheckedGalleries.contains(it.bucket) || medias.find { gm -> gm.uri == it.uri } == null
+                }?.apply {
                     deleteSignedMediaMultiAsync(this)
                 }
             }
 
-            allSignedMedia.removeAll(sortMedias.await())
+            sortMedias.await()?.let { allSignedMedia?.removeAll(it) }
 
-            val pictureJob = async(Dispatchers.Default) {
-                pictures.forEach {
-                    sortMedia(allSignedMedia, it)
+            val updateList = mutableListOf<GalleryMedia>()
+            val insertList = mutableListOf<GalleryMedia>()
+
+            fun sortMedia(
+                allSignedMedia: List<GalleryMedia>?,
+                insertList: MutableList<GalleryMedia>,
+                updateList: MutableList<GalleryMedia>,
+                media: GalleryMedia
+            ) {
+                if (allSignedMedia?.isNotEmpty() == true) {
+                    allSignedMedia.find { it.uri == media.uri }.also {
+                        if (it == null) insertList.add(media)
+                        else if (it != media) updateList.add(media)
+                    }
+                } else {
+                    insertList.add(media)
                 }
             }
-            val videoJob = async(Dispatchers.Default) {
-                videos.forEach {
-                    sortMedia(allSignedMedia, it)
-                }
-            }
 
-            pictureJob.await()
-            videoJob.await()
+            medias.forEach {
+                sortMedia(allSignedMedia, insertList, updateList, it)
+            }
 
             insertSignedMediaMulti(insertList)
             updateSignedMediaMulti(updateList)

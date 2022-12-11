@@ -51,7 +51,7 @@ internal abstract class DataBase : RoomDatabase() {
             return Room.databaseBuilder(
                 MApplication.app,
                 DataBase::class.java,
-                "SeennDB"
+                "MeTimeDB"
             ).build()
         }
     }

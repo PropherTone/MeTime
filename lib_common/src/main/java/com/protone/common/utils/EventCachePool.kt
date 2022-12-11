@@ -3,56 +3,77 @@ package com.protone.common.utils
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.reflect.KClass
 
 class EventCachePool<Event : Any>(
     private val lifecycleOwner: LifecycleOwner? = null,
+    private val replay: Boolean = false,
     private val duration: Long
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     companion object {
         @JvmStatic
-        fun <Event : Any> get(lifecycleOwner: LifecycleOwner? = null, duration: Long) =
-            EventCachePool<Event>(lifecycleOwner, duration)
+        fun <Event : Any> get(
+            lifecycleOwner: LifecycleOwner? = null,
+            replay: Boolean = false,
+            duration: Long
+        ) = EventCachePool<Event>(lifecycleOwner, replay, duration)
     }
 
-    private val eventMap by lazy { mutableMapOf<KClass<out Event>, MutableList<Event>>() }
-
-
-
-    fun holdEvent(event: Event) {
-
-        eventMap[event::class].takeIf {
-            if (it == null) eventMap[event::class] = mutableListOf()
-            true
-        }?.add(event)
-
+    private val eventMap by lazy {
+        mutableMapOf<KClass<out Event>, MutableList<Event>>()
     }
 
-    private fun createJob(): Job = launch(start = CoroutineStart.LAZY) {
-        while (isActive){
-            if (lifecycleOwner?.lifecycle?.currentState == Lifecycle.State.DESTROYED) return@launch
+    private val job = launch(start = CoroutineStart.LAZY) {
+        flow.collect {
+            if (lifecycleOwner?.lifecycle?.currentState == Lifecycle.State.DESTROYED) {
+                clear()
+                return@collect
+            }
             delay(duration)
             dispatch()
         }
     }
 
+    private val flow = MutableSharedFlow<Event>(
+        replay = if (replay) 1 else 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+    suspend fun holdEvent(event: Event) {
+        eventMap[event::class].also {
+            if (it == null) eventMap[event::class] = mutableListOf()
+            eventMap[event::class]?.add(event)
+        }
+        flow.emit(event)
+    }
+
     private suspend fun dispatch() {
-        eventMap.forEach { (_, v) ->
-            block?.invoke(v)
-            v.clear()
+        block?.let {
+            eventMap.forEach { (_, v) ->
+                if (v.isNotEmpty()) {
+                    it.invoke(v)
+                    v.clear()
+                }
+            }
         }
     }
 
     private var block: (suspend (List<Event>) -> Unit)? = null
-    fun handlerEvent(block: suspend (List<Event>) -> Unit): EventCachePool<Event> {
+    fun handleEvent(block: suspend (List<Event>) -> Unit): EventCachePool<Event> {
+        job.start()
         this.block = block
         return this
     }
 
     fun clear() {
         block = null
+        job.cancel()
         eventMap.clear()
         cancel()
     }
+
 }

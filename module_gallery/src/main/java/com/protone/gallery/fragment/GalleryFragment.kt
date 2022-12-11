@@ -115,12 +115,6 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                         )
                         startActivity(PictureBoxActivity::class.intent)
                     }
-                    is GalleryFragmentViewModel.FragEvent.OnNewGallery -> {
-                        getBucketAdapter().insertBucket(it.gallery)
-                    }
-                    is GalleryFragmentViewModel.FragEvent.OnGalleryRemoved -> {
-                        getBucketAdapter().deleteBucket(it.gallery)
-                    }
                     is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
                         noticeListUpdate(
                             it.galleryMedia,
@@ -139,6 +133,15 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                             GalleryListAdapter.MediaStatus.UPDATED
                         )
                     }
+                    is GalleryFragmentViewModel.FragEvent.OnMediasDeleted -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnMediasInserted -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnMediasUpdated -> {}
+                    is GalleryFragmentViewModel.FragEvent.OnNewGallery -> {
+                        getBucketAdapter().insertBucket(it.gallery)
+                    }
+                    is GalleryFragmentViewModel.FragEvent.OnGalleryRemoved -> {
+                        getBucketAdapter().deleteBucket(it.gallery)
+                    }
                     is GalleryFragmentViewModel.FragEvent.OnGalleryUpdated -> {
                         viewModel.run {
                             getBucketAdapter().apply {
@@ -150,9 +153,6 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                     is GalleryFragmentViewModel.FragEvent.OnNewGalleries -> {}
                     is GalleryFragmentViewModel.FragEvent.OnGalleriesRemoved -> {}
                     is GalleryFragmentViewModel.FragEvent.OnGalleriesUpdated -> {}
-                    is GalleryFragmentViewModel.FragEvent.OnMediasDeleted -> {}
-                    is GalleryFragmentViewModel.FragEvent.OnMediasInserted -> {}
-                    is GalleryFragmentViewModel.FragEvent.OnMediasUpdated -> {}
                     else -> Unit
                 }
             }

@@ -1,11 +1,13 @@
 package com.protone.database.room.dao
 
 import android.net.Uri
+import android.util.Log
 import androidx.room.*
 import com.protone.common.entity.Gallery
 import com.protone.common.utils.converters.UriTypeConverter
 import com.protone.common.entity.GalleryMedia
 import com.protone.database.room.mapToLongList
+import java.lang.Exception
 
 @Dao
 @TypeConverters(UriTypeConverter::class)
@@ -14,55 +16,55 @@ interface SignedGalleryDAO {
     @Query("SELECT * FROM GalleryMedia ORDER BY dateModified DESC")
     fun getAllSignedMedia(): List<GalleryMedia>?
 
-    @Query("SELECT * FROM GalleryMedia WHERE isVideo LIKE :isVideo ORDER BY dateModified DESC")
+    @Query("SELECT * FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllMediaByType(isVideo: Boolean): List<GalleryMedia>?
 
-    @Query("SELECT DISTINCT bucket FROM GalleryMedia WHERE isVideo LIKE :isVideo ORDER BY dateModified DESC")
+    @Query("SELECT DISTINCT bucket FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllGallery(isVideo: Boolean): List<String>?
 
     @Query("SELECT DISTINCT bucket FROM GalleryMedia ORDER BY dateModified DESC")
     fun getAllGallery(): List<String>?
 
-    @Query("SELECT * FROM GalleryMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo ORDER BY dateModified DESC")
+    @Query("SELECT * FROM GalleryMedia WHERE bucket IS :name AND isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllMediaByGallery(name: String, isVideo: Boolean): List<GalleryMedia>?
 
-    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo")
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket IS :name AND isVideo IS :isVideo")
     fun getMediaCountByGallery(name: String, isVideo: Boolean): Int
 
-    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE isVideo LIKE :isVideo")
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE isVideo IS :isVideo")
     fun getMediaCount(isVideo: Boolean): Int
 
     @Query("SELECT COUNT(mediaId) FROM GalleryMedia")
     fun getMediaCount(): Int
 
-    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket LIKE :name")
+    @Query("SELECT COUNT(mediaId) FROM GalleryMedia WHERE bucket IS :name")
     fun getMediaCountByGallery(name: String): Int
 
-    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia WHERE bucket LIKE :gallery)")
+    @Query("SELECT media_uri FROM (SELECT media_uri,MAX(dateModified) FROM GalleryMedia WHERE bucket IS :gallery)")
     fun getNewestMediaInGallery(gallery: String): Uri?
 
-    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia)")
+    @Query("SELECT media_uri FROM (SELECT media_uri,MAX(dateModified) FROM GalleryMedia)")
     fun getNewestMedia(): Uri?
 
-    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia WHERE bucket LIKE :gallery AND isVideo LIKE :isVideo)")
+    @Query("SELECT media_uri FROM (SELECT media_uri,MAX(dateModified) FROM GalleryMedia WHERE bucket IS :gallery AND isVideo IS :isVideo)")
     fun getNewestMediaInGallery(gallery: String, isVideo: Boolean): Uri?
 
-    @Query("SELECT media_uri FROM GalleryMedia WHERE dateModified IN (SELECT MAX(dateModified) FROM GalleryMedia WHERE isVideo LIKE :isVideo)")
+    @Query("SELECT media_uri FROM (SELECT media_uri,MAX(dateModified) FROM GalleryMedia WHERE isVideo IS :isVideo)")
     fun getNewestMedia(isVideo: Boolean): Uri?
 
-    @Query("SELECT * FROM GalleryMedia WHERE bucket LIKE :name ORDER BY dateModified DESC")
+    @Query("SELECT * FROM GalleryMedia WHERE bucket IS :name ORDER BY dateModified DESC")
     fun getAllMediaByGallery(name: String): List<GalleryMedia>?
 
-    @Query("SELECT * FROM GalleryMedia WHERE media_uri LIKE :uri")
+    @Query("SELECT * FROM GalleryMedia WHERE media_uri IS :uri")
     fun getSignedMedia(uri: Uri): GalleryMedia?
 
-    @Query("SELECT * FROM GalleryMedia WHERE path LIKE :path")
+    @Query("SELECT * FROM GalleryMedia WHERE path IS :path")
     fun getSignedMedia(path: String): GalleryMedia?
 
-    @Query("DELETE FROM GalleryMedia WHERE media_uri LIKE :uri")
+    @Query("DELETE FROM GalleryMedia WHERE media_uri IS :uri")
     fun deleteSignedMediaByUri(uri: Uri)
 
-    @Query("DELETE FROM GalleryMedia WHERE bucket LIKE :gallery")
+    @Query("DELETE FROM GalleryMedia WHERE bucket IS :gallery")
     fun deleteSignedMediasByGallery(gallery: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -70,7 +72,20 @@ interface SignedGalleryDAO {
 
     @Transaction
     fun insertSignedMediaMulti(medias: List<GalleryMedia>): List<Long> {
-        return medias.mapToLongList { insertSignedMedia(it) }
+        val list = mutableListOf<Long>()
+        medias.forEach {
+            if (it == null) {
+                Log.d("TAG", "mapToLongList: null????")
+            }
+            try {
+                insertSignedMedia(it).apply {
+                    if (this != -1L) list.add(this)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return list
     }
 
     @Delete

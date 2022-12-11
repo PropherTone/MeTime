@@ -9,7 +9,7 @@ interface MusicBucketDAO {
     @Query("SELECT * FROM MusicBucket ORDER BY date ASC")
     fun getAllMusicBucket(): List<MusicBucket>?
 
-    @Query("SELECT * FROM MusicBucket WHERE name LIKE :name")
+    @Query("SELECT * FROM MusicBucket WHERE name IS :name")
     fun getMusicBucketByName(name: String): MusicBucket?
 
     @Insert

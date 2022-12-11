@@ -14,7 +14,7 @@ interface MediaWithGalleryBucketDAO {
         "SELECT * FROM GalleryMedia " +
                 "INNER JOIN MediaWithGalleryBucket" +
                 " ON GalleryMedia.mediaId = MediaWithGalleryBucket.mediaId" +
-                " WHERE MediaWithGalleryBucket.galleryBucketId LIKE :bucketId"
+                " WHERE MediaWithGalleryBucket.galleryBucketId IS :bucketId"
     )
     @RewriteQueriesToDropUnusedColumns
     fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia>

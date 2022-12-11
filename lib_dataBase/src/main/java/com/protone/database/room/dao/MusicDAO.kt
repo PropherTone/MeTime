@@ -32,7 +32,7 @@ interface MusicDAO {
     @Update(entity = Music::class)
     fun updateMusic(music: Music): Int
 
-    @Query("SELECT * FROM Music WHERE uri LIKE :uri")
+    @Query("SELECT * FROM Music WHERE uri IS :uri")
     fun getMusicByUri(uri: Uri): Music?
 
 }

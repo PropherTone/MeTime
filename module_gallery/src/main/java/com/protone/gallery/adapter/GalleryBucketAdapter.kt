@@ -31,7 +31,8 @@ class GalleryBucketAdapter(
 
     private enum class ItemState {
         SIZE_CHANGED,
-        URI_CHANGED
+        URI_CHANGED,
+        ALL_CHANGED
     }
 
     sealed class GalleryBucketEvent {
@@ -62,11 +63,14 @@ class GalleryBucketAdapter(
                         }
                         notifyItemChangedCO(
                             index,
-                            when {
-                                mList[index].size != data.bucket.size -> ItemState.SIZE_CHANGED
-                                mList[index].uri != data.bucket.uri -> ItemState.URI_CHANGED
-                                else -> null
-                            }.apply { mList[index] = data.bucket }
+                            data.bucket.also {
+                                when {
+                                    mList[index].size != it.size && mList[index].uri != it.uri -> ItemState.ALL_CHANGED
+                                    mList[index].size != it.size -> ItemState.SIZE_CHANGED
+                                    mList[index].uri != it.uri -> ItemState.URI_CHANGED
+                                    else -> null
+                                }.apply { mList[index] = it }
+                            }
                         )
                         break
                     }
@@ -103,6 +107,18 @@ class GalleryBucketAdapter(
             })
     }
 
+    private fun GalleryBucketListLayoutBinding.changedText(item: Gallery) {
+        bucketItemNumber.text = item.size.toString()
+    }
+
+    private fun GalleryBucketListLayoutBinding.changedUri(item: Gallery) {
+        if (bucketThumb.tag != item.uri) {
+            bucketThumb.tag = item.uri
+            Image.load(item.uri).with(context).into(bucketThumb)
+        }
+    }
+
+
     override fun onBindViewHolder(
         holder: Holder<GalleryBucketListLayoutBinding>,
         position: Int,
@@ -111,15 +127,14 @@ class GalleryBucketAdapter(
         if (payloads.isNotEmpty()) {
             when (payloads.first()) {
                 ItemState.SIZE_CHANGED -> holder.binding.apply {
-                    bucketItemNumber.text = mList[position].size.toString()
+                    changedText(mList[position])
                 }
                 ItemState.URI_CHANGED -> holder.binding.apply {
-                    bucketThumb.let { thumb ->
-                        if (thumb.tag != mList[position].uri) {
-                            thumb.tag = mList[position].uri
-                            Image.load(mList[position].uri).with(context).into(thumb)
-                        }
-                    }
+                    changedUri(mList[position])
+                }
+                ItemState.ALL_CHANGED -> holder.binding.apply {
+                    changedText(mList[position])
+                    changedUri(mList[position])
                 }
             }
         }
@@ -144,14 +159,9 @@ class GalleryBucketAdapter(
                         }.create().show()
                     false
                 }
-                bucketThumb.let { thumb ->
-                    if (thumb.tag != data.uri) {
-                        thumb.tag = data.uri
-                        Image.load(data.uri).with(context).into(thumb)
-                    }
-                }
                 bucketName.text = data.name
-                bucketItemNumber.text = data.size.toString()
+                changedText(data)
+                changedUri(data)
                 bucket.setOnClickListener {
                     checkSelect(position, data)
                     selectBucket?.invoke(data)

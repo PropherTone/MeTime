@@ -12,13 +12,13 @@ interface GalleryBucketDAO {
     @Insert
     fun insertGalleryBucket(galleryBucket: GalleryBucket)
 
-    @Query("SELECT * FROM GalleryBucket WHERE type LIKE :name")
+    @Query("SELECT * FROM GalleryBucket WHERE type IS :name")
     fun getGalleryBucket(name: String): GalleryBucket?
 
     @Delete
     fun deleteGalleryBucket(galleryBucket: GalleryBucket)
 
-    @Query("SELECT * FROM GalleryBucket WHERE image LIKE :isVideo")
+    @Query("SELECT * FROM GalleryBucket WHERE image IS :isVideo")
     fun getAllGalleryBucket(isVideo: Boolean): List<GalleryBucket>?
 
     @Query("SELECT * FROM GalleryBucket")

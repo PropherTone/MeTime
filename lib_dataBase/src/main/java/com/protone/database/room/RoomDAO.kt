@@ -1,17 +1,26 @@
 package com.protone.database.room
 
 import android.content.Context
+import android.util.Log
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
 import com.protone.common.entity.Note
 import com.protone.database.room.dao.*
 import com.wajahatkarim3.roomexplorer.RoomExplorer
+import java.lang.Exception
 
 inline fun <reified T> List<T>.mapToLongList(block: (T) -> Long): List<Long> {
     val list = mutableListOf<Long>()
     this.forEach {
-        block(it).apply {
-            if (this != -1L) list.add(this)
+        if (it == null) {
+            Log.d("TAG", "mapToLongList: null????")
+        }
+        try {
+            block(it).apply {
+                if (this != -1L) list.add(this)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
     return list
@@ -19,7 +28,9 @@ inline fun <reified T> List<T>.mapToLongList(block: (T) -> Long): List<Long> {
 
 infix fun List<GalleryMedia>.mediasFilterBy(idList: List<Long>) =
     if (this.size != idList.size)
-        this.filter { idList.contains(it.mediaId) }
+        this.filter {
+            idList.contains(it.mediaId)
+        }
     else this
 
 infix fun List<Music>.musicsFilterBy(idList: List<Long>) =
