@@ -29,9 +29,7 @@ class SplashViewModel : BaseViewModel() {
 
     suspend fun firstBootWork() {
         if (userConfig.isFirstBoot) {
-            withContext(Dispatchers.IO) {
-                musicDAO.insertMusicMulti(scanAudio { _, _ -> })
-            }
+            musicDAO.insertMusicMulti(scanAudio { _, _ -> })
             val allMusicRs = musicDAO.getAllMusic() ?: return
 
             var launch: Job? = null

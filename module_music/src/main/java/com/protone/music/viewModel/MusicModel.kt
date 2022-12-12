@@ -40,8 +40,8 @@ class MusicModel : BaseViewModel() {
     var onMusicDataEvent: OnMusicDataEvent? = null
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-            dataBase.musicMessenger.bufferCollect {
+        viewModelScope.launchDefault {
+            observeMusicData {
                 when (it) {
                     is MediaAction.MusicDataAction.OnNewMusicBucket ->
                         onMusicDataEvent?.onNewMusicBucket(it.musicBucket)

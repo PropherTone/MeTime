@@ -72,20 +72,7 @@ interface SignedGalleryDAO {
 
     @Transaction
     fun insertSignedMediaMulti(medias: List<GalleryMedia>): List<Long> {
-        val list = mutableListOf<Long>()
-        medias.forEach {
-            if (it == null) {
-                Log.d("TAG", "mapToLongList: null????")
-            }
-            try {
-                insertSignedMedia(it).apply {
-                    if (this != -1L) list.add(this)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return list
+        return medias.mapToLongList { insertSignedMedia(it) }
     }
 
     @Delete

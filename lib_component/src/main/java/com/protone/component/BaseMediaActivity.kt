@@ -6,7 +6,6 @@ import androidx.databinding.ViewDataBinding
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.*
-import com.protone.component.database.dao.DatabaseBridge
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
@@ -16,7 +15,7 @@ import com.protone.component.view.dialog.cateDialog
 import com.protone.component.view.dialog.checkListDialog
 import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.popWindows.ColorfulPopWindow
-import com.protone.component.popWindows.GalleryOptionPop
+import com.protone.component.view.popWindows.GalleryOptionPop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
@@ -26,7 +25,17 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 ) : BaseActivity<VB, VM, T>(handleEvent),
     View.OnClickListener {
 
-    var popLayout: GalleryOptionPopBinding? = null
+    val popLayout: GalleryOptionPopBinding by lazy {
+        GalleryOptionPopBinding.inflate(layoutInflater, root, false).apply {
+            pop = GalleryOptionPop(this@BaseMediaActivity, root)
+            galleryDelete.setOnClickListener(this@BaseMediaActivity)
+            galleryMoveTo.setOnClickListener(this@BaseMediaActivity)
+            galleryRename.setOnClickListener(this@BaseMediaActivity)
+            gallerySelectAll.setOnClickListener(this@BaseMediaActivity)
+            gallerySetCate.setOnClickListener(this@BaseMediaActivity)
+            galleryIntoBox.setOnClickListener(this@BaseMediaActivity)
+        }
+    }
 
     private var pop: GalleryOptionPop? = null
 
@@ -37,22 +46,8 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     abstract fun popSetCate()
     abstract fun popIntoBox()
 
-    fun initPop() {
-        if (pop == null) {
-            popLayout = GalleryOptionPopBinding.inflate(layoutInflater, root, false).apply {
-                pop = GalleryOptionPop(this@BaseMediaActivity, root)
-                galleryDelete.setOnClickListener(this@BaseMediaActivity)
-                galleryMoveTo.setOnClickListener(this@BaseMediaActivity)
-                galleryRename.setOnClickListener(this@BaseMediaActivity)
-                gallerySelectAll.setOnClickListener(this@BaseMediaActivity)
-                gallerySetCate.setOnClickListener(this@BaseMediaActivity)
-                galleryIntoBox.setOnClickListener(this@BaseMediaActivity)
-            }
-        }
-    }
-
     fun showPop(anchor: View, onSelect: Boolean) {
-        popLayout?.apply {
+        popLayout.apply {
             galleryDelete.isGone = onSelect
             galleryMoveTo.isGone = onSelect
             galleryRename.isGone = onSelect
@@ -62,7 +57,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     }
 
     override fun onClick(v: View?) {
-        popLayout?.apply {
+        popLayout.apply {
             when (v) {
                 galleryDelete -> popDelete()
                 galleryMoveTo -> popMoveTo()
@@ -171,7 +166,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         cateDialog(addCate = {
             titleDialog(R.string.addCate.getString(), "") { re ->
                 if (re.isEmpty()) {
-                    "请输入内容".toast()
+                    R.string.enter.getString().toast()
                     return@titleDialog
                 }
                 addCate(re, gms)
@@ -199,7 +194,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                     (g.cate as MutableList).add(cate)
                 }
             }
-            DatabaseBridge.instance.galleryDAOBridge.updateMediaMultiAsync(list)
+            viewModel.galleryDAO.updateMediaMultiAsync(list)
         }
     }
 
@@ -212,18 +207,12 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,
-            dataList = DatabaseBridge.instance.galleryDAOBridge.getAllGalleryBucket(isVideo)
+            dataList = viewModel.galleryDAO.getAllGalleryBucket(isVideo)
                 ?.map { it.type }?.toList() as MutableList<String>? ?: mutableListOf()
         ) { re ->
             if (re != null) {
                 gms.let { list ->
-                    list.forEach {
-                        if (it.type == null) it.type = mutableListOf()
-                        if (it.type?.contains(re) == false)
-                            (it.type as MutableList<String>).add(re)
-                        else "${it.name}已存在${it.type}中".toast()
-                    }
-                    DatabaseBridge.instance.galleryDAOBridge.updateMediaMultiAsync(list)
+                    viewModel.galleryDAO.insertMediaWithGalleryBucketMultiAsync(re, list)
                     callback.invoke(re, list)
                 }
             } else R.string.none.getString().toast()

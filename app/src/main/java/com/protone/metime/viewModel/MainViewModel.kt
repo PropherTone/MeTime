@@ -3,6 +3,8 @@ package com.protone.metime.viewModel
 import android.graphics.Bitmap
 import com.protone.common.R
 import com.protone.common.baseType.toBitmap
+import com.protone.common.baseType.withDefaultContext
+import com.protone.common.baseType.withIOContext
 import com.protone.common.context.MApplication
 import com.protone.common.entity.GalleryMedia
 import com.protone.component.database.photoInToday
@@ -25,15 +27,15 @@ class MainViewModel : BaseViewModel() {
     }
 
     suspend fun getMusics(bucketName: String) = withContext(Dispatchers.IO) {
-            musicDAO.getMusicBucketByName(bucketName)?.musicBucketId?.let {
-                musicDAO.getMusicWithMusicBucket(it)
-            }
+        musicDAO.getMusicBucketByName(bucketName)?.musicBucketId?.let {
+            musicDAO.getMusicWithMusicBucket(it)
+        }
     }
 
-    fun loadBlurIcon(path: String): Bitmap? {
-        return try {
+    suspend fun loadBlurIcon(path: String): Bitmap? = withDefaultContext {
+        return@withDefaultContext try {
             Blur.blur(
-                path.toBitmap(),
+                withIOContext { path.toBitmap() },
                 radius = 10,
                 sampling = 10
             )

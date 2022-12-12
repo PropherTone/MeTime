@@ -9,7 +9,6 @@ import com.protone.common.utils.converters.UriTypeConverter
 
 @Dao
 @TypeConverters(UriTypeConverter::class)
-@SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
 interface GalleriesWithNotesDAO {
 
     @Insert

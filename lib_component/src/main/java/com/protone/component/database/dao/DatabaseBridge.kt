@@ -112,16 +112,11 @@ class DatabaseBridge : DatabaseHelper() {
 
         fun insertMusicMultiAsyncWithBucket(musicBucket: String, music: List<Music>) {
             execute {
-                val bucket = musicDAOBridge.getMusicBucketByName(musicBucket)
-                bucket?.let { b ->
-                    music.forEach {
-                        insertMusicWithMusicBucket(
-                            MusicWithMusicBucket(
-                                b.musicBucketId,
-                                it.musicBaseId
-                            )
-                        )
-                    }
+                val bucket = musicDAOBridge.getMusicBucketByName(musicBucket) ?: return@execute
+                music.forEach {
+                    insertMusicWithMusicBucket(
+                        MusicWithMusicBucket(bucket.musicBucketId, it.musicBaseId)
+                    )
                 }
             }
         }
@@ -142,6 +137,51 @@ class DatabaseBridge : DatabaseHelper() {
         override suspend fun sendEvent(mediaAction: MediaAction.GalleryDataAction) {
             sendGalleryAction(mediaAction)
         }
+
+        fun insertMediaWithGalleryBucketAsync(bucketId: Long, mediaId: Long) {
+            execute {
+                insertMediaWithGalleryBucket(MediaWithGalleryBucket(bucketId, mediaId))
+            }
+        }
+
+        fun insertMediaWithGalleryBucketMultiAsync(bucketName: String, medias: List<GalleryMedia>) {
+            if (medias.isEmpty()) return
+            execute {
+                getGalleryBucket(bucketName)?.let { bucket ->
+                    insertMediaWithGalleryBucketMulti(medias.map {
+                        MediaWithGalleryBucket(it.mediaId, bucket.galleryBucketId)
+                    })
+                }
+            }
+        }
+
+        fun insertMediaWithGalleryBucketMultiAsync(bucketId: Long, medias: List<GalleryMedia>) {
+            if (medias.isEmpty()) return
+            execute {
+                insertMediaWithGalleryBucketMulti(medias.map {
+                    MediaWithGalleryBucket(it.mediaId, bucketId)
+                })
+            }
+        }
+
+        fun deleteMediaWithGalleryBucketAsync(mediaWithGalleryBucket: MediaWithGalleryBucket) {
+            execute {
+                deleteMediaWithGalleryBucket(mediaWithGalleryBucket)
+            }
+        }
+
+        fun getGalleryMediasByBucketAsync(bucketId: Long) {
+            execute {
+                getGalleryMediasByBucket(bucketId)
+            }
+        }
+
+        fun getGalleryBucketByMediasAsync(mediaId: Long) {
+            execute {
+                getGalleryBucketByMedias(mediaId)
+            }
+        }
+
 
         fun deleteSignedMediaMultiAsync(list: List<GalleryMedia>) {
             execute {
@@ -234,9 +274,7 @@ class DatabaseBridge : DatabaseHelper() {
             return Pair(getNoteByName(note.title) != null, id)
         }
 
-        suspend fun insertNoteDirRs(
-            noteDir: NoteDir,
-        ): Pair<Boolean, NoteDir> {
+        suspend fun insertNoteDirRs(noteDir: NoteDir): Pair<Boolean, NoteDir> {
             var count = 0
             val tempName = noteDir.name
             val names = mutableMapOf<String, Int>()

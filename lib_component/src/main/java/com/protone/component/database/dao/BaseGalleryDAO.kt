@@ -2,19 +2,13 @@ package com.protone.component.database.dao
 
 import android.net.Uri
 import com.protone.common.baseType.withIOContext
+import com.protone.common.entity.*
 import com.protone.component.database.MediaAction
-import com.protone.common.entity.GalleriesWithNotes
-import com.protone.common.entity.GalleryBucket
-import com.protone.common.entity.GalleryMedia
-import com.protone.common.entity.Note
-import com.protone.database.room.getGalleriesWithNotesDAO
-import com.protone.database.room.getGalleryBucketDAO
-import com.protone.database.room.getGalleryDAO
-import com.protone.database.room.mediasFilterBy
+import com.protone.database.room.*
 
 sealed class BaseGalleryDAO : SignedGalleryDAO()
 
-sealed class SignedGalleryDAO : GalleriesWithNotesDAO() {
+sealed class SignedGalleryDAO : MediasWithGalleriesDAO() {
     private val signedGalleryDAO = getGalleryDAO()
 
     suspend fun getAllSignedMedia(): List<GalleryMedia>? = withIOContext {
@@ -150,31 +144,6 @@ sealed class SignedGalleryDAO : GalleriesWithNotesDAO() {
     }
 }
 
-sealed class GalleriesWithNotesDAO : GalleryBucketDAO() {
-    private val galleriesWithNotesDAO = getGalleriesWithNotesDAO()
-
-    suspend fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) =
-        withIOContext {
-            galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes).apply {
-                sendEvent(
-                    MediaAction.GalleryDataAction.OnGalleriesWithNotesInserted(
-                        galleriesWithNotes
-                    )
-                )
-            }
-        }
-
-    suspend fun getNotesWithGallery(uri: Uri): List<Note> = withIOContext {
-        galleriesWithNotesDAO.getNotesWithGallery(uri) ?: mutableListOf()
-    }
-
-    suspend fun getGalleriesWithNote(noteId: Long): List<GalleryMedia> =
-        withIOContext {
-            galleriesWithNotesDAO.getGalleriesWithNote(noteId) ?: mutableListOf()
-        }
-
-}
-
 sealed class GalleryBucketDAO : BaseDAO<MediaAction.GalleryDataAction>() {
     private val galleryBucketDAO = getGalleryBucketDAO()
 
@@ -204,3 +173,80 @@ sealed class GalleryBucketDAO : BaseDAO<MediaAction.GalleryDataAction>() {
         }
     }
 }
+
+sealed class GalleriesWithNotesDAO : GalleryBucketDAO() {
+    private val galleriesWithNotesDAO = getGalleriesWithNotesDAO()
+
+    suspend fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) =
+        withIOContext {
+            galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnGalleriesWithNotesInserted(
+                        galleriesWithNotes
+                    )
+                )
+            }
+        }
+
+    suspend fun getNotesWithGallery(uri: Uri): List<Note> = withIOContext {
+        galleriesWithNotesDAO.getNotesWithGallery(uri) ?: mutableListOf()
+    }
+
+    suspend fun getGalleriesWithNote(noteId: Long): List<GalleryMedia> =
+        withIOContext {
+            galleriesWithNotesDAO.getGalleriesWithNote(noteId) ?: mutableListOf()
+        }
+
+}
+
+sealed class MediasWithGalleriesDAO : GalleriesWithNotesDAO() {
+    private val mediaWithGalleryBucketDAO by lazy { getMediaWithGalleryBucketDAO() }
+
+    suspend fun insertMediaWithGalleryBucket(mediaWithGalleryBucket: MediaWithGalleryBucket): Long =
+        withIOContext {
+            mediaWithGalleryBucketDAO.insertMediaWithGalleryBucket(mediaWithGalleryBucket).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnMediaWithGalleryBucketInserted(
+                        mediaWithGalleryBucket
+                    )
+                )
+            }
+        }
+
+    suspend fun insertMediaWithGalleryBucketMulti(mediaWithGalleryBuckets: List<MediaWithGalleryBucket>): List<Long> =
+        withIOContext {
+            return@withIOContext mediaWithGalleryBucketDAO.insertMediaWithGalleryBucketMulti(
+                mediaWithGalleryBuckets
+            ).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnMediaWithGalleryBucketMultiInserted(
+                        mediaWithGalleryBuckets
+                    )
+                )
+            }
+        }
+
+    suspend fun deleteMediaWithGalleryBucket(mediaWithGalleryBucket: MediaWithGalleryBucket): Int =
+        withIOContext {
+            return@withIOContext mediaWithGalleryBucketDAO.deleteMediaWithGalleryBucket(
+                mediaWithGalleryBucket.mediaId,
+                mediaWithGalleryBucket.galleryBucketId
+            ).apply {
+                sendEvent(
+                    MediaAction.GalleryDataAction.OnMediaWithGalleryBucketDeleted(
+                        mediaWithGalleryBucket
+                    )
+                )
+            }
+        }
+
+
+    suspend fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia> = withIOContext {
+        return@withIOContext mediaWithGalleryBucketDAO.getGalleryMediasByBucket(bucketId)
+    }
+
+    suspend fun getGalleryBucketByMedias(mediaId: Long): List<GalleryBucket> = withIOContext {
+        return@withIOContext mediaWithGalleryBucketDAO.getGalleryBucketByMedias(mediaId)
+    }
+}
+

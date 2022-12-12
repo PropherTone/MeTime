@@ -34,13 +34,12 @@ class GalleryActivity :
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GalleryActivity
             root.fitStatuesBar()
-            initPop()
         }
     }
 
     override suspend fun GalleryViewModel.init() {
         val chooseType =
-            intent.extras?.getString(RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE) ?: ""
+            intent.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE) ?: ""
 
         if (chooseType.isNotEmpty()) {
             binding.galleryActionMenu.isVisible = false

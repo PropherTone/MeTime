@@ -25,7 +25,7 @@ import com.protone.component.database.dao.DatabaseBridge
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 
-class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
+class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     companion object {
         private const val UPDATE_MUSIC = 1
@@ -189,12 +189,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
             val updateList = mutableListOf<GalleryMedia>()
             val insertList = mutableListOf<GalleryMedia>()
 
-            fun sortMedia(
-                allSignedMedia: List<GalleryMedia>?,
-                insertList: MutableList<GalleryMedia>,
-                updateList: MutableList<GalleryMedia>,
-                media: GalleryMedia
-            ) {
+            medias.forEach { media ->
                 if (allSignedMedia?.isNotEmpty() == true) {
                     allSignedMedia.find { it.uri == media.uri }.also {
                         if (it == null) insertList.add(media)
@@ -203,10 +198,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 } else {
                     insertList.add(media)
                 }
-            }
-
-            medias.forEach {
-                sortMedia(allSignedMedia, insertList, updateList, it)
             }
 
             insertSignedMediaMulti(insertList)

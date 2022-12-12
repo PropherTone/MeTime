@@ -54,7 +54,7 @@ class NoteTypeListAdapter(
                 ) { dialog, _ ->
                     val noteType = mList[position]
                     deleteNoteDir?.invoke(noteType)
-                    notifyItemRemoved(position)
+                    notifyItemRemovedChecked(position)
                     dialog.dismiss()
                 }.setNegativeButton(R.string.cancel.getString()) { dialog, _ ->
                     dialog.dismiss()
@@ -70,20 +70,20 @@ class NoteTypeListAdapter(
 
     fun insertNoteDir(noteDir: NoteDir) {
         mList.add(noteDir)
-        notifyItemInserted(mList.size)
+        notifyItemInsertedChecked(mList.size)
     }
 
     fun setNoteTypeList(list: List<NoteDir>) {
         val size = mList.size
         mList.clear()
-        notifyItemRangeRemoved(0, size)
+        notifyItemRangeRemovedChecked(0, size)
         selectList.clear()
         NoteDir(R.string.all.getString(), "").let {
             mList.add(it)
             selectList.add(it)
         }
         mList.addAll(list)
-        notifyItemRangeInserted(0, mList.size)
+        notifyItemRangeInsertedChecked(0, mList.size)
     }
 
     private var addNote: ((String?) -> Unit)? = null

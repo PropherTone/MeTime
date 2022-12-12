@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.launchDefault
@@ -25,6 +26,10 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
 
     val mList = mutableListOf<Item>()
 
+    protected var layoutManager: LinearLayoutManager? = null
+    protected var firstPosition: Int = -1
+    protected var lastPosition: Int = -1
+
     open fun setData(collection: Collection<Item>) {
         mList.clear()
         mList.addAll(collection)
@@ -43,6 +48,19 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
     open suspend fun handleEventAsynchronous(data: Event) {}
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        layoutManager =
+            recyclerView.layoutManager.takeIf { it is LinearLayoutManager } as LinearLayoutManager
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    layoutManager?.apply {
+                        firstPosition = findFirstVisibleItemPosition()
+                        lastPosition = findLastVisibleItemPosition()
+                    }
+                }
+            }
+        })
         super.onAttachedToRecyclerView(recyclerView)
         if (handleEvent) launchDefault {
             adapterFlow.bufferCollect {
@@ -108,44 +126,104 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         }
     }
 
-    suspend fun notifyItemChangedCO(position: Int, payload: Any? = null): Unit = withMainContext {
-        if (payload != null)
-            notifyItemChanged(position, payload)
-        else notifyItemChanged(position)
+    private inline fun onVisibleSite(block: (Int, Int) -> Unit) {
+        block.invoke(firstPosition, lastPosition)
     }
 
-    suspend fun notifyItemInsertedCO(position: Int): Unit = withMainContext {
-        notifyItemInserted(position)
+    private inline fun isPositionInVisibleSite(
+        position: Int, located: () -> Unit
+    ) {
+        onVisibleSite { first, last ->
+            if (position in first..last || (first == -1 && last == -1))
+                located()
+        }
     }
 
-    suspend fun notifyItemRemovedCO(position: Int): Unit = withMainContext {
-        notifyItemRemoved(position)
+    private inline fun isPositionInVisibleSite(
+        positionStart: Int, itemCount: Int, located: () -> Unit
+    ) {
+        onVisibleSite { first, last ->
+            if ((positionStart in first..last && positionStart + itemCount <= last) || (first == -1 && last == -1))
+                located()
+        }
     }
+
+    fun notifyItemChangedChecked(position: Int, payload: Any? = null) {
+        isPositionInVisibleSite(position) {
+            payload?.let { notifyItemChanged(position, payload) } ?: notifyItemChanged(position)
+        }
+    }
+
+    fun notifyItemInsertedChecked(position: Int) {
+        isPositionInVisibleSite(position) {
+            notifyItemInserted(position)
+        }
+    }
+
+    fun notifyItemRemovedChecked(position: Int) {
+        isPositionInVisibleSite(position) {
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun notifyItemRangeInsertedChecked(positionStart: Int, itemCount: Int) {
+        isPositionInVisibleSite(positionStart, itemCount) {
+            notifyItemRangeInserted(positionStart, itemCount)
+        }
+    }
+
+    fun notifyItemRangeRemovedChecked(positionStart: Int, itemCount: Int) {
+        isPositionInVisibleSite(positionStart, itemCount) {
+            notifyItemRangeRemoved(positionStart, itemCount)
+        }
+    }
+
+    fun notifyItemRangeChangedChecked(positionStart: Int, itemCount: Int, payload: Any? = null) {
+        isPositionInVisibleSite(positionStart, itemCount) {
+            payload?.let { notifyItemRangeChanged(positionStart, itemCount, payload) }
+                ?: notifyItemRangeChanged(positionStart, itemCount)
+        }
+    }
+
+
+    suspend fun notifyItemChangedCO(position: Int, payload: Any? = null): Unit =
+        withMainContext {
+            if (payload != null)
+                notifyItemChangedChecked(position, payload)
+            else notifyItemChangedChecked(position)
+        }
+
+    suspend fun notifyItemInsertedCO(position: Int): Unit =
+        withMainContext {
+            notifyItemInsertedChecked(position)
+        }
+
+    suspend fun notifyItemRemovedCO(position: Int): Unit =
+        withMainContext {
+            notifyItemRemovedChecked(position)
+        }
 
     @SuppressLint("NotifyDataSetChanged")
-    suspend fun notifyDataSetChangedCO(): Unit = withMainContext {
-        notifyDataSetChanged()
-    }
+    suspend fun notifyDataSetChangedCO(): Unit =
+        withMainContext {
+            notifyDataSetChanged()
+        }
 
     suspend fun notifyItemRangeInsertedCO(positionStart: Int, itemCount: Int): Unit =
         withMainContext {
-            notifyItemRangeInserted(positionStart, itemCount)
+            notifyItemRangeInsertedChecked(positionStart, itemCount)
         }
 
     suspend fun notifyItemRangeRemovedCO(positionStart: Int, itemCount: Int): Unit =
         withMainContext {
-            notifyItemRangeRemoved(positionStart, itemCount)
+            notifyItemRangeRemovedChecked(positionStart, itemCount)
         }
 
-    suspend fun notifyItemRangeChangedCO(
-        positionStart: Int,
-        itemCount: Int,
-        payload: Any? = null
-    ): Unit =
+    suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int, payload: Any? = null) =
         withMainContext {
             if (payload == null)
-                notifyItemRangeChanged(positionStart, itemCount)
-            else notifyItemRangeChanged(positionStart, itemCount)
+                notifyItemRangeChangedChecked(positionStart, itemCount)
+            else notifyItemRangeChangedChecked(positionStart, itemCount, payload)
         }
 
 }

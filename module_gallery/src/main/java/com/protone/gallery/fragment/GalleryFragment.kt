@@ -92,7 +92,6 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     private fun GalleryFragmentViewModel.observeEvent() {
         launchDefault {
             fragEvent.bufferCollect {
-                Log.d(TAG, "observeEvent: $it")
                 when (it) {
                     is GalleryFragmentViewModel.FragEvent.AddToGalleryBucket -> {
                         insertNewMedias(it.name, it.list)
@@ -178,7 +177,9 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
-                            onGallerySelected(ALL_GALLERY, 100)
+                            viewModel.getBucket(ALL_GALLERY)?.let {
+                                onGallerySelected(it.name, it.size)
+                            }
                         }
                         viewModel.isBucketShowUp = false
                         galleryToolButton.isVisible = onSelectMod

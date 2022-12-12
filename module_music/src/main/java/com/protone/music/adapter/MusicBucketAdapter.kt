@@ -45,7 +45,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             is MusicBucketAEvent.AddBucket -> {
                 withContext(Dispatchers.Main) {
                     mList.add(data.musicBucket)
-                    notifyItemInserted(mList.size - 1)
+                    notifyItemInsertedChecked(mList.size - 1)
                 }
             }
             is MusicBucketAEvent.RefreshBucket -> {
@@ -70,7 +70,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 if (index < 0) return
                 withContext(Dispatchers.Main) {
                     mList.removeAt(index)
-                    notifyItemRemoved(index)
+                    notifyItemRemovedChecked(index)
                 }
                 selectList.clear()
                 selectList.add(mList[0])

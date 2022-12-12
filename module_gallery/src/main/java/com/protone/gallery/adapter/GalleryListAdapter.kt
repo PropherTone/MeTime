@@ -48,8 +48,6 @@ class GalleryListAdapter(
     private var itemLength = 0
     private var onSelectMod = false
 
-    private var layoutManager: LinearLayoutManager? = null
-
     @SuppressLint("NotifyDataSetChanged")
     override suspend fun handleEventAsynchronous(data: GalleryListEvent) {
         when (data) {
@@ -101,7 +99,7 @@ class GalleryListAdapter(
             is GalleryListEvent.NoticeListItemInsert -> {
                 withContext(Dispatchers.Main) {
                     mList.add(0, data.media)
-                    notifyItemInserted(0)
+                    notifyItemInsertedChecked(0)
                 }
             }
         }
@@ -121,8 +119,6 @@ class GalleryListAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        layoutManager =
-            recyclerView.layoutManager.takeIf { it is LinearLayoutManager } as LinearLayoutManager
         itemLength = (recyclerView.width - recyclerView.paddingEnd - recyclerView.paddingStart) / 4
         recyclerView.layoutAnimationListener = object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
@@ -196,7 +192,7 @@ class GalleryListAdapter(
             itemCount = mList.size
         }
         layoutManager?.let {
-            notifyItemRangeChanged(
+            notifyItemRangeChangedChecked(
                 it.findFirstVisibleItemPosition().let { first ->
                     if (first <= 0) 0
                     else if (first >= preLoad) first - preLoad

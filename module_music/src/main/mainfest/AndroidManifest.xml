@@ -18,7 +18,7 @@
 
     <application
         android:allowBackup="true"
-        android:name="com.protone.common.MainApplication"
+        android:name="com.protone.component.MainApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="Music"
         android:roundIcon="@mipmap/ic_launcher_round"

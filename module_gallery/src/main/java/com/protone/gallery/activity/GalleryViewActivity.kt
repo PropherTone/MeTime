@@ -30,6 +30,7 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUri
 import com.protone.common.utils.onResult
 import com.protone.component.BaseMediaActivity
+import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.adapter.CatoListAdapter
 import com.protone.component.view.adapter.CheckListAdapter
 import com.protone.gallery.databinding.GalleryViewActivityBinding
@@ -51,9 +52,8 @@ class GalleryViewActivity : BaseMediaActivity<
         return GalleryViewActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GalleryViewActivity
             galleryVCover.fitStatuesBarUsePadding()
-            initPop()
-            popLayout?.galleryIntoBox?.isGone = true
-            popLayout?.gallerySelectAll?.isGone = true
+            popLayout.galleryIntoBox.isGone = true
+            popLayout.gallerySelectAll.isGone = true
             next.setOnClickListener {
                 galleryVView.setCurrentItem(1 + galleryVView.currentItem, true)
             }
@@ -233,7 +233,8 @@ class GalleryViewActivity : BaseMediaActivity<
                 val index = viewModel.galleryMedias.indexOf(it[0])
                 if (index != -1) {
                     viewModel.galleryMedias.removeAt(index)
-                    binding.galleryVView.adapter?.notifyItemRemoved(index)
+                    (binding.galleryVView.adapter as BaseAdapter<*, *, *>?)
+                        ?.notifyItemRemovedChecked(index)
                 }
             }
         }

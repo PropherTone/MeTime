@@ -5,7 +5,7 @@ import androidx.room.*
 import com.protone.common.utils.converters.ListTypeConverter
 import com.protone.common.utils.converters.UriTypeConverter
 
-@Entity
+@Entity(indices = [Index(value = ["media_uri"], unique = true)])
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleryMedia(
     @ColumnInfo(name = "media_uri")

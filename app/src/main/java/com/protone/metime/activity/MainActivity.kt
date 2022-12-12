@@ -11,6 +11,7 @@ import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.onGlobalLayout
 import com.protone.common.context.root
+import com.protone.common.entity.GalleryMedia
 import com.protone.component.database.dao.DatabaseBridge
 import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
@@ -38,8 +39,7 @@ class MainActivity :
     private var userName: String? = null
         set(value) {
             if (value == null) return
-            binding.userWelcome.text =
-                if (value == "") getString(R.string.welcome_msg) else value
+            binding.userWelcome.text = if (value == "") getString(R.string.welcome_msg) else value
             binding.userDate.text = todayDate("yyyy/MM/dd")
             field = value
         }
@@ -55,11 +55,8 @@ class MainActivity :
                     .with(this)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.userIcon)
-                launchIO {
-                    val loadBlurIcon = viewModel.loadBlurIcon(value)
-                    withMainContext {
-                        binding.userBack.setImageBitmap(loadBlurIcon)
-                    }
+                launch {
+                    binding.userBack.setImageBitmap(viewModel.loadBlurIcon(value))
                 }
             }
             field = value
@@ -88,19 +85,17 @@ class MainActivity :
             startActivity(RouterPath.MusicRouterPath.MusicPlayer)
         }
 
-        onResume = {
-            userName = userConfig.userName
-            userIcon = userConfig.userIcon.also {
-                musicController.setInterceptAlbumCover(it.isEmpty())
+        onLifecycleEvent {
+            onResume {
+                userName = userConfig.userName
+                userIcon = userConfig.userIcon.also {
+                    musicController.setInterceptAlbumCover(it.isEmpty())
+                }
             }
-        }
-
-        onFinish = {
-            userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
-            userConfig.lastMusic =
-                musicController.getPlayingMusic()?.toJson() ?: ""
-            DatabaseBridge.instance.shutdownNow()
-            stopService(WorkService::class.intent)
+            onFinish {
+                userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
+                userConfig.lastMusic = musicController.getPlayingMusic()?.toJson() ?: ""
+            }
         }
 
         refreshModelList()
@@ -109,7 +104,7 @@ class MainActivity :
                 userConfig.musicLoopMode = loopMode
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
-            launch(Dispatchers.Default) {
+            launchDefault {
                 getMusics(userConfig.lastMusicBucket)?.let { list ->
                     list as MutableList<Music>
                     musicController.setMusicList(list)

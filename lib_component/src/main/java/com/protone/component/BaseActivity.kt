@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.android.arouter.facade.Postcard
 import com.alibaba.android.arouter.launcher.ARouter
@@ -52,15 +53,23 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
     private var viewEvent: Channel<VE>? = null
     private var viewEventTask: Job? = null
 
-    protected var onFinish: (suspend () -> Unit)? = null
     protected var onResume: (suspend () -> Unit)? = null
+        set(value) {
+            field = value
+            if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+                launch {
+                    field?.invoke()
+                }
+            }
+        }
     protected var onRestart: (suspend () -> Unit)? = null
     protected var onPause: (suspend () -> Unit)? = null
     protected var onStop: (suspend () -> Unit)? = null
+    protected var onFinish: (suspend () -> Unit)? = null
 
     init {
         if (handleEvent) {
-            viewEvent = Channel(Channel.UNLIMITED)
+            viewEvent = Channel(1)
             viewEventTask = launchMain {
                 viewEvent?.receiveAsFlow()?.collect {
                     try {
@@ -107,6 +116,9 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         }
     }
 
+    fun onLifecycleEvent(block: LifecycleEvent.() -> Unit) {
+        LifecycleEvent().apply(block)
+    }
 
     fun <T> startActivityWithGainData(data: T, intent: Intent?) {
         IntentDataHolder.put(data)
@@ -243,8 +255,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         try {
             launch {
                 Log.d(TAG, "onResume: ${this@BaseActivity::class.simpleName}")
-                onResume?.invoke()
-                doResume()
+                onResume?.invoke() ?: doResume()
             }
         } finally {
             super.onResume()
@@ -255,8 +266,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         try {
             launch {
                 Log.d(TAG, "onRestart: ${this@BaseActivity::class.simpleName}")
-                onRestart?.invoke()
-                doRestart()
+                onRestart?.invoke() ?: doRestart()
             }
         } finally {
             super.onRestart()
@@ -267,8 +277,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         try {
             launch {
                 Log.d(TAG, "onPause: ${this@BaseActivity::class.simpleName}")
-                onPause?.invoke()
-                doPause()
+                onPause?.invoke() ?: doPause()
             }
             hideSoftInput()
         } finally {
@@ -280,8 +289,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         try {
             launch {
                 Log.d(TAG, "onStop: ${this@BaseActivity::class.simpleName}")
-                onStop?.invoke()
-                doStop()
+                onStop?.invoke() ?: doStop()
             }
         } finally {
             super.onStop()
@@ -292,8 +300,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         try {
             launch {
                 Log.d(TAG, "finish: ${this@BaseActivity::class.simpleName}")
-                onFinish?.invoke()
-                doFinish()
+                onFinish?.invoke() ?: doFinish()
             }
         } finally {
             super.finish()
@@ -310,5 +317,28 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
             cancel()
         }
     }
+
+    inner class LifecycleEvent {
+        fun onFinish(block: suspend () -> Unit) {
+            onFinish = block
+        }
+
+        fun onResume(block: suspend () -> Unit) {
+            onResume = block
+        }
+
+        fun onRestart(block: suspend () -> Unit) {
+            onRestart = block
+        }
+
+        fun onPause(block: suspend () -> Unit) {
+            onPause = block
+        }
+
+        fun onStop(block: suspend () -> Unit) {
+            onStop = block
+        }
+    }
+
 
 }

@@ -3,9 +3,7 @@ package com.protone.metime.adapter
 import android.content.Context
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.R
-import com.protone.component.databinding.*
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.GalleryMedia
@@ -13,6 +11,7 @@ import com.protone.common.entity.Note
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
+import com.protone.component.databinding.DateLayoutBinding
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.metime.databinding.MusicCardBinding
 import com.protone.metime.databinding.NoteCardBinding
@@ -51,19 +50,19 @@ class MainModelListAdapter(
             photoInTodayJson()?.let {
                 mList.add("photo:${it}")
                 withContext(Dispatchers.Main) {
-                    notifyItemInserted(mList.size - 1)
+                    notifyItemInsertedChecked(mList.size - 1)
                 }
             }
             videoInTodayJson()?.let {
                 mList.add("video:${it}")
                 withContext(Dispatchers.Main) {
-                    notifyItemInserted(mList.size - 1)
+                    notifyItemInsertedChecked(mList.size - 1)
                 }
             }
             randomNoteJson()?.let {
                 mList.add("tNote:${it}")
                 withContext(Dispatchers.Main) {
-                    notifyItemInserted(mList.size - 1)
+                    notifyItemInsertedChecked(mList.size - 1)
                 }
             }
         }

@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.component.R
 import com.protone.common.utils.displayUtils.AnimationHelper
@@ -52,11 +53,11 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
     open fun checkSelect(position: Int, item: Item) {
         if (selectList.contains(item)) {
             selectList.remove(item)
-            notifyItemChanged(position, UNSELECT)
+            notifyItemChangedChecked(position, UNSELECT)
         } else {
             if (!multiChoose) clearSelected()
             selectList.add(item)
-            notifyItemChanged(position, SELECT)
+            notifyItemChangedChecked(position, SELECT)
         }
     }
 
@@ -73,7 +74,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
             selectList.clear()
             if (itemIndex != -1) {
                 launch {
-                    notifyItemChanged(itemIndex, UNSELECT)
+                    notifyItemChangedChecked(itemIndex, UNSELECT)
                 }
             }
         }
@@ -86,7 +87,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
         selectList.clear()
         list.forEach {
             if (it != -1) launch {
-                notifyItemChanged(it, UNSELECT)
+                notifyItemChangedChecked(it, UNSELECT)
             }
         }
     }

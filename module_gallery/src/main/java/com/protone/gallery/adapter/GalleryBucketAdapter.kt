@@ -176,7 +176,7 @@ class GalleryBucketAdapter(
     ) {
         if (!multiChoose) clearSelected()
         selectList.add(item)
-        notifyItemChanged(position, (SELECT))
+        notifyItemChangedChecked(position, (SELECT))
     }
 
     fun deleteBucket(bucket: Gallery) {

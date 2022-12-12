@@ -46,7 +46,6 @@ class GallerySearchActivity : BaseMediaActivity<
         return GallerySearchActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GallerySearchActivity
             root.fitStatuesBar()
-            initPop()
         }
     }
 

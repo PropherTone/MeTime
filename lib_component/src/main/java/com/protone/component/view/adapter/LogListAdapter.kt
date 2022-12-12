@@ -39,7 +39,7 @@ class LogListAdapter(context: Context) : BaseAdapter<String,LogListLayoutBinding
         data.forEach {
             if (!mList.contains(it)) {
                 mList.add(it)
-                notifyItemInserted(mList.size)
+                notifyItemInsertedChecked(mList.size)
             }
         }
     }

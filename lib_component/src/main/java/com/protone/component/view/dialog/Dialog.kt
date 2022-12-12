@@ -111,7 +111,6 @@ fun Activity.cateDialog(
                 addCon.invoke()
             }
         }.show()
-
 }
 
 fun Activity.checkListDialog(

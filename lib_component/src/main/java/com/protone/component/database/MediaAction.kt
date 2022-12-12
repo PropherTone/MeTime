@@ -37,6 +37,9 @@ sealed class MediaAction {
         data class OnGalleryBucketInserted(val galleryBucket: GalleryBucket) : GalleryDataAction()
         data class OnGalleryBucketDeleted(val galleryBucket: GalleryBucket) : GalleryDataAction()
         data class OnGalleriesWithNotesInserted(val galleriesWithNotes: GalleriesWithNotes) : GalleryDataAction()
+        data class OnMediaWithGalleryBucketInserted(val mediaWithGalleryBucket: MediaWithGalleryBucket) : GalleryDataAction()
+        data class OnMediaWithGalleryBucketMultiInserted(val mediaWithGalleryBuckets: List<MediaWithGalleryBucket>) : GalleryDataAction()
+        data class OnMediaWithGalleryBucketDeleted(val mediaWithGalleryBucket: MediaWithGalleryBucket) : GalleryDataAction()
     }
 
 }

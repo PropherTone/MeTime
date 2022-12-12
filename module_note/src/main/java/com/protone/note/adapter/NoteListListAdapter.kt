@@ -101,9 +101,9 @@ class NoteListListAdapter(
     fun setNoteList(list: List<Note>) {
         val size = noteList.size
         noteList.clear()
-        notifyItemRangeRemoved(0, size)
+        notifyItemRangeRemovedChecked(0, size)
         noteList.addAll(list)
-        notifyItemRangeInserted(0, noteList.size)
+        notifyItemRangeInsertedChecked(0, noteList.size)
     }
 
     fun deleteNote(note: Note) {

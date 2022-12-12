@@ -1,4 +1,4 @@
-package com.protone.component.popWindows
+package com.protone.component.view.popWindows
 
 import android.content.Context
 import android.view.View
