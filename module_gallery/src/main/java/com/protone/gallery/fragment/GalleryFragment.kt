@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,7 +27,6 @@ import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
-import com.protone.common.utils.TAG
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.json.toJson
 import com.protone.component.view.dialog.titleDialog
@@ -61,7 +59,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
     private lateinit var toolButtonAnimator: ValueAnimator
 
-    private var init: (() -> Unit)? = null
+    private var init: (GalleryFragmentViewModel.() -> Unit)? = null
 
     fun onInit(
         isVideo: Boolean,
@@ -84,9 +82,12 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         super.onAttach(context)
         val model: GalleryFragmentViewModel by viewModels()
         viewModel = model
-        init?.invoke()
-        init = null
-        viewModel.observeEvent()
+        viewModel.apply {
+            init?.invoke(this)
+            attachEvent()
+            init = null
+            observeEvent()
+        }
     }
 
     private fun GalleryFragmentViewModel.observeEvent() {
@@ -163,7 +164,17 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = GalleryFragmentLayoutBinding.inflate(inflater, container, false).apply {
+        binding = initView(inflater, container)
+        initList()
+        viewModel.sortData()
+        return binding.root
+    }
+
+    private fun initView(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): GalleryFragmentLayoutBinding =
+        GalleryFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.onGlobalLayout {
                 galleryBucketContainer.botBlock = tabController.measuredHeight.toFloat()
                 toolButtonAnimator = AnimationHelper.rotation(galleryToolButton, 45f)
@@ -178,6 +189,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
                             viewModel.getBucket(ALL_GALLERY)?.let {
+                                viewModel.rightGallery = it.name
                                 onGallerySelected(it.name, it.size)
                             }
                         }
@@ -209,16 +221,6 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                 }
             }
         }
-        initList()
-        viewModel.sortData()
-        return binding.root
-    }
-
-    override fun onDestroy() {
-        binding.unbind()
-        cancel()
-        super.onDestroy()
-    }
 
     private fun initList() = binding.run {
         galleryList.apply {
@@ -254,11 +256,10 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     }
 
     private fun onGallerySelected(gallery: String, size: Int) {
+        binding.galleryShowBucket.negative()
         if (viewModel.rightGallery == gallery) return
         launch {
             viewModel.rightGallery = gallery
-            binding.galleryShowBucket.negative()
-            if (viewModel.isBucketShowUp) return@launch
             binding.galleryList.swapAdapter(
                 GalleryListAdapter(requireContext(), true, itemCount = size).also {
                     it.multiChoose = true
@@ -270,7 +271,6 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     }
 
     private fun noticeListUpdate(media: GalleryMedia, status: GalleryListAdapter.MediaStatus) {
-        if (viewModel.isBucketShowUp) return
         when (status) {
             GalleryListAdapter.MediaStatus.INSERTED -> {
                 getListAdapter().noticeListItemInsert(media)
@@ -302,6 +302,12 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
             putBoolean(IS_VIDEO, galleryMedia.isVideo)
             putString(GALLERY, viewModel.getGalleryName())
         })
+    }
+
+    override fun onDestroy() {
+        binding.unbind()
+        cancel()
+        super.onDestroy()
     }
 
 }

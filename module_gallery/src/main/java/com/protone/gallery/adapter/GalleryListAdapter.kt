@@ -39,7 +39,6 @@ class GalleryListAdapter(
         object QuiteSelectAll : GalleryListEvent()
         data class NoticeDataUpdate(val item: MutableList<GalleryMedia>?) : GalleryListEvent()
         data class NoticeSelectChange(val item: GalleryMedia) : GalleryListEvent()
-        data class RemoveMedia(val galleryMedia: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemUpdate(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemDelete(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemInsert(val media: GalleryMedia) : GalleryListEvent()
@@ -74,14 +73,6 @@ class GalleryListAdapter(
                     notifyItemChangedCO(indexOf)
                 }
             }
-            is GalleryListEvent.RemoveMedia -> {
-                val index = mList.indexOf(data.galleryMedia)
-                if (index != -1) {
-                    mList.removeAt(index)
-                    if (selectList.contains(data.galleryMedia)) selectList.remove(data.galleryMedia)
-                    notifyItemRemovedCO(index)
-                }
-            }
             is GalleryListEvent.NoticeListItemUpdate -> {
                 val index = mList.indexOf(data.media)
                 if (index != -1) {
@@ -93,12 +84,15 @@ class GalleryListAdapter(
                 val index = mList.indexOf(data.media)
                 if (index != -1) {
                     mList.removeAt(index)
+                    if (selectList.contains(mList[index])) selectList.remove(data.media)
+                    itemCount = mList.size
                     notifyItemRemovedCO(index)
                 }
             }
             is GalleryListEvent.NoticeListItemInsert -> {
                 withContext(Dispatchers.Main) {
                     mList.add(0, data.media)
+                    itemCount = mList.size
                     notifyItemInsertedChecked(0)
                 }
             }
@@ -221,10 +215,6 @@ class GalleryListAdapter(
 
     fun noticeSelectChange(item: GalleryMedia) {
         emit(GalleryListEvent.NoticeSelectChange(item))
-    }
-
-    fun removeMedia(galleryMedia: GalleryMedia) {
-        emit(GalleryListEvent.RemoveMedia(galleryMedia))
     }
 
     fun noticeListItemUpdate(media: GalleryMedia) {

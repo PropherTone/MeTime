@@ -141,14 +141,14 @@ class GallerySearchActivity : BaseMediaActivity<
         tryDelete(viewModel.selectList) {
             binding.apply {
                 if (it.size == 1) {
-                    (resultGalleries.adapter as GalleryListAdapter).removeMedia(it[0])
-                    (resultCato.adapter as GalleryListAdapter).removeMedia(it[0])
-                    (resultNotes.adapter as GalleryListAdapter).removeMedia(it[0])
+                    (resultGalleries.adapter as GalleryListAdapter).noticeListItemDelete(it[0])
+                    (resultCato.adapter as GalleryListAdapter).noticeListItemDelete(it[0])
+                    (resultNotes.adapter as GalleryListAdapter).noticeListItemDelete(it[0])
                 } else if (it.size > 1) {
                     it.forEach { gm ->
-                        (resultGalleries.adapter as GalleryListAdapter).removeMedia(gm)
-                        (resultCato.adapter as GalleryListAdapter).removeMedia(gm)
-                        (resultNotes.adapter as GalleryListAdapter).removeMedia(gm)
+                        (resultGalleries.adapter as GalleryListAdapter).noticeListItemDelete(gm)
+                        (resultCato.adapter as GalleryListAdapter).noticeListItemDelete(gm)
+                        (resultNotes.adapter as GalleryListAdapter).noticeListItemDelete(gm)
                     }
                 }
             }

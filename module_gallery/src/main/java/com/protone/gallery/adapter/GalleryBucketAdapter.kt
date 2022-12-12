@@ -2,7 +2,6 @@ package com.protone.gallery.adapter
 
 import android.app.AlertDialog
 import android.content.Context
-import android.net.Uri
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
@@ -13,8 +12,6 @@ import com.protone.common.context.newLayoutInflater
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.R
 import com.protone.common.entity.Gallery
-import com.protone.common.entity.GalleryBucket
-import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryBucketListLayoutBinding
 
@@ -27,12 +24,6 @@ class GalleryBucketAdapter(
 
     init {
         GalleryBucketAdapterDataProxy().block()
-    }
-
-    private enum class ItemState {
-        SIZE_CHANGED,
-        URI_CHANGED,
-        ALL_CHANGED
     }
 
     sealed class GalleryBucketEvent {
@@ -56,21 +47,12 @@ class GalleryBucketAdapter(
                 var index = 0
                 while (iterator.hasNext()) {
                     if (iterator.next().name == data.bucket.name) {
-                        if (selectList.size > 0) {
-                            if (selectList[0].name == data.bucket.name) {
-                                selectList[0] = data.bucket
-                            }
+                        if (selectList.size > 0 && selectList[0].name == data.bucket.name) {
+                            selectList[0] = data.bucket
                         }
                         notifyItemChangedCO(
                             index,
-                            data.bucket.also {
-                                when {
-                                    mList[index].size != it.size && mList[index].uri != it.uri -> ItemState.ALL_CHANGED
-                                    mList[index].size != it.size -> ItemState.SIZE_CHANGED
-                                    mList[index].uri != it.uri -> ItemState.URI_CHANGED
-                                    else -> null
-                                }.apply { mList[index] = it }
-                            }
+                            data.bucket.itemState
                         )
                         break
                     }
@@ -118,7 +100,6 @@ class GalleryBucketAdapter(
         }
     }
 
-
     override fun onBindViewHolder(
         holder: Holder<GalleryBucketListLayoutBinding>,
         position: Int,
@@ -126,13 +107,13 @@ class GalleryBucketAdapter(
     ) {
         if (payloads.isNotEmpty()) {
             when (payloads.first()) {
-                ItemState.SIZE_CHANGED -> holder.binding.apply {
+                Gallery.ItemState.SIZE_CHANGED -> holder.binding.apply {
                     changedText(mList[position])
                 }
-                ItemState.URI_CHANGED -> holder.binding.apply {
+                Gallery.ItemState.URI_CHANGED -> holder.binding.apply {
                     changedUri(mList[position])
                 }
-                ItemState.ALL_CHANGED -> holder.binding.apply {
+                Gallery.ItemState.ALL_CHANGED -> holder.binding.apply {
                     changedText(mList[position])
                     changedUri(mList[position])
                 }
