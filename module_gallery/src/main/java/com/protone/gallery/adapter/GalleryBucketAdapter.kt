@@ -30,6 +30,7 @@ class GalleryBucketAdapter(
         data class DeleteBucket(val bucket: Gallery) : GalleryBucketEvent()
         data class RefreshBucket(val bucket: Gallery) : GalleryBucketEvent()
         data class InsertBucket(val bucket: Gallery) : GalleryBucketEvent()
+        data class InsertBuckets(val buckets: List<Gallery>) : GalleryBucketEvent()
     }
 
     override suspend fun handleEventAsynchronous(data: GalleryBucketEvent) {
@@ -43,25 +44,17 @@ class GalleryBucketAdapter(
                 }
             }
             is GalleryBucketEvent.RefreshBucket -> {
-                val iterator = mList.iterator()
-                var index = 0
-                while (iterator.hasNext()) {
-                    if (iterator.next().name == data.bucket.name) {
-                        if (selectList.size > 0 && selectList[0].name == data.bucket.name) {
-                            selectList[0] = data.bucket
-                        }
-                        notifyItemChangedCO(
-                            index,
-                            data.bucket.itemState
-                        )
-                        break
-                    }
-                    index++
+                mList.indexOfFirst { it.name == data.bucket.name }.let {
+                    if (it != -1) notifyItemChangedCO(it, data.bucket.itemState)
                 }
             }
             is GalleryBucketEvent.InsertBucket -> {
                 mList.add(data.bucket)
                 notifyItemInsertedCO(mList.size)
+            }
+            is GalleryBucketEvent.InsertBuckets -> {
+                mList.addAll(data.buckets)
+                notifyItemRangeInsertedCO(mList.size - data.buckets.size, data.buckets.size)
             }
         }
     }
@@ -170,6 +163,10 @@ class GalleryBucketAdapter(
 
     fun insertBucket(item: Gallery) {
         emit(GalleryBucketEvent.InsertBucket(item))
+    }
+
+    fun insertBucket(items: List<Gallery>) {
+        emit(GalleryBucketEvent.InsertBuckets(items))
     }
 
     private var deleteGalleryBucket: ((String) -> Unit)? = null

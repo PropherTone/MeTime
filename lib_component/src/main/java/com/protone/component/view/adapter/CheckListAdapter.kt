@@ -4,11 +4,12 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import com.protone.common.context.newLayoutInflater
+import com.protone.common.entity.GalleryBucket
 import com.protone.component.databinding.CheckListAdapterLayoutBinding
 
 class CheckListAdapter(
     context: Context,
-    dataList: MutableList<String>? = null,
+    dataList: List<String>? = null,
     private val check: Boolean = true
 ) : SelectListAdapter<CheckListAdapterLayoutBinding, String, Any>(
     context

@@ -8,10 +8,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
-import com.protone.common.baseType.bufferCollect
-import com.protone.common.baseType.launchDefault
-import com.protone.common.baseType.launchIO
-import com.protone.common.baseType.toast
+import com.protone.common.baseType.*
 import com.protone.common.context.workIntentFilter
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
@@ -23,18 +20,28 @@ import com.protone.component.broadcast.WorkReceiver
 import com.protone.component.broadcast.workLocalBroadCast
 import com.protone.component.database.dao.DatabaseBridge
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlin.coroutines.CoroutineContext
 
 class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     companion object {
         private const val UPDATE_MUSIC = 1
         private const val UPDATE_GALLERY = 2
+
+        private const val CALL_MUSIC_UPDATE = "MUSIC"
+        private const val CALL_GALLERY_UPDATE = "GALLERY"
     }
 
+    private val jobStressChannel = Channel<String>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
     private val activeTimer = ActiveTimer(this, 2048L).apply {
-        addFunction(UPDATE_MUSIC) { this@WorkService.updateMusic() }
-        addFunction(UPDATE_GALLERY) { this@WorkService.updateGallery() }
+        addFunction(UPDATE_MUSIC) { jobStressChannel.trySend(CALL_MUSIC_UPDATE) }
+        addFunction(UPDATE_GALLERY) { jobStressChannel.trySend(CALL_GALLERY_UPDATE) }
     }
 
     private val workReceiver: BroadcastReceiver = object : WorkReceiver() {
@@ -61,6 +68,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     override fun onCreate() {
         super.onCreate()
         registerBroadcast()
+        collectJobEvent()
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -73,6 +81,17 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         cancel()
         workLocalBroadCast.unregisterReceiver(workReceiver)
         contentResolver.unregisterContentObserver(mediaContentObserver)
+    }
+
+    private fun collectJobEvent() {
+        launchDefault {
+            jobStressChannel.receiveAsFlow().collectLatest {
+                when (it) {
+                    CALL_GALLERY_UPDATE -> this.coroutineContext.updateGallery()
+                    CALL_MUSIC_UPDATE -> updateMusic()
+                }
+            }
+        }
     }
 
     private fun registerBroadcast() {
@@ -94,21 +113,35 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         workLocalBroadCast.registerReceiver(workReceiver, workIntentFilter)
     }
 
-    private fun updateMusicBucket() {
-        makeToast("歌单更新完毕")
-    }
-
     private fun updateMusic(uri: Uri) {
         launchDefault {
             scanAudioWithUri(uri) {
                 DatabaseBridge.instance.musicDAOBridge.insertMusicCheck(it)
             }
-            updateMusicBucket()
+            makeToast("音乐更新完毕")
         }
-        makeToast("音乐更新完毕")
     }
 
-    private fun updateMusic() {
+    private fun updateGallery(uri: Uri) {
+        launchDefault {
+            if (!isUriExist(uri)) {
+                DatabaseBridge.instance.galleryDAOBridge.deleteSignedMediaByUri(uri)
+                Log.d(TAG, "updateGallery(uri: Uri):!isUriExist 相册更新完毕")
+                makeToast("相册更新完毕")
+            } else scanGalleryWithUri(uri) {
+                val checkedMedia = DatabaseBridge
+                    .instance
+                    .galleryDAOBridge
+                    .insertSignedMediaChecked(it)
+                if (checkedMedia != null) {
+                    Log.d(TAG, "updateGallery(uri: Uri): 相册更新完毕")
+                    makeToast("相册更新完毕")
+                }
+            }
+        }
+    }
+
+    private suspend fun updateMusic(): Unit = coroutineScope {
         fun sortMusic(allMusic: MutableList<Music>, music: Music): Boolean {
             val index = allMusic.indexOf(music)
             return if (index != -1) {
@@ -116,7 +149,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 true
             } else false
         }
-
         DatabaseBridge.instance.musicDAOBridge.run {
             val allMusic = mutableListOf<Music>()
             launchDefault {
@@ -131,7 +163,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     insertMusic(it)
                 }
                 deleteMusicMulti(allMusic)
-                updateMusicBucket()
                 if (allMusic.size != 0) {
                     makeToast("音乐更新完毕")
                 }
@@ -139,26 +170,10 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         }
     }
 
-    private fun updateGallery(uri: Uri) = launchIO {
-        if (!isUriExist(uri)) {
-            DatabaseBridge.instance.galleryDAOBridge.deleteSignedMediaByUri(uri)
-            Log.d(TAG, "updateGallery(uri: Uri):!isUriExist 相册更新完毕")
-            makeToast("相册更新完毕")
-        } else scanGalleryWithUri(uri) {
-            val checkedMedia = DatabaseBridge
-                .instance
-                .galleryDAOBridge
-                .insertSignedMediaChecked(it)
-            if (checkedMedia != null) {
-                Log.d(TAG, "updateGallery(uri: Uri): 相册更新完毕")
-                makeToast("相册更新完毕")
-            }
-        }
-    }
 
-    private fun updateGallery() = DatabaseBridge.instance.galleryDAOBridge.run {
-        Log.d(TAG, "updateGallery: ")
-        launchDefault {
+    private suspend fun CoroutineContext.updateGallery(): Unit = withContext(this) {
+        DatabaseBridge.instance.galleryDAOBridge.run {
+            Log.d(TAG, "updateGallery: ")
             val allSignedMedia = getAllSignedMedia() as MutableList?
             val scanPicture = async(Dispatchers.Default) {
                 scanPicture { _, _ -> }

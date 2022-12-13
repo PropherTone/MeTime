@@ -29,7 +29,7 @@ interface MediaWithGalleryBucketDAO {
                 " ON GalleryMedia.mediaId = MediaWithGalleryBucket.mediaId" +
                 " WHERE MediaWithGalleryBucket.galleryBucketId IS :bucketId"
     )
-    fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia>
+    fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia>?
 
     @RewriteQueriesToDropUnusedColumns
     @Query(
@@ -38,6 +38,6 @@ interface MediaWithGalleryBucketDAO {
                 "ON GalleryBucket.galleryBucketId = MediaWithGalleryBucket.galleryBucketId " +
                 "WHERE MediaWithGalleryBucket.mediaId LIKE :mediaId"
     )
-    fun getGalleryBucketByMedias(mediaId: Long): List<GalleryBucket>
+    fun getGalleryBucketByMedias(mediaId: Long): List<GalleryBucket>?
 
 }

@@ -55,6 +55,9 @@ dependencyResolutionManagement {
             version('arouterVersion', '1.5.2')
             alias('arouter-api').to('com.alibaba','arouter-api').versionRef('arouterVersion')
             alias('arouter-compiler').to('com.alibaba','arouter-compiler').versionRef('arouterVersion')
+
+            //JitPack分页库
+            alias("paging").to("androidx.paging:paging-runtime:3.1.1")
         }
     }
 

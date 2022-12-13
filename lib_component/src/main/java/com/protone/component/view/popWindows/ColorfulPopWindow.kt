@@ -15,6 +15,7 @@ import androidx.transition.TransitionManager
 import com.protone.common.baseType.toInt
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.context.root
+import com.protone.common.entity.GalleryBucket
 import com.protone.common.utils.spans.SpanStates
 import com.protone.component.R
 import com.protone.component.databinding.*
@@ -57,7 +58,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
     inline fun startListPopup(
         title: String = "",
         anchor: View,
-        dataList: MutableList<String>,
+        dataList: List<String>,
         isUpToBot: Boolean = false,
         crossinline onCall: (String?) -> Unit
     ) = weakContext.get()?.let { context ->
@@ -71,7 +72,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
         binding.listConfirm.setOnClickListener {
             binding.listList.adapter.let {
                 if (it is CheckListAdapter)
-                    onCall.invoke(if (it.selectList.size > 0) it.selectList[0] else null)
+                    onCall.invoke(it.selectList.takeIf { list -> list.isNotEmpty() }?.first())
             }
         }
         binding.listCancel.setOnClickListener { onCall.invoke(null) }

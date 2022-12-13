@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
@@ -27,6 +28,7 @@ import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
 import com.protone.component.service.WorkService
+import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +86,9 @@ class MainActivity :
         musicController.onClick {
             startActivity(RouterPath.MusicRouterPath.MusicPlayer)
         }
+        userIcon = userConfig.userIcon.also {
+            musicController.setInterceptAlbumCover(it.isEmpty())
+        }
 
         onLifecycleEvent {
             onResume {
@@ -98,7 +103,8 @@ class MainActivity :
             }
         }
 
-        refreshModelList()
+        initTimeList()
+
         bindMusicService {
             musicController.setBinder(this@MainActivity, it) { loopMode ->
                 userConfig.musicLoopMode = loopMode
@@ -137,24 +143,22 @@ class MainActivity :
         }
     }
 
-    private suspend fun MainViewModel.refreshModelList() {
-        getPhotoInToday()?.let { media ->
-            Image.load(media.uri).with(this@MainActivity).into(binding.photoCardPhoto)
-            binding.photoCardTitle.text = media.date.toDateString("yyyy/MM/dd")
-            binding.timePhoto.setOnClickListener {
-                startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                    galleryViewPostcard(media.toJson(), false, ALL_GALLERY)
+    private fun initTimeList() {
+        binding.timeList.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = TimeListAdapter(object : TimeListAdapter.CardEvent {
+                override fun onPhotoClick(media: GalleryMedia) {
+                    startActivity(RouterPath.GalleryRouterPath.GalleryView) {
+                        galleryViewPostcard(media.toJson(), false, ALL_GALLERY)
+                    }
                 }
-            }
-        }
-        getVideoInToday()?.let { media ->
-            binding.videoPlayer.setVideoPath(media.uri)
-            binding.videoCardTitle.text = media.date.toDateString()
-            binding.videoPlayer.setFullScreen {
-                startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                    galleryViewPostcard(media.toJson(), true, ALL_GALLERY)
+
+                override fun onVideoClick(media: GalleryMedia) {
+                    startActivity(RouterPath.GalleryRouterPath.GalleryView) {
+                        galleryViewPostcard(media.toJson(), true, ALL_GALLERY)
+                    }
                 }
-            }
+            })
         }
     }
 }

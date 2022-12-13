@@ -15,6 +15,9 @@ interface GalleryBucketDAO {
     @Query("SELECT * FROM GalleryBucket WHERE type IS :name")
     fun getGalleryBucket(name: String): GalleryBucket?
 
+    @Query("SELECT * FROM GalleryBucket WHERE galleryBucketId IS :id")
+    fun getGalleryBucket(id: Long): GalleryBucket?
+
     @Delete
     fun deleteGalleryBucket(galleryBucket: GalleryBucket)
 

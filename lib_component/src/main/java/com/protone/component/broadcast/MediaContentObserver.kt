@@ -11,9 +11,9 @@ import com.protone.common.utils.TAG
 
 class MediaContentObserver(mHandler: Handler) : ContentObserver(mHandler) {
 
-    override fun onChange(selfChange: Boolean, uri: Uri?) {
+    override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
         super.onChange(selfChange, uri)
-        Log.d(TAG, "Media on change: selfChange>$selfChange,uri>$uri")
+        Log.d(TAG, "Media on change: selfChange>$selfChange,uri>$uri,flags>$flags")
         val uriString = uri.toString()
         when {
             uriString.contains("audio") -> {

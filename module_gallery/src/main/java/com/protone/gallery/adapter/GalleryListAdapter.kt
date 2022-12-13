@@ -9,14 +9,12 @@ import android.widget.ImageView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.view.adapter.SelectListAdapter
+import com.protone.component.R
 import com.protone.gallery.databinding.GalleryListAdapterLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class GalleryListAdapter(
     context: Context,
@@ -28,12 +26,6 @@ class GalleryListAdapter(
     context, true
 ) {
 
-    enum class MediaStatus {
-        UPDATED,
-        INSERTED,
-        DELETED
-    }
-
     sealed class GalleryListEvent {
         object SelectAll : GalleryListEvent()
         object QuiteSelectAll : GalleryListEvent()
@@ -42,6 +34,7 @@ class GalleryListAdapter(
         data class NoticeListItemUpdate(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemDelete(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemInsert(val media: GalleryMedia) : GalleryListEvent()
+        data class NoticeListInsert(val medias: List<GalleryMedia>) : GalleryListEvent()
     }
 
     private var itemLength = 0
@@ -84,17 +77,20 @@ class GalleryListAdapter(
                 val index = mList.indexOf(data.media)
                 if (index != -1) {
                     mList.removeAt(index)
-                    if (selectList.contains(mList[index])) selectList.remove(data.media)
+                    if (selectList.contains(mList[index])) selectList.remove(mList[index])
                     itemCount = mList.size
                     notifyItemRemovedCO(index)
                 }
             }
             is GalleryListEvent.NoticeListItemInsert -> {
-                withContext(Dispatchers.Main) {
-                    mList.add(0, data.media)
-                    itemCount = mList.size
-                    notifyItemInsertedChecked(0)
-                }
+                mList.add(0, data.media)
+                itemCount = mList.size
+                notifyItemInsertedCO(0)
+            }
+            is GalleryListEvent.NoticeListInsert -> {
+                mList.addAll(0, data.medias)
+                itemCount = mList.size
+                notifyItemRangeInsertedCO(0, data.medias.size)
             }
         }
     }
@@ -152,13 +148,16 @@ class GalleryListAdapter(
     override fun onBindViewHolder(holder: Holder<GalleryListAdapterLayoutBinding>, position: Int) {
         if (position >= mList.size) {
             //TODO 实现加载效果
-            holder.binding.imageView.setImageResource(com.protone.component.R.drawable.none_state_background)
+            holder.binding.imageView.setImageResource(R.drawable.none_state_background)
             return
         }
         setSelect(holder.binding, position, mList[position] in selectList)
         holder.binding.videoIcon.isGone = !mList[position].isVideo && !combine
         holder.binding.imageView.let { image ->
-            Image.load(mList[position].thumbnailUri).with(context).into(image)
+            Image.load(mList[position].thumbnailUri)
+                .with(context)
+                .placeholder(R.drawable.none_state_background)
+                .into(image)
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(position, mList[position])
@@ -187,12 +186,12 @@ class GalleryListAdapter(
         }
         layoutManager?.let {
             notifyItemRangeChangedChecked(
-                it.findFirstVisibleItemPosition().let { first ->
+                firstPosition.let { first ->
                     if (first <= 0) 0
                     else if (first >= preLoad) first - preLoad
                     else 0
                 },
-                it.findLastVisibleItemPosition().let { last ->
+                lastPosition.let { last ->
                     if (last >= itemCount) itemCount
                     else if (last <= itemCount - preLoad) last + preLoad
                     else itemCount
@@ -227,6 +226,10 @@ class GalleryListAdapter(
 
     fun noticeListItemInsert(media: GalleryMedia) {
         emit(GalleryListEvent.NoticeListItemInsert(media))
+    }
+
+    fun noticeListInsert(media: List<GalleryMedia>) {
+        emit(GalleryListEvent.NoticeListInsert(media))
     }
 
     private var onSelectListener: OnSelect? = null

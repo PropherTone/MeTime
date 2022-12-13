@@ -60,6 +60,8 @@ dependencies {
     api libs.bundles.baseLibs
     api libs.bundles.componentLibs
 
+    implementation libs.paging
+
     kapt libs.arouter.compiler
 
 }

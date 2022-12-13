@@ -9,6 +9,7 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.context.root
+import com.protone.common.entity.GalleryBucket
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.onResult
 import com.protone.component.R
@@ -133,7 +134,7 @@ fun Activity.checkListDialog(
         listConfirm.setOnClickListener {
             listList.adapter.let {
                 if (it is CheckListAdapter)
-                    callBack?.invoke(if (it.selectList.size > 0) it.selectList[0] else null)
+                    callBack?.invoke(it.selectList.takeIf { list -> list.isNotEmpty() }?.first())
             }
             create.dismiss()
         }

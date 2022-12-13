@@ -16,11 +16,15 @@
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_view_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_note/src/main/res/layout/note_list_adapter_layout.xml" value="0.15729166666666666" />
-        <entry key="..\:/MeTime/app/src/main/res/layout/main_activity.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/main_activity.xml" value="0.1" />
         <entry key="..\:/MeTime/app/src/main/res/layout/music_card.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/app/src/main/res/layout/photo_card.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/app/src/main/res/layout/splash_activity.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/time_photo_card.xml" value="0.24010416666666667" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/time_photo_card_layout.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/time_video_card_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/app/src/main/res/layout/video_card.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/video_module_card_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.125" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.125" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_data_usage_24_white.xml" value="0.152" />
@@ -68,7 +72,7 @@
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/date_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/drag_card_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/drag_rect_layout.xml" value="0.24114583333333334" />
-        <entry key="..\:/MeTime/lib_component/src/main/res/layout/gallery_option_pop.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/layout/gallery_option_pop.xml" value="0.1" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/image_cate_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/image_list_dialog_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/list_pop_windows_layout.xml" value="0.24114583333333334" />

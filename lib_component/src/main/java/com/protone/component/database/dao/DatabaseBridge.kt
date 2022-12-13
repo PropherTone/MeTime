@@ -138,9 +138,12 @@ class DatabaseBridge : DatabaseHelper() {
             sendGalleryAction(mediaAction)
         }
 
-        fun insertMediaWithGalleryBucketAsync(bucketId: Long, mediaId: Long) {
+        fun insertMediaWithGalleryBucketAsync(bucketId: Long, media: GalleryMedia) {
             execute {
-                insertMediaWithGalleryBucket(MediaWithGalleryBucket(bucketId, mediaId))
+                insertMediaWithGalleryBucket(
+                    MediaWithGalleryBucket(bucketId, media.mediaId),
+                    media
+                )
             }
         }
 
@@ -150,7 +153,7 @@ class DatabaseBridge : DatabaseHelper() {
                 getGalleryBucket(bucketName)?.let { bucket ->
                     insertMediaWithGalleryBucketMulti(medias.map {
                         MediaWithGalleryBucket(it.mediaId, bucket.galleryBucketId)
-                    })
+                    }, medias)
                 }
             }
         }
@@ -160,7 +163,7 @@ class DatabaseBridge : DatabaseHelper() {
             execute {
                 insertMediaWithGalleryBucketMulti(medias.map {
                     MediaWithGalleryBucket(it.mediaId, bucketId)
-                })
+                }, medias)
             }
         }
 
@@ -169,19 +172,6 @@ class DatabaseBridge : DatabaseHelper() {
                 deleteMediaWithGalleryBucket(mediaWithGalleryBucket)
             }
         }
-
-        fun getGalleryMediasByBucketAsync(bucketId: Long) {
-            execute {
-                getGalleryMediasByBucket(bucketId)
-            }
-        }
-
-        fun getGalleryBucketByMediasAsync(mediaId: Long) {
-            execute {
-                getGalleryBucketByMedias(mediaId)
-            }
-        }
-
 
         fun deleteSignedMediaMultiAsync(list: List<GalleryMedia>) {
             execute {

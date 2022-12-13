@@ -19,6 +19,9 @@ interface SignedGalleryDAO {
     @Query("SELECT * FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllMediaByType(isVideo: Boolean): List<GalleryMedia>?
 
+    @Query("SELECT * FROM GalleryMedia WHERE isVideo IS :isVideo AND dateModified < :timeMillis ORDER BY dateModified DESC")
+    fun getAllMediaBeforeDateByType(timeMillis: Long, isVideo: Boolean): List<GalleryMedia>?
+
     @Query("SELECT DISTINCT bucket FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllGallery(isVideo: Boolean): List<String>?
 
@@ -60,6 +63,9 @@ interface SignedGalleryDAO {
 
     @Query("SELECT * FROM GalleryMedia WHERE path IS :path")
     fun getSignedMedia(path: String): GalleryMedia?
+
+    @Query("SELECT * FROM GalleryMedia WHERE mediaId IS :id")
+    fun getSignedMedia(id: Long): GalleryMedia?
 
     @Query("DELETE FROM GalleryMedia WHERE media_uri IS :uri")
     fun deleteSignedMediaByUri(uri: Uri)

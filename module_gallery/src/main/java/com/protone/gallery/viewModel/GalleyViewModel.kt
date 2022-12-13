@@ -51,12 +51,6 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         }
     }
 
-    fun addToBucket(name: String, list: MutableList<GalleryMedia>) {
-        viewModelScope.launch {
-            getCurrentMailer()?.emit(GalleryFragmentViewModel.FragEvent.AddToGalleryBucket(name, list))
-        }
-    }
-
     fun selectAll() {
         viewModelScope.launch {
             getCurrentMailer()?.emit(GalleryFragmentViewModel.FragEvent.SelectAll)

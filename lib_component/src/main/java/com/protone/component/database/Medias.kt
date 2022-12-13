@@ -14,11 +14,13 @@ suspend fun photoInToday(): GalleryMedia? =
 suspend fun videoInToday(): GalleryMedia? =
     getOldDateMedia(DatabaseBridge.instance.galleryDAOBridge.getAllMediaByType(true))
 
-private fun getOldDateMedia(medias: List<GalleryMedia>?): GalleryMedia? {
-    val ca = Calendar.getInstance(Locale.CHINA)
-    val now = Calendar.getInstance(Locale.CHINA).apply {
+fun getOldDateMedia(
+    medias: List<GalleryMedia>?,
+    now: Calendar = Calendar.getInstance(Locale.CHINA).apply {
         timeInMillis = System.currentTimeMillis()
     }
+): GalleryMedia? {
+    val ca = Calendar.getInstance(Locale.CHINA)
     medias?.forEach {
         ca.timeInMillis = it.date * 1000
         if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
@@ -39,7 +41,7 @@ private fun getOldDateMedia(medias: List<GalleryMedia>?): GalleryMedia? {
 
 fun randomNote(): Note? {
     val allNote = runBlocking(Dispatchers.IO) {
-       DatabaseBridge.instance.noteDAOBridge.getAllNote()
+        DatabaseBridge.instance.noteDAOBridge.getAllNote()
     }
     return allNote?.let { if (it.isEmpty()) null else it[(it.indices).random()] }
 }

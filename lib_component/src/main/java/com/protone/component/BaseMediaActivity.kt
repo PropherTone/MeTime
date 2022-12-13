@@ -6,6 +6,7 @@ import androidx.databinding.ViewDataBinding
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.*
+import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
@@ -87,6 +88,61 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
+    fun addCate(gms: MutableList<GalleryMedia>) {
+        cateDialog(addCate = {
+            titleDialog(R.string.addCate.getString(), "") { re ->
+                if (re.isEmpty()) {
+                    R.string.enter.getString().toast()
+                    return@titleDialog
+                }
+                addCate(re, gms)
+            }
+        }, addCon = {
+            launchDefault {
+                startActivityForResult(RouterPath.GalleryRouterPath.Main) {
+                    galleryMainPostcard(CHOOSE_MEDIA)
+                }.let { result ->
+                    val uri =
+                        result?.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.URI)
+                    if (uri != null) {
+                        addCate(uri, gms)
+                    } else showFailedToast()
+                }
+            }
+        })
+    }
+
+    fun moveTo(
+        anchor: View,
+        isVideo: Boolean,
+        gms: MutableList<GalleryMedia>,
+        callback: (GalleryBucket, MutableList<GalleryMedia>) -> Unit
+    ) = launchMain {
+        val pop = ColorfulPopWindow(this@BaseMediaActivity)
+        pop.startListPopup(
+            anchor = anchor,
+            dataList = (viewModel.galleryDAO
+                .getAllGalleryBucket(isVideo) as MutableList<GalleryBucket>?)
+                ?.map { it.type } ?: mutableListOf()
+        ) { re ->
+            if (re == null) {
+                R.string.none.getString().toast()
+                pop.dismiss()
+                return@startListPopup
+            }
+            gms.let { list ->
+                launchDefault {
+                    viewModel.galleryDAO.getGalleryBucket(re)?.let {
+                        viewModel.galleryDAO
+                            .insertMediaWithGalleryBucketMultiAsync(it.galleryBucketId, list)
+                        withMainContext { callback.invoke(it, list) }
+                    }
+                }
+            }
+            pop.dismiss()
+        }
+    }
+
     private fun rename(gm: GalleryMedia) {
         val mimeType = gm.name.getFileMimeType()
         titleDialog(
@@ -162,30 +218,6 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    fun addCate(gms: MutableList<GalleryMedia>) {
-        cateDialog(addCate = {
-            titleDialog(R.string.addCate.getString(), "") { re ->
-                if (re.isEmpty()) {
-                    R.string.enter.getString().toast()
-                    return@titleDialog
-                }
-                addCate(re, gms)
-            }
-        }, addCon = {
-            launchDefault {
-                startActivityForResult(RouterPath.GalleryRouterPath.Main) {
-                    galleryMainPostcard(CHOOSE_MEDIA)
-                }.let { result ->
-                    val uri =
-                        result?.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.URI)
-                    if (uri != null) {
-                        addCate(uri, gms)
-                    } else showFailedToast()
-                }
-            }
-        })
-    }
-
     private fun addCate(cate: String, gms: MutableList<GalleryMedia>) {
         gms.let { list ->
             list.forEach { gm ->
@@ -195,28 +227,6 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 }
             }
             viewModel.galleryDAO.updateMediaMultiAsync(list)
-        }
-    }
-
-    fun moveTo(
-        anchor: View,
-        isVideo: Boolean,
-        gms: MutableList<GalleryMedia>,
-        callback: (String, MutableList<GalleryMedia>) -> Unit
-    ) = launchMain {
-        val pop = ColorfulPopWindow(this@BaseMediaActivity)
-        pop.startListPopup(
-            anchor = anchor,
-            dataList = viewModel.galleryDAO.getAllGalleryBucket(isVideo)
-                ?.map { it.type }?.toList() as MutableList<String>? ?: mutableListOf()
-        ) { re ->
-            if (re != null) {
-                gms.let { list ->
-                    viewModel.galleryDAO.insertMediaWithGalleryBucketMultiAsync(re, list)
-                    callback.invoke(re, list)
-                }
-            } else R.string.none.getString().toast()
-            pop.dismiss()
         }
     }
 

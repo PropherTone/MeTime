@@ -13,7 +13,6 @@ import com.protone.component.database.MediaAction
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.util.stream.Collectors
 
 class GalleryFragmentViewModel : BaseViewModel() {
 
@@ -36,16 +35,11 @@ class GalleryFragmentViewModel : BaseViewModel() {
         object OnActionBtn : FragEvent()
         object IntoBox : FragEvent()
 
-        data class AddToGalleryBucket(val name: String, val list: MutableList<GalleryMedia>) :
-            FragEvent()
-
         data class OnNewGallery(val gallery: Gallery) : FragEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : FragEvent()
         data class OnGalleryUpdated(val gallery: Gallery) : FragEvent()
 
-        data class OnNewGalleries(val gallery: List<Gallery>) : FragEvent()
-        data class OnGalleriesRemoved(val gallery: List<Gallery>) : FragEvent()
-        data class OnGalleriesUpdated(val gallery: List<Gallery>) : FragEvent()
+        data class OnNewGalleries(val galleries: List<Gallery>) : FragEvent()
 
         data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : FragEvent()
 
@@ -54,74 +48,39 @@ class GalleryFragmentViewModel : BaseViewModel() {
         data class OnMediaInserted(val media: GalleryMedia) : MediaEvent(media)
         data class OnMediaUpdated(val media: GalleryMedia) : MediaEvent(media)
 
-        data class OnMediasDeleted(val galleryMedia: List<GalleryMedia>) : FragEvent()
-        data class OnMediasInserted(val galleryMedia: List<GalleryMedia>) : FragEvent()
-        data class OnMediasUpdated(val galleryMedia: List<GalleryMedia>) : FragEvent()
+        data class OnMediasInserted(val medias: List<GalleryMedia>) : FragEvent()
     }
 
     private val pool = EventCachePool.get<FragEvent>(duration = 500L).apply {
-
-        suspend fun buildEvent(data: List<FragEvent>) = data.first().also { fragEvent ->
-            if (fragEvent !is FragEvent.MediaEvent) return@also
-            data.associate { (it as FragEvent.MediaEvent).galleryMedia.bucket to listOf(it.galleryMedia) }
-                .run {
-                    keys.forEach { galleryName ->
-                        galleryData.find { it.name == galleryName }.also { gallery ->
-                            if (gallery != null) {
-                                gallery.size = getGallerySize(galleryName)
-                                gallery.uri = getNewestMedia(galleryName)
-                                sendEvent(FragEvent.OnGalleryUpdated(gallery))
-                            } else {
-                                Gallery(
-                                    galleryName,
-                                    getGallerySize(galleryName),
-                                    getNewestMedia(galleryName)
-                                ).also { target ->
-                                    target.cacheAndNotice()
-                                }
+        handleEvent { data ->
+            if (data.isNotEmpty()) when (data.first()) {
+                is FragEvent.OnMediaInserted -> data.first().also { fragEvent ->
+                    if (fragEvent !is FragEvent.MediaEvent) return@also
+                    data.associate { (it as FragEvent.MediaEvent) to listOf(it.galleryMedia) }.run {
+                        keys.forEach { event ->
+                            event.galleryMedia.bucket.let { galleryName ->
+                                galleryData.find { it.name == galleryName }.also { gallery ->
+                                        if (gallery != null) {
+                                            gallery.updateGallery()
+                                        } else {
+                                            Gallery(
+                                                galleryName,
+                                                getGallerySize(galleryName),
+                                                getNewestMedia(galleryName)
+                                            ).also { target -> target.cacheAndNotice() }
+                                        }
+                                    }
+                            }
+                            this[event]?.let {
+                                sendEvent(FragEvent.OnMediasInserted(it))
                             }
                         }
-                        this[galleryName]?.let {
-                            sendEvent(FragEvent.OnMediasInserted(it))
-                        }
                     }
-                }
-        }
-
-        suspend fun updateGallery(gallery: Gallery) {
-            val all = getGallerySize(gallery.name)
-                .takeIf { size ->
-                    size != gallery.size
-                }?.let { size ->
-                    gallery.size = size
-                    gallery.itemState = Gallery.ItemState.SIZE_CHANGED
-                    true
-                } ?: false
-                    && getNewestMedia(gallery.name)
-                .takeIf { uri ->
-                    uri != gallery.uri
-                }?.let { uri ->
-                    gallery.uri = uri
-                    gallery.itemState = Gallery.ItemState.URI_CHANGED
-                    true
-                } ?: false
-            if (all) gallery.itemState = Gallery.ItemState.ALL_CHANGED
-            sendEvent(FragEvent.OnGalleryUpdated(gallery))
-        }
-
-        handleEvent {
-            if (it.isNotEmpty()) when (it.first()) {
-                is FragEvent.OnMediaDeleted, is FragEvent.OnMediaInserted -> {
-                    buildEvent(it)
                 }
                 is FragEvent.OnGalleryUpdated -> {
-                    it.distinct().forEach { event ->
-                        (event as FragEvent.OnGalleryUpdated).gallery.also { gallery ->
-                            updateGallery(gallery)
-                        }
-                    }
-                    galleryData.find { gallery -> gallery.name == ALL_GALLERY }?.let { gallery ->
-                        updateGallery(gallery)
+                    data.distinct().forEach { event ->
+                        (event as FragEvent.OnGalleryUpdated).gallery.updateGallery()
+                        galleryData.find { gallery -> gallery.name == ALL_GALLERY }?.updateGallery()
                     }
                 }
                 else -> Unit
@@ -165,9 +124,18 @@ class GalleryFragmentViewModel : BaseViewModel() {
 
     fun getBucket(bucket: String) = galleryData.find { it.name == bucket }
 
-    private suspend fun Gallery.cacheAndNotice() {
-        galleryData.add(this)
-        sendEvent(FragEvent.OnNewGallery(this), true)
+    fun addBucket(name: String) {
+        galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideo)) { re, _ ->
+            if (!re) R.string.failed_msg.getString().toast()
+        }
+    }
+
+    fun deleteGalleryBucket(bucket: String) {
+        viewModelScope.launchIO {
+            galleryDAO.run {
+                getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
+            }
+        }
     }
 
     fun sortData() = viewModelScope.launchDefault {
@@ -202,18 +170,34 @@ class GalleryFragmentViewModel : BaseViewModel() {
         }
     }
 
-    fun addBucket(name: String) {
-        galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideo)) { re, _ ->
-            if (!re) R.string.failed_msg.getString().toast()
-        }
+    private suspend fun Gallery.cacheAndNotice() {
+        galleryData.add(this)
+        sendEvent(FragEvent.OnNewGallery(this), true)
     }
 
-    fun deleteGalleryBucket(bucket: String) {
-        viewModelScope.launchIO {
-            galleryDAO.run {
-                getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
-            }
-        }
+    private suspend fun Gallery.updateGallery() {
+        val all = getGallerySize(name)
+            .takeIf { size ->
+                if (size <= 0) {
+                    sendEvent(FragEvent.OnGalleryRemoved(this))
+                    return
+                }
+                size != this.size
+            }?.let { size ->
+                this.size = size
+                itemState = Gallery.ItemState.SIZE_CHANGED
+                true
+            } ?: false
+                && getNewestMedia(name)
+            .takeIf { uri ->
+                uri != this.uri
+            }?.let { uri ->
+                this.uri = uri
+                itemState = Gallery.ItemState.URI_CHANGED
+                true
+            } ?: false
+        if (all) itemState = Gallery.ItemState.ALL_CHANGED
+        sendEvent(FragEvent.OnGalleryUpdated(this))
     }
 
     private fun observeGallery() {
@@ -224,7 +208,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
                     sendEvent(FragEvent.OnGalleryUpdated(it), false)
                 }
                 if (media.bucket != rightGallery) return
-                sendEvent(FragEvent.OnMediaDeleted(media), false)
+                sendEvent(FragEvent.OnMediaDeleted(media), true)
             }
 
             suspend fun onGalleryMediaInserted(media: GalleryMedia) {
@@ -243,10 +227,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
 
             suspend fun sendGalleryRemoved(gallery: Gallery) {
                 galleryData.find { it.name == ALL_GALLERY }.let {
-                    if (it != null) {
-                        it.size = it.size - gallery.size
-                        sendEvent(FragEvent.OnGalleryUpdated(it))
-                    }
+                    it?.updateGallery()
                     galleryData.remove(gallery)
                     sendEvent(FragEvent.OnGalleryRemoved(gallery))
                 }
@@ -292,6 +273,20 @@ class GalleryFragmentViewModel : BaseViewModel() {
                             sendGalleryRemoved(gallery)
                         }
                     }
+                    is MediaAction.GalleryDataAction.OnMediaWithGalleryBucketMultiInserted ->
+                        it.mediaWithGalleryBuckets
+                            .map { mwb -> mwb.galleryBucketId }
+                            .distinct()
+                            .forEach { bucketId ->
+                                galleryDAO.getGalleryBucket(bucketId)?.let { galleryBucket ->
+                                    if (rightGallery == galleryBucket.type) {
+                                        galleryDAO.getGalleryMediasByBucket(bucketId)
+                                            ?.let { medias ->
+                                                sendEvent(FragEvent.OnMediasInserted(medias))
+                                            }
+                                    }
+                                }
+                            }
                     else -> Unit
                 }
             }
@@ -302,12 +297,5 @@ class GalleryFragmentViewModel : BaseViewModel() {
         if (immediate) _fragFlow.emit(fragEvent)
         else pool.holdEvent(fragEvent)
     }
-
-    suspend fun insertNewMedias(gallery: String, list: MutableList<GalleryMedia>) {
-        withDefaultContext {
-            TODO("insertNewMedias")
-        }
-    }
-
 
 }

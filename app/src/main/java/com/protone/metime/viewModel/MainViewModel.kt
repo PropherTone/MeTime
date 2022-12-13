@@ -44,17 +44,4 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun getPhotoInToday(): GalleryMedia? = withContext(Dispatchers.Default) {
-        photoInToday()
-    }
-
-
-    suspend fun getVideoInToday() = withContext(Dispatchers.Default) {
-        videoInToday()
-    }
-
-    suspend fun getRandomNote() = withContext(Dispatchers.Default) {
-        randomNote()
-    }
-
 }

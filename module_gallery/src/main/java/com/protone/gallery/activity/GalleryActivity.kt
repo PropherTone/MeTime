@@ -118,9 +118,7 @@ class GalleryActivity :
     override fun popMoveTo() {
         viewModel.chooseData?.let {
             if (it.size <= 0) return
-            moveTo(binding.galleryBar, it[0].isVideo, it) { target, list ->
-                viewModel.addToBucket(target, list)
-            }
+            moveTo(binding.galleryBar, it[0].isVideo, it) { _, _ -> }
         }
     }
 

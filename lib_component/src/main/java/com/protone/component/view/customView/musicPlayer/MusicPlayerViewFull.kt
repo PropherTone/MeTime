@@ -42,7 +42,6 @@ class MusicPlayerViewFull @JvmOverloads constructor(
     }
 
     override fun setName(name: String) {
-        binding.musicName.ellipsize = TextUtils.TruncateAt.MARQUEE
         binding.musicName.text = name
     }
 

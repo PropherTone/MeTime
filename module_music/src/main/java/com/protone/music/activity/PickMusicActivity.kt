@@ -90,7 +90,7 @@ class PickMusicActivity :
 
     fun confirm() {
         val selectList = getSelectList()
-        if (selectList != null && selectList.size > 0) {
+        if (selectList != null && selectList.isNotEmpty()) {
             setResult(RESULT_OK, Intent().apply {
                 data = selectList[0].uri
             })
