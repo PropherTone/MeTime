@@ -1,6 +1,7 @@
 package com.protone.component.database.dao
 
 import android.net.Uri
+import android.util.Log
 import com.protone.common.baseType.withIOContext
 import com.protone.common.entity.*
 import com.protone.component.database.MediaAction
@@ -19,12 +20,10 @@ sealed class SignedGalleryDAO : MediasWithGalleriesDAO() {
         signedGalleryDAO.getAllMediaByType(isVideo)
     }
 
-    suspend fun getAllMediaBeforeDateByType(
-        timeMillis: Long,
-        isVideo: Boolean
-    ): List<GalleryMedia>? = withIOContext {
-        signedGalleryDAO.getAllMediaBeforeDateByType(timeMillis, isVideo)
-    }
+    suspend fun getAllMediaBetweenDate(start: Long, end: Long): List<GalleryMedia>? =
+        withIOContext {
+            signedGalleryDAO.getAllMediaBetweenDate(start, end)
+        }
 
     suspend fun getAllGallery(isVideo: Boolean): List<String>? = withIOContext {
         signedGalleryDAO.getAllGallery(isVideo)

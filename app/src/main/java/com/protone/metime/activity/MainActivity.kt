@@ -2,19 +2,16 @@ package com.protone.metime.activity
 
 import androidx.activity.viewModels
 import androidx.core.view.isGone
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.common.R
-import com.protone.common.baseType.*
-import com.protone.common.context.intent
+import com.protone.common.baseType.getString
+import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.toast
+import com.protone.common.context.MApplication
 import com.protone.common.context.onGlobalLayout
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
-import com.protone.component.database.dao.DatabaseBridge
-import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
 import com.protone.common.utils.ALL_GALLERY
@@ -27,11 +24,10 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
-import com.protone.component.service.WorkService
+import com.protone.component.database.userConfig
 import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity :
@@ -105,16 +101,22 @@ class MainActivity :
 
         initTimeList()
 
+        musicController.bindMusicService()
+
+        observeViewEvent()
+    }
+
+    private fun MusicControllerIMP.bindMusicService() {
         bindMusicService {
-            musicController.setBinder(this@MainActivity, it) { loopMode ->
+            setBinder(this@MainActivity, it) { loopMode ->
                 userConfig.musicLoopMode = loopMode
             }
-            musicController.setLoopMode(userConfig.musicLoopMode)
+            setLoopMode(userConfig.musicLoopMode)
             launchDefault {
-                getMusics(userConfig.lastMusicBucket)?.let { list ->
+                viewModel.getMusics(userConfig.lastMusicBucket)?.let { list ->
                     list as MutableList<Music>
-                    musicController.setMusicList(list)
-                    musicController.refresh(
+                    setMusicList(list)
+                    refresh(
                         if (userConfig.lastMusic.isNotEmpty())
                             userConfig.lastMusic.toEntity(Music::class.java)
                         else if (list.isNotEmpty()) list[0] else getEmptyMusic(),
@@ -123,7 +125,9 @@ class MainActivity :
                 }
             }
         }
+    }
 
+    private fun observeViewEvent() {
         onViewEvent {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
@@ -145,8 +149,11 @@ class MainActivity :
 
     private fun initTimeList() {
         binding.timeList.apply {
+            updateLayoutParams {
+                height = MApplication.screenHeight
+            }
             layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = TimeListAdapter(object : TimeListAdapter.CardEvent {
+            TimeListAdapter(object : TimeListAdapter.CardEvent {
                 override fun onPhotoClick(media: GalleryMedia) {
                     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
                         galleryViewPostcard(media.toJson(), false, ALL_GALLERY)
@@ -158,7 +165,14 @@ class MainActivity :
                         galleryViewPostcard(media.toJson(), true, ALL_GALLERY)
                     }
                 }
-            })
+            }).let { timeListAdapter ->
+                launchDefault {
+                    viewModel.getTimeMediaPager(2).collect {
+                        timeListAdapter.submitData(it)
+                    }
+                }
+                adapter = timeListAdapter
+            }
         }
     }
 }
