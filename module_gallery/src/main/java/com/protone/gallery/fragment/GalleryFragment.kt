@@ -172,6 +172,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
+                            viewModel.rightGallery = " "
                             viewModel.getBucket(ALL_GALLERY)?.let {
                                 onGallerySelected(it.name, it.size)
                             }

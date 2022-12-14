@@ -1,5 +1,6 @@
 package com.protone.component
 
+import android.util.Log
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
@@ -17,8 +18,7 @@ import com.protone.component.view.dialog.checkListDialog
 import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.component.view.popWindows.GalleryOptionPop
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.streams.toList
 
 abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
@@ -117,7 +117,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         isVideo: Boolean,
         gms: MutableList<GalleryMedia>,
         callback: (GalleryBucket, MutableList<GalleryMedia>) -> Unit
-    ) = launchMain {
+    ) = launch {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,
@@ -130,16 +130,16 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 pop.dismiss()
                 return@startListPopup
             }
-            gms.let { list ->
-                launchDefault {
-                    viewModel.galleryDAO.getGalleryBucket(re)?.let {
-                        viewModel.galleryDAO
-                            .insertMediaWithGalleryBucketMultiAsync(it.galleryBucketId, list)
-                        withMainContext { callback.invoke(it, list) }
+            this.launchDefault {
+                viewModel.galleryDAO.getGalleryBucket(re)?.let {
+                    viewModel.galleryDAO
+                        .insertMediaWithGalleryBucketMultiAsync(it.galleryBucketId, gms)
+                    withMainContext {
+                        callback.invoke(it, gms)
+                        pop.dismiss()
                     }
                 }
             }
-            pop.dismiss()
         }
     }
 

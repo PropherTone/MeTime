@@ -50,14 +50,12 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         layoutManager =
             recyclerView.layoutManager.takeIf { it is LinearLayoutManager } as LinearLayoutManager
+        refreshVisiblePosition()
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    layoutManager?.apply {
-                        firstPosition = findFirstVisibleItemPosition()
-                        lastPosition = findLastVisibleItemPosition()
-                    }
+                    refreshVisiblePosition()
                 }
             }
         })
@@ -66,6 +64,13 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
             adapterFlow.bufferCollect {
                 handleEventAsynchronous(it)
             }
+        }
+    }
+
+    private fun refreshVisiblePosition() {
+        layoutManager?.apply {
+            firstPosition = findFirstVisibleItemPosition()
+            lastPosition = findLastVisibleItemPosition()
         }
     }
 
@@ -140,11 +145,15 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
     }
 
     private inline fun isPositionInVisibleSite(
-        positionStart: Int, itemCount: Int, located: () -> Unit
+        positionStart: Int, itemCount: Int, located: (Int, Int) -> Unit
     ) {
         onVisibleSite { first, last ->
-            if ((positionStart in first..last && positionStart + itemCount <= last) || (first == -1 && last == -1))
-                located()
+            val lastIndex = positionStart + itemCount
+            if ((positionStart in first..last) || (first == -1 && last == -1))
+                located(
+                    positionStart,
+                    if (lastIndex > mList.size) itemCount - (lastIndex - mList.size) else itemCount
+                )
         }
     }
 
@@ -167,21 +176,21 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
     }
 
     fun notifyItemRangeInsertedChecked(positionStart: Int, itemCount: Int) {
-        isPositionInVisibleSite(positionStart, itemCount) {
-            notifyItemRangeInserted(positionStart, itemCount)
+        isPositionInVisibleSite(positionStart, itemCount) { start, count ->
+            notifyItemRangeInserted(start, count)
         }
     }
 
     fun notifyItemRangeRemovedChecked(positionStart: Int, itemCount: Int) {
-        isPositionInVisibleSite(positionStart, itemCount) {
-            notifyItemRangeRemoved(positionStart, itemCount)
+        isPositionInVisibleSite(positionStart, itemCount) { start, count ->
+            notifyItemRangeRemoved(start, count)
         }
     }
 
     fun notifyItemRangeChangedChecked(positionStart: Int, itemCount: Int, payload: Any? = null) {
-        isPositionInVisibleSite(positionStart, itemCount) {
-            payload?.let { notifyItemRangeChanged(positionStart, itemCount, payload) }
-                ?: notifyItemRangeChanged(positionStart, itemCount)
+        isPositionInVisibleSite(positionStart, itemCount) { start, count ->
+            payload?.let { notifyItemRangeChanged(start, count, payload) }
+                ?: notifyItemRangeChanged(start, count)
         }
     }
 

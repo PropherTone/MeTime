@@ -186,15 +186,15 @@ class GalleryListAdapter(
         }
         layoutManager?.let {
             notifyItemRangeChangedChecked(
-                firstPosition.let { first ->
-                    if (first <= 0) 0
-                    else if (first >= preLoad) first - preLoad
-                    else 0
+                when {
+                    firstPosition <= 0 -> 0
+                    firstPosition >= preLoad -> firstPosition - preLoad
+                    else -> 0
                 },
-                lastPosition.let { last ->
-                    if (last >= itemCount) itemCount
-                    else if (last <= itemCount - preLoad) last + preLoad
-                    else itemCount
+                when {
+                    lastPosition >= itemCount || lastPosition == -1 -> itemCount
+                    lastPosition <= itemCount - preLoad -> lastPosition + preLoad
+                    else -> itemCount
                 }
             )
         }

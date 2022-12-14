@@ -60,16 +60,16 @@ class GalleryFragmentViewModel : BaseViewModel() {
                         keys.forEach { event ->
                             event.galleryMedia.bucket.let { galleryName ->
                                 galleryData.find { it.name == galleryName }.also { gallery ->
-                                        if (gallery != null) {
-                                            gallery.updateGallery()
-                                        } else {
-                                            Gallery(
-                                                galleryName,
-                                                getGallerySize(galleryName),
-                                                getNewestMedia(galleryName)
-                                            ).also { target -> target.cacheAndNotice() }
-                                        }
+                                    if (gallery != null) {
+                                        gallery.updateGallery()
+                                    } else {
+                                        Gallery(
+                                            galleryName,
+                                            getGallerySize(galleryName),
+                                            getNewestMedia(galleryName)
+                                        ).also { target -> target.cacheAndNotice() }
                                     }
+                                }
                             }
                             this[event]?.let {
                                 sendEvent(FragEvent.OnMediasInserted(it))
@@ -93,12 +93,16 @@ class GalleryFragmentViewModel : BaseViewModel() {
     }
 
     suspend fun getGallery(gallery: String) = withIOContext {
-        galleryDAO.run {
-            when {
-                combine && gallery == ALL_GALLERY -> getAllSignedMedia()
-                combine -> getAllMediaByGallery(gallery)
-                gallery == ALL_GALLERY -> getAllMediaByType(isVideo)
-                else -> getAllMediaByGallery(gallery, isVideo)
+        galleryData.find { it.name == gallery }?.let { entity ->
+            galleryDAO.run {
+                if (entity.custom) return@withIOContext getGalleryBucket(gallery)?.galleryBucketId
+                    ?.let { getGalleryMediasByBucket(it) }
+                when {
+                    combine && gallery == ALL_GALLERY -> getAllSignedMedia()
+                    combine -> getAllMediaByGallery(gallery)
+                    gallery == ALL_GALLERY -> getAllMediaByType(isVideo)
+                    else -> getAllMediaByGallery(gallery, isVideo)
+                }
             }
         }
     }
@@ -164,7 +168,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
     private fun sortPrivateData() {
         viewModelScope.launchDefault {
             getAllGalleryBucket()?.forEach {
-                Gallery(it.type, 0, null).cacheAndNotice()
+                Gallery(it.type, 0, null, custom = true).cacheAndNotice()
             }
             isDataSorted = true
         }
@@ -261,7 +265,8 @@ class GalleryFragmentViewModel : BaseViewModel() {
                     }
                     is MediaAction.GalleryDataAction.OnGalleryBucketInserted -> {
                         if (!isLock) {
-                            Gallery(it.galleryBucket.type, 0, null).cacheAndNotice()
+                            Gallery(it.galleryBucket.type, 0, null, custom = true)
+                                .cacheAndNotice()
                         } else {
                             R.string.locked.getString().toast()
                         }
