@@ -97,9 +97,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
         galleryData.find { it.name == gallery }?.let { entity ->
             galleryDAO.run {
                 if (entity.custom) return@withIOContext getGalleryBucket(gallery)?.galleryBucketId
-                    ?.let {
-                        getGalleryMediasByBucket(it)
-                    }
+                    ?.let { getGalleryMediasByBucket(it) }
                 when {
                     combine && gallery == ALL_GALLERY -> getAllSignedMedia()
                     combine -> getAllMediaByGallery(gallery)

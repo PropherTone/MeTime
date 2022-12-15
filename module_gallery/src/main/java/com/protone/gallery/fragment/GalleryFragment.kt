@@ -161,6 +161,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         GalleryFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.onGlobalLayout {
                 galleryBucketContainer.botBlock = tabController.measuredHeight.toFloat()
+                galleryBucketContainer.hideDuration = 120L
                 toolButtonAnimator = AnimationHelper.rotation(galleryToolButton, 45f)
                 galleryShowBucket.setOnStateListener(object : StatusImageView.StateListener {
                     override fun onActive() {
@@ -172,9 +173,12 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
-                            viewModel.rightGallery = " "
-                            viewModel.getBucket(ALL_GALLERY)?.let {
-                                onGallerySelected(it.name, it.size)
+                            viewModel.rightGallery = ALL_GALLERY
+                            launchDefault {
+                                viewModel.getBucket(ALL_GALLERY)?.let { gallery ->
+                                    viewModel.getGallery(gallery.name)
+                                        ?.let { getListAdapter().setData(it) }
+                                }
                             }
                         }
                         viewModel.isBucketShowUp = false
@@ -209,11 +213,14 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     private fun initList() = binding.run {
         galleryList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
-                it.multiChoose = true
-                it.setOnSelectListener(this@GalleryFragment)
-            }
             addItemDecoration(GalleryItemDecoration(paddingEnd))
+            post {
+                adapter = GalleryListAdapter(context = context, useSelect = true, itemCount = 0)
+                    .also {
+                        it.multiChoose = true
+                        it.setOnSelectListener(this@GalleryFragment)
+                    }
+            }
         }
         galleryBucket.apply {
             layoutManager = LinearLayoutManager(context)
@@ -240,9 +247,12 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     }
 
     private fun onGallerySelected(gallery: String, size: Int) {
-        if (viewModel.rightGallery == gallery) return
+        if (viewModel.rightGallery == gallery) {
+            binding.galleryShowBucket.negative()
+            return
+        }
         viewModel.rightGallery = gallery
-        binding.galleryList.swapAdapter(
+        if (viewModel.rightGallery != "") binding.galleryList.swapAdapter(
             GalleryListAdapter(requireContext(), true, itemCount = size).also {
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleryFragment)
@@ -250,7 +260,6 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         )
         binding.galleryShowBucket.negative()
         launch {
-            getListAdapter().refreshVisiblePosition()
             viewModel.getGallery(gallery)?.let { getListAdapter().setData(it) }
         }
     }

@@ -181,6 +181,7 @@ class GalleryListAdapter(
 
     override fun setData(collection: Collection<GalleryMedia>) {
         super.setData(collection)
+        refreshVisiblePosition()
         if (mList.size > itemCount) {
             itemCount = mList.size
             notifyItemRangeInsertedChecked(mList.size - collection.size, collection.size)

@@ -32,7 +32,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="0dp"
-                android:paddingBottom="@dimen/main_margin"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <View
@@ -187,7 +186,8 @@
                     android:id="@+id/time_list"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_margin="@dimen/main_margin"
+                    android:layout_marginTop="@dimen/main_margin"
+                    android:overScrollMode="never"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/music_player_card" />
 

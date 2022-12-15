@@ -150,9 +150,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     private suspend fun GalleryViewViewModel.getMediaIndex() = onResult { co ->
-        val galleryMedia = intent.extras
-            ?.getString(MEDIA)
-            ?.toEntity(GalleryMedia::class.java)
+        val galleryMedia = intent.getStringExtra(MEDIA)?.toEntity(GalleryMedia::class.java)
         val indexOf = galleryMedias.indexOf(galleryMedia)
         curPosition = indexOf
         co.resumeWith(Result.success(indexOf))

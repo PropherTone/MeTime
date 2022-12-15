@@ -45,9 +45,8 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
                     else -> false
                 }
             )
-        } else {
-            this.onBindViewHolder(holder, position)
         }
+        this.onBindViewHolder(holder, position)
     }
 
     open fun checkSelect(position: Int, item: Item) {

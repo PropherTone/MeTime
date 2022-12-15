@@ -117,7 +117,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         isVideo: Boolean,
         gms: MutableList<GalleryMedia>,
         callback: (GalleryBucket, MutableList<GalleryMedia>) -> Unit
-    ) = launch {
+    )  =  launch {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,

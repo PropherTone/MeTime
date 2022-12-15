@@ -12,6 +12,9 @@ import java.util.*
 class TimeMediaDataSource :
     PagingSource<Calendar, GalleryMedia>() {
 
+    override val keyReuseSupported: Boolean
+        get() = true
+
     override fun getRefreshKey(state: PagingState<Calendar, GalleryMedia>): Calendar? {
         return null
     }

@@ -1,9 +1,12 @@
 package com.protone.metime.activity
 
+import android.graphics.Rect
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
@@ -153,6 +156,20 @@ class MainActivity :
                 height = MApplication.screenHeight
             }
             layoutManager = LinearLayoutManager(this@MainActivity)
+            val margin = resources.getDimensionPixelSize(R.dimen.main_margin)
+            addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    super.getItemOffsets(outRect, view, parent, state)
+                    outRect.bottom = margin
+                    outRect.left = margin
+                    outRect.right = margin
+                }
+            })
             TimeListAdapter(object : TimeListAdapter.CardEvent {
                 override fun onPhotoClick(media: GalleryMedia) {
                     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
