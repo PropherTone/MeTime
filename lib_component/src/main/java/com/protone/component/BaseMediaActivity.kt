@@ -130,7 +130,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 pop.dismiss()
                 return@startListPopup
             }
-            this.launchDefault {
+            this@BaseMediaActivity.launchDefault {
                 viewModel.galleryDAO.getGalleryBucket(re)?.let {
                     viewModel.galleryDAO
                         .insertMediaWithGalleryBucketMultiAsync(it.galleryBucketId, gms)

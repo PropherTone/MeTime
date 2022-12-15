@@ -67,7 +67,7 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         }
     }
 
-    private fun refreshVisiblePosition() {
+    fun refreshVisiblePosition() {
         layoutManager?.apply {
             firstPosition = findFirstVisibleItemPosition()
             lastPosition = findLastVisibleItemPosition()

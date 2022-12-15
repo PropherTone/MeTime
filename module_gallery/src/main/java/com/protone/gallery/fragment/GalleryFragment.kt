@@ -240,16 +240,17 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     }
 
     private fun onGallerySelected(gallery: String, size: Int) {
-        binding.galleryShowBucket.negative()
         if (viewModel.rightGallery == gallery) return
+        viewModel.rightGallery = gallery
+        binding.galleryList.swapAdapter(
+            GalleryListAdapter(requireContext(), true, itemCount = size).also {
+                it.multiChoose = true
+                it.setOnSelectListener(this@GalleryFragment)
+            }, false
+        )
+        binding.galleryShowBucket.negative()
         launch {
-            viewModel.rightGallery = gallery
-            binding.galleryList.swapAdapter(
-                GalleryListAdapter(requireContext(), true, itemCount = size).also {
-                    it.multiChoose = true
-                    it.setOnSelectListener(this@GalleryFragment)
-                }, false
-            )
+            getListAdapter().refreshVisiblePosition()
             viewModel.getGallery(gallery)?.let { getListAdapter().setData(it) }
         }
     }

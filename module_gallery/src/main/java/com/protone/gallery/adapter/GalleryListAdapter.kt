@@ -183,21 +183,21 @@ class GalleryListAdapter(
         super.setData(collection)
         if (mList.size > itemCount) {
             itemCount = mList.size
+            notifyItemRangeInsertedChecked(mList.size - collection.size, collection.size)
+            return
         }
-        layoutManager?.let {
-            notifyItemRangeChangedChecked(
-                when {
-                    firstPosition <= 0 -> 0
-                    firstPosition >= preLoad -> firstPosition - preLoad
-                    else -> 0
-                },
-                when {
-                    lastPosition >= itemCount || lastPosition == -1 -> itemCount
-                    lastPosition <= itemCount - preLoad -> lastPosition + preLoad
-                    else -> itemCount
-                }
-            )
-        }
+        notifyItemRangeChangedChecked(
+            when {
+                firstPosition <= 0 -> 0
+                firstPosition >= preLoad -> firstPosition - preLoad
+                else -> 0
+            },
+            when {
+                lastPosition >= itemCount || lastPosition == -1 -> itemCount
+                lastPosition <= itemCount - preLoad -> lastPosition + preLoad
+                else -> itemCount
+            }
+        )
     }
 
     fun noticeDataUpdate(item: MutableList<GalleryMedia>?) {

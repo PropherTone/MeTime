@@ -1,5 +1,6 @@
 package com.protone.gallery.viewModel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
 import com.protone.common.baseType.*
@@ -8,6 +9,7 @@ import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.EventCachePool
+import com.protone.common.utils.TAG
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
 import kotlinx.coroutines.delay
@@ -60,15 +62,13 @@ class GalleryFragmentViewModel : BaseViewModel() {
                         keys.forEach { event ->
                             event.galleryMedia.bucket.let { galleryName ->
                                 galleryData.find { it.name == galleryName }.also { gallery ->
-                                    if (gallery != null) {
+                                    if (gallery != null)
                                         gallery.updateGallery()
-                                    } else {
-                                        Gallery(
-                                            galleryName,
-                                            getGallerySize(galleryName),
-                                            getNewestMedia(galleryName)
-                                        ).also { target -> target.cacheAndNotice() }
-                                    }
+                                    else Gallery(
+                                        galleryName,
+                                        getGallerySize(galleryName),
+                                        getNewestMedia(galleryName)
+                                    ).also { target -> target.cacheAndNotice() }
                                 }
                             }
                             this[event]?.let {
@@ -93,10 +93,13 @@ class GalleryFragmentViewModel : BaseViewModel() {
     }
 
     suspend fun getGallery(gallery: String) = withIOContext {
+        Log.d(TAG, "getGallery: ")
         galleryData.find { it.name == gallery }?.let { entity ->
             galleryDAO.run {
                 if (entity.custom) return@withIOContext getGalleryBucket(gallery)?.galleryBucketId
-                    ?.let { getGalleryMediasByBucket(it) }
+                    ?.let {
+                        getGalleryMediasByBucket(it)
+                    }
                 when {
                     combine && gallery == ALL_GALLERY -> getAllSignedMedia()
                     combine -> getAllMediaByGallery(gallery)
