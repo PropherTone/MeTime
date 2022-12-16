@@ -90,7 +90,6 @@ class DefaultBlurController(private val root: ViewGroup, blurEngine: BlurEngine)
         if (!isInit) return false
         if (!root.isVisible && blurView?.isVisible == false) return true
         drawDecor()
-        decorBitmap = decorBitmap?.apply { blurEngine.blur(this) }
         return true
     }
 
@@ -111,7 +110,7 @@ class DefaultBlurController(private val root: ViewGroup, blurEngine: BlurEngine)
                 leftScaled = -opsX / wScaled
                 rightScaled = -opsY / hScaled
             }
-            transformCanvas()
+            if (!changeWH) transformCanvas()
         }
         isResized = true
     }
@@ -119,7 +118,9 @@ class DefaultBlurController(private val root: ViewGroup, blurEngine: BlurEngine)
     override fun drawBlurred(canvas: Canvas?): Boolean {
         if (!isInit) return true
         canvas?.apply {
-            if (this is BlurCanvas) return false
+            if (this is BlurCanvas) {
+                decorBitmap = decorBitmap?.apply { blurEngine.blur(this) }
+            }
             save()
             scale(scaleFactory.wScaled, scaleFactory.hScaled)
             decorBitmap?.apply { drawBitmap(this, 0f, 0f, bitmapPaint) }

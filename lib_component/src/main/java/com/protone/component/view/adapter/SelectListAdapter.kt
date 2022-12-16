@@ -34,19 +34,20 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
     }
 
     override fun onBindViewHolder(holder: Holder<VB>, position: Int, payloads: MutableList<Any>) {
-        if (payloads.isNotEmpty()) {
-            if (payloads.first() !is String) return
-            setSelect(
-                holder.binding,
-                position,
-                when (payloads.first()) {
-                    SELECT -> true
-                    UNSELECT -> false
-                    else -> false
-                }
-            )
+        if (payloads.isEmpty()) {
+            this.onBindViewHolder(holder, position)
+            return
         }
-        this.onBindViewHolder(holder, position)
+        if (payloads.first() !is String) return
+        setSelect(
+            holder.binding,
+            position,
+            when (payloads.first()) {
+                SELECT -> true
+                UNSELECT -> false
+                else -> false
+            }
+        )
     }
 
     open fun checkSelect(position: Int, item: Item) {

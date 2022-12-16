@@ -94,6 +94,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         launchDefault {
             try {
                 if (albumBitmap == null) {
+                    if (interceptAlbumCover) return@launchDefault
                     withMainContext {
                         switcher.setImageDrawable(baseCoverDrawable)
                     }
@@ -111,7 +112,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
                 }
             } catch (e: Exception) {
                 if (isInDebug()) e.printStackTrace()
-                withMainContext {
+                if (!interceptAlbumCover) withMainContext {
                     switcher.setImageDrawable(baseCoverDrawable)
                 }
             }

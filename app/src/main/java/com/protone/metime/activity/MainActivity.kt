@@ -79,14 +79,14 @@ class MainActivity :
 
     override suspend fun MainViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
+        userIcon = userConfig.userIcon.also {
+            musicController.setInterceptAlbumCover(it.isEmpty())
+        }
         musicController.setOnBlurAlbumCover {
             binding.userBack.setImageBitmap(it)
         }
         musicController.onClick {
             startActivity(RouterPath.MusicRouterPath.MusicPlayer)
-        }
-        userIcon = userConfig.userIcon.also {
-            musicController.setInterceptAlbumCover(it.isEmpty())
         }
 
         onLifecycleEvent {

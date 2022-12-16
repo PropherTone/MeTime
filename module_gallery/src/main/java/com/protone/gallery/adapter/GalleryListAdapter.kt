@@ -29,7 +29,7 @@ class GalleryListAdapter(
     sealed class GalleryListEvent {
         object SelectAll : GalleryListEvent()
         object QuiteSelectAll : GalleryListEvent()
-        data class NoticeDataUpdate(val item: MutableList<GalleryMedia>?) : GalleryListEvent()
+        data class NoticeDataUpdate(val item: MutableList<GalleryMedia>) : GalleryListEvent()
         data class NoticeSelectChange(val item: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemUpdate(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemDelete(val media: GalleryMedia) : GalleryListEvent()
@@ -56,8 +56,25 @@ class GalleryListAdapter(
                 }
             }
             is GalleryListEvent.NoticeDataUpdate -> {
-                if (data.item == null) return
-                notifyListChangedCO(data.item)
+                if (data.item.isEmpty()) return
+                super.setData(data.item)
+                if (mList.size > itemCount) {
+                    itemCount = mList.size
+                    notifyItemRangeInsertedCO(mList.size - data.item.size, data.item.size)
+                    return
+                }
+                notifyItemRangeChangedChecked(
+                    when {
+                        firstPosition <= 0 -> 0
+                        firstPosition >= preLoad -> firstPosition - preLoad
+                        else -> 0
+                    },
+                    when {
+                        lastPosition >= itemCount || lastPosition == -1 -> itemCount
+                        lastPosition <= itemCount - preLoad -> lastPosition + preLoad
+                        else -> itemCount
+                    }
+                )
             }
             is GalleryListEvent.NoticeSelectChange -> {
                 val indexOf = mList.indexOf(data.item)
@@ -180,28 +197,11 @@ class GalleryListAdapter(
     override fun getItemCount(): Int = itemCount
 
     override fun setData(collection: Collection<GalleryMedia>) {
-        super.setData(collection)
         refreshVisiblePosition()
-        if (mList.size > itemCount) {
-            itemCount = mList.size
-            notifyItemRangeInsertedChecked(mList.size - collection.size, collection.size)
-            return
-        }
-        notifyItemRangeChangedChecked(
-            when {
-                firstPosition <= 0 -> 0
-                firstPosition >= preLoad -> firstPosition - preLoad
-                else -> 0
-            },
-            when {
-                lastPosition >= itemCount || lastPosition == -1 -> itemCount
-                lastPosition <= itemCount - preLoad -> lastPosition + preLoad
-                else -> itemCount
-            }
-        )
+        noticeDataUpdate(collection as MutableList<GalleryMedia>)
     }
 
-    fun noticeDataUpdate(item: MutableList<GalleryMedia>?) {
+    private fun noticeDataUpdate(item: MutableList<GalleryMedia>) {
         emit(GalleryListEvent.NoticeDataUpdate(item))
     }
 

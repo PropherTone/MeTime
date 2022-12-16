@@ -75,6 +75,10 @@ class MusicActivity :
                     })
             )
             musicBucketContainer.setForeColor(getColor(com.protone.component.R.color.foreDark))
+            root.viewTreeObserver.addOnPreDrawListener {
+                if (doBlur) musicBucketContainer.renderFrame()
+                true
+            }
             root.onGlobalLayout {
                 actionBtnContainer.marginBottom(mySmallMusicPlayer.height + search.marginBottom)
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
@@ -82,7 +86,6 @@ class MusicActivity :
                 musicShowBucket.setOnStateListener(this@MusicActivity)
                 musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
                 appToolbar.setExpanded(false, false)
-                musicBucketContainer.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                 toolbar.progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
@@ -228,10 +231,6 @@ class MusicActivity :
                 musicFinishPhanton.y = location[1].toFloat()
                 musicBucketNamePhanton.isGone = false
                 musicFinishPhanton.isGone = false
-                root.viewTreeObserver.addOnPreDrawListener {
-                    if (doBlur) musicBucketContainer.renderFrame()
-                    true
-                }
             }
         }
     }
