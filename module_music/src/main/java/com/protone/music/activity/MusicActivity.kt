@@ -41,7 +41,7 @@ class MusicActivity :
     private var doBlur = true
 
     override val viewModel: MusicModel by lazy {
-        ViewModelProvider(this).get(MusicModel::class.java).apply {
+        ViewModelProvider(this)[MusicModel::class.java].apply {
             onMusicDataEvent = object : MusicModel.OnMusicDataEvent {
                 override suspend fun onNewMusicBucket(musicBucket: MusicBucket) {
                     getMusicBucketAdapter()?.addBucket(musicBucket)

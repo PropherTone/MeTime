@@ -32,8 +32,9 @@ open class SBlurView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas?) {
-        blurTool.drawBlurred(canvas)
-        super.onDraw(canvas)
+        if (blurTool.drawBlurred(canvas)) {
+            super.onDraw(canvas)
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

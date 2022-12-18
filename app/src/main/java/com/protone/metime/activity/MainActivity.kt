@@ -66,7 +66,7 @@ class MainActivity :
     override fun createView(): MainActivityBinding {
         return MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
-            toolMotion.fitStatuesBarUsePadding()
+            motionHeader.fitStatuesBarUsePadding()
             root.onGlobalLayout {
                 actionBtnContainer.also {
                     it.y = it.y + viewModel.btnH * 2
