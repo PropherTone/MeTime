@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <com.protone.component.customView.ScalableRegionLoadingImageView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <com.protone.component.view.customView.ScalableRegionLoadingImageView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
 </layout>

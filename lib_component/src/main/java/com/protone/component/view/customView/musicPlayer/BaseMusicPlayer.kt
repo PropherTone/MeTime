@@ -8,19 +8,20 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
-import com.protone.component.R
+import com.protone.common.utils.BitmapCachePool
 import com.protone.common.baseType.launchDefault
-import com.protone.common.baseType.toBitmap
-import com.protone.common.baseType.withDefaultContext
 import com.protone.common.baseType.withMainContext
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.isInDebug
+import com.protone.component.R
 import com.protone.component.view.customView.ColorfulProgressBar
 import com.protone.component.view.customView.SwitchImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+
+val bitmapCachePool by lazy { BitmapCachePool() }
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -73,9 +74,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 
     private fun loadAlbum(albumUri: Uri?) {
         launch {
-            val albumBitmap = withDefaultContext {
-                albumUri?.toBitmap()
-            }
+            val albumBitmap = albumUri?.let { bitmapCachePool.get(it) }
             if (albumBitmap == null) {
                 coverSwitcher.setImageDrawable(baseAlbumDrawable)
             } else {

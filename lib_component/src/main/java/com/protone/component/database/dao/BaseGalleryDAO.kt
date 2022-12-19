@@ -25,6 +25,10 @@ sealed class SignedGalleryDAO : MediasWithGalleriesDAO() {
             signedGalleryDAO.getAllMediaBetweenDate(start, end)
         }
 
+    suspend fun getMediasByDate(data: Long): List<GalleryMedia>? = withIOContext {
+        signedGalleryDAO.getAllMediaByDate(data)
+    }
+
     suspend fun getAllGallery(isVideo: Boolean): List<String>? = withIOContext {
         signedGalleryDAO.getAllGallery(isVideo)
     }

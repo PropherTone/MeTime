@@ -12,8 +12,8 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.component.BaseActivity
 import com.protone.component.BaseViewModel
-import com.protone.component.customView.ScalableRegionLoadingImageView
-import com.protone.component.customView.bitmapCache
+import com.protone.component.view.customView.ScalableRegionLoadingImageView
+import com.protone.component.view.customView.bitmapCache
 import com.protone.gallery.adapter.PictureBoxAdapter
 import com.protone.gallery.databinding.PictureBoxActivityBinding
 import com.protone.gallery.viewModel.PictureBoxViewModel

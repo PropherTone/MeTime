@@ -4,7 +4,6 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidStudioProject/MeTime/app/src/main/res/layout/gallery_detail_layout.xml" value="0.358695652173913" />
-        <entry key="..\:/AndroidStudioProject/MeTime/app/src/main/res/layout/main_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/app/src/main/res/layout/video_card.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/main_background.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/none_state_background.xml" value="0.202" />
@@ -15,7 +14,6 @@
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_detail_layout.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_fragment_layout.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_view_activity.xml" value="0.17806484295845998" />
-        <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_note/src/main/res/layout/note_list_adapter_layout.xml" value="0.15729166666666666" />
         <entry key="..\:/MeTime/app/src/main/res/layout/main_activity.xml" value="0.1" />
@@ -24,7 +22,7 @@
         <entry key="..\:/MeTime/app/src/main/res/layout/splash_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/app/src/main/res/layout/time_photo_card.xml" value="0.24010416666666667" />
         <entry key="..\:/MeTime/app/src/main/res/layout/time_photo_card_layout.xml" value="0.24114583333333334" />
-        <entry key="..\:/MeTime/app/src/main/res/layout/time_video_card_layout.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/time_video_card_layout.xml" value="0.264" />
         <entry key="..\:/MeTime/app/src/main/res/layout/video_card.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/app/src/main/res/layout/video_module_card_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_base/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.125" />

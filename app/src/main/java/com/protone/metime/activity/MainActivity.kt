@@ -1,6 +1,7 @@
 package com.protone.metime.activity
 
 import android.graphics.Rect
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -14,6 +15,7 @@ import com.protone.common.baseType.toast
 import com.protone.common.context.MApplication
 import com.protone.common.context.onGlobalLayout
 import com.protone.common.context.root
+import com.protone.common.context.statuesBarHeight
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
@@ -73,6 +75,10 @@ class MainActivity :
                     viewModel.btnY = it.y
                 }
                 musicPlayer.duration = userConfig.lastMusicProgress
+            }
+            mainHeader.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                val headerProgress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+                actionBtnContainer.y = viewModel.btnY - (viewModel.btnH * headerProgress) * 2
             }
         }
     }
@@ -168,6 +174,11 @@ class MainActivity :
                     outRect.bottom = margin
                     outRect.left = margin
                     outRect.right = margin
+                    val position = parent.getChildAdapterPosition(view)
+                    if (position == 0) outRect.top = statuesBarHeight
+                    if (position >= (parent.layoutManager?.itemCount?.minus(1) ?: 0)) {
+                        outRect.bottom = outRect.bottom + binding.actionBtnContainer.measuredHeight
+                    }
                 }
             })
             TimeListAdapter(object : TimeListAdapter.CardEvent {

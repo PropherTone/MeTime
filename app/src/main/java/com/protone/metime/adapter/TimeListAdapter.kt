@@ -1,14 +1,17 @@
 package com.protone.metime.adapter
 
 import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.view.adapter.BaseAdapter
+import com.protone.metime.R
 import com.protone.metime.databinding.TimePhotoCardLayoutBinding
 import com.protone.metime.databinding.TimeVideoCardLayoutBinding
 
@@ -28,6 +31,11 @@ class TimeListAdapter(private val cardEvent: CardEvent) :
     companion object {
         private const val PHOTO = 0
         private const val VIDEO = 1
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+
+        super.onAttachedToRecyclerView(recyclerView)
     }
 
     override fun getItemViewType(position: Int): Int {

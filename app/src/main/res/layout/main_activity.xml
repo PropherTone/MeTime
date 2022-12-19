@@ -31,6 +31,8 @@
                 android:id="@+id/main_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                app:elevation="0dp"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$Behavior">
 
                 <androidx.constraintlayout.motion.widget.MotionLayout
@@ -39,7 +41,8 @@
                     android:layout_height="wrap_content"
                     android:elevation="0dp"
                     app:layoutDescription="@xml/main_activity_scene"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_scrollFlags="scroll">
 
                     <View
                         android:id="@+id/userCard"
@@ -141,6 +144,7 @@
                         app:layout_constraintTop_toBottomOf="@id/userCard" />
 
                     <View
+                        android:id="@+id/noteBook_line"
                         android:layout_width="0dp"
                         android:layout_height="2dp"
                         android:background="@color/white"
@@ -150,7 +154,7 @@
                         app:layout_constraintWidth_percent="0.1" />
 
                     <View
-                        android:id="@+id/view"
+                        android:id="@+id/gallery_line"
                         android:layout_width="0dp"
                         android:layout_height="2dp"
                         android:background="@color/white"
@@ -160,7 +164,7 @@
                         app:layout_constraintWidth_percent="0.1" />
 
                     <View
-                        android:id="@+id/view2"
+                        android:id="@+id/music_line"
                         android:layout_width="0dp"
                         android:layout_height="2dp"
                         android:background="@color/white"
@@ -197,7 +201,6 @@
                 android:id="@+id/time_list"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="@dimen/main_margin"
                 android:overScrollMode="never"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
                 app:layout_constraintBottom_toBottomOf="parent"

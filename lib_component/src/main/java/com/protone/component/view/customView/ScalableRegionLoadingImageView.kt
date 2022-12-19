@@ -1,4 +1,4 @@
-package com.protone.component.customView
+package com.protone.component.view.customView
 
 import android.annotation.SuppressLint
 import android.content.Context

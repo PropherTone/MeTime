@@ -1,6 +1,7 @@
 package com.protone.common.baseType
 
 import android.graphics.Bitmap
+import android.util.Base64
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -48,6 +49,14 @@ fun File.getSHA(): String? {
             fis?.close()
         } catch (e: IOException) {
         }
+    }
+}
+
+fun String.toBase64(): String? {
+    return try {
+        Base64.decode(this,Base64.DEFAULT).decodeToString()
+    } catch (e: Exception) {
+        null
     }
 }
 

@@ -6,7 +6,6 @@ import com.protone.common.baseType.withDefaultContext
 import com.protone.common.entity.GalleryMedia
 import com.protone.component.database.dao.DatabaseBridge
 import java.lang.NullPointerException
-import java.time.Year
 import java.util.*
 
 class TimeMediaDataSource :
@@ -26,21 +25,26 @@ class TimeMediaDataSource :
                 .let { calendar ->
                     val currentTime = calendar.timeInMillis / 1000
                     calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR) - 1)
-                    DatabaseBridge.instance
-                        .galleryDAOBridge
-                        .getAllMediaBetweenDate(currentTime, calendar.timeInMillis / 1000)?.let re@{
-                            if (it.isEmpty()) return@re null
-                            it as MutableList<GalleryMedia>
-                            val firstRandom = (0..it.size).random()
-                            val firstMedia = it[firstRandom]
-                            it.remove(firstMedia)
-                            LoadResult.Page(
-                                listOf(firstMedia, it[(0..it.size).random()]),
-                                null,
-                                calendar
-                            )
-                        } ?: LoadResult.Error(NullPointerException("No Media"))
+                    galleryDAO().getMediasByDate(currentTime)?.let current@{
+                        if (it.isEmpty()) return@current null
+                        LoadResult.Page(it, null, calendar)
+                    } ?: galleryDAO().getAllMediaBetweenDate(
+                        currentTime,
+                        calendar.timeInMillis / 1000
+                    )?.let random@{
+                        if (it.isEmpty()) return@random null
+                        it as MutableList<GalleryMedia>
+                        val firstRandom = (it.indices).random()
+                        val firstMedia = it[firstRandom]
+                        it.remove(firstMedia)
+                        LoadResult.Page(
+                            listOf(firstMedia, it[(it.indices).random()]),
+                            null,
+                            calendar
+                        )
+                    } ?: LoadResult.Error(NullPointerException("No Media"))
                 }
         }
 
+    private fun galleryDAO() = DatabaseBridge.instance.galleryDAOBridge
 }

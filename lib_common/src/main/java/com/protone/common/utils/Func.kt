@@ -42,7 +42,7 @@ suspend inline fun <T> onResult(
 ) = withContext(dispatcher) {
     suspendCancellableCoroutine {
         try {
-            runnable.invoke(this, it)
+            this.runnable(it)
         } catch (e: Exception) {
             if (isInDebug()) e.printStackTrace()
             R.string.unknown_error.getString().toast()

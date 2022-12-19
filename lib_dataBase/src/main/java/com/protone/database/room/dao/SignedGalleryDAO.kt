@@ -22,6 +22,9 @@ interface SignedGalleryDAO {
     @Query("SELECT * FROM GalleryMedia WHERE dateModified BETWEEN :end AND :start")
     fun getAllMediaBetweenDate(start: Long, end: Long): List<GalleryMedia>?
 
+    @Query("SELECT * FROM GalleryMedia WHERE dateModified IS :data")
+    fun getAllMediaByDate(data: Long): List<GalleryMedia>?
+
     @Query("SELECT DISTINCT bucket FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllGallery(isVideo: Boolean): List<String>?
 
