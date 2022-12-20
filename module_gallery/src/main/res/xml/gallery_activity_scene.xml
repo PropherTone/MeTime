@@ -5,6 +5,22 @@
     <ConstraintSet android:id="@+id/start">
 
         <Constraint
+            android:id="@+id/finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/gallery_actionMenu"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintStart_toEndOf="@id/finish"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
             android:id="@+id/gallery_bar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
@@ -29,9 +45,36 @@
             app:layout_constraintStart_toEndOf="@+id/gallery_list"
             app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
 
+        <Constraint
+            android:id="@+id/gallery_choose_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/icon_margin"
+            android:layout_marginBottom="@dimen/icon_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:visibilityMode="ignore" />
+
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+            android:id="@+id/finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/gallery_actionMenu"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintStart_toEndOf="@id/finish"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <Constraint
             android:id="@+id/gallery_bar"
             android:layout_width="0dp"
@@ -56,6 +99,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/gallery_list"
             app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
+
+        <Constraint
+            android:id="@+id/gallery_choose_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/icon_margin"
+            android:layout_marginBottom="@dimen/icon_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:visibilityMode="ignore" />
+
     </ConstraintSet>
 
     <Transition

@@ -50,7 +50,7 @@
                         android:contentDescription="@string/action"
                         android:elevation="@dimen/small_elevation"
                         android:onClick="@{()->activity.finish()}"
-                        android:padding="@dimen/icon_padding_mid"
+                        android:padding="@dimen/main_padding"
                         android:src="@drawable/ic_round_arrow_left__white_24"
                         app:layout_collapseMode="pin"
                         app:layout_constraintStart_toStartOf="parent"

@@ -1,5 +1,6 @@
 package com.protone.gallery.activity
 
+import android.animation.ValueAnimator
 import android.content.Intent
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -24,6 +25,7 @@ import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
 import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_VIDEO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
@@ -106,6 +108,12 @@ class GalleryActivity :
     }
 
     fun showPop() {
+        val progress = binding.motionRoot.progress
+        ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
+            addUpdateListener {
+                binding.motionRoot.progress = (it.animatedValue as Float)
+            }
+        }.start()
         showPop(binding.galleryActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
     }
 
