@@ -18,37 +18,41 @@
         android:layout_height="match_parent"
         app:layoutDescription="@xml/note_layout_scene">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_icon"
+            android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="UseCompoundDrawables">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:layout_width="@dimen/action_icon"
-                android:layout_height="@dimen/action_icon"
-                android:layout_gravity="start|bottom"
-                android:background="@drawable/background_ripple_transparent_white"
+                android:id="@+id/imageView"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
                 android:contentDescription="@string/action"
                 android:onClick="@{()->activity.finish()}"
                 android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_round_arrow_left__white_24" />
+                android:src="@drawable/ic_round_arrow_left__white_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="@dimen/action_icon"
-                android:layout_marginEnd="@dimen/action_icon"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:letterSpacing="0.02"
                 android:text="@string/model_noteBook"
                 android:textColor="@color/white"
                 android:textSize="@dimen/title_text"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/note_list"

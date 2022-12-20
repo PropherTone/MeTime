@@ -104,6 +104,7 @@
                         android:layout_height="@dimen/action_btn"
                         android:layout_gravity="center"
                         android:layout_weight="1"
+                        android:background="?android:selectableItemBackground"
                         android:contentDescription="@string/model_gallery"
                         android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Gallery.INSTANCE)}"
                         android:paddingTop="@dimen/icon_padding_mid"
@@ -119,6 +120,7 @@
                         android:layout_height="@dimen/action_btn"
                         android:layout_gravity="center"
                         android:layout_weight="1"
+                        android:background="?android:selectableItemBackground"
                         android:contentDescription="@string/model_noteBook"
                         android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Note.INSTANCE)}"
                         android:paddingTop="@dimen/icon_padding_mid"
@@ -134,6 +136,7 @@
                         android:layout_height="@dimen/action_btn"
                         android:layout_gravity="center"
                         android:layout_weight="1"
+                        android:background="?android:selectableItemBackground"
                         android:contentDescription="@string/model_music"
                         android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Music.INSTANCE)}"
                         android:paddingTop="@dimen/icon_padding_mid"
@@ -173,25 +176,16 @@
                         app:layout_constraintStart_toEndOf="@+id/noteBook"
                         app:layout_constraintWidth_percent="0.1" />
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/music_player_card"
+                    <com.protone.component.view.customView.musicPlayer.MusicPlayerViewMid
+                        android:id="@+id/musicPlayer"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/music_player_mid"
-                        android:layout_margin="@dimen/main_margin"
-                        app:cardBackgroundColor="@color/transparent"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="0dp"
+                        android:layout_marginStart="@dimen/main_margin"
+                        android:layout_marginTop="@dimen/main_margin"
+                        android:layout_marginEnd="@dimen/main_margin"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/noteBook">
-
-                        <com.protone.component.view.customView.musicPlayer.MusicPlayerViewMid
-                            android:id="@+id/musicPlayer"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            app:layout_constraintTop_toBottomOf="@id/noteBook" />
-
-                    </androidx.cardview.widget.CardView>
+                        app:layout_constraintTop_toBottomOf="@id/noteBook" />
 
                 </androidx.constraintlayout.motion.widget.MotionLayout>
 

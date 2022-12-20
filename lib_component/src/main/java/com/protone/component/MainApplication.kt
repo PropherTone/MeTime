@@ -11,6 +11,7 @@ import com.protone.common.utils.SCrashHandler
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.todayDate
+import com.protone.component.BuildConfig
 import com.protone.component.database.dao.DatabaseBridge
 import com.protone.component.service.MusicService
 import com.protone.component.service.WorkService

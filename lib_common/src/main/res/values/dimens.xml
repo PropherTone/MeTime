@@ -18,7 +18,6 @@
     <dimen name="model_icon_dimen">60dp</dimen>
     <dimen name="list_item_height">68dp</dimen>
     <dimen name="huge_icon">160dp</dimen>
-    <dimen name="media_item">240dp</dimen>
     <dimen name="small_title_text">18sp</dimen>
     <dimen name="small_elevation">2dp</dimen>
 
@@ -32,10 +31,9 @@
     <dimen name="icon_margin">20dp</dimen>
     <dimen name="back_margin">10dp</dimen>
     <dimen name="main_margin">10dp</dimen>
-    <dimen name="small_margin">5dp</dimen>
+    <dimen name="small_margin">6dp</dimen>
     <dimen name="lists_margin">1dp</dimen>
     <dimen name="texts_margin">10dp</dimen>
     <dimen name="full_edit_margin">24dp</dimen>
 
-    <dimen name="item_radius">12dp</dimen>
 </resources>

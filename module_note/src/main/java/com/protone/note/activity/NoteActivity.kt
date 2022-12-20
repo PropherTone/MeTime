@@ -12,18 +12,17 @@ import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.putExtras
 import com.protone.common.context.root
-import com.protone.component.database.MediaAction
 import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE_DIR
 import com.protone.component.BaseActivity
+import com.protone.component.database.MediaAction
 import com.protone.component.view.dialog.titleDialog
 import com.protone.note.adapter.NoteListListAdapter
 import com.protone.note.adapter.NoteTypeListAdapter
 import com.protone.note.databinding.NoteActivityBinding
 import com.protone.note.viewModel.NoteViewModel
-import com.protone.note.viewModel.NoteEditViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -123,18 +122,18 @@ class NoteActivity :
             noteBucketList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
                 it.adapter = NoteTypeListAdapter(this@NoteActivity) {
-                    addNote {
+                    addNote { note ->
                         startActivity(NoteEditActivity::class.intent.putExtras {
-                            putString(NOTE_DIR, it)
+                            putString(NOTE_DIR, note)
                         })
                     }
-                    onTypeSelected {
+                    onTypeSelected { dir ->
                         launch {
-                            refreshNoteList(viewModel.getNoteList(it))
+                            refreshNoteList(viewModel.getNoteList(dir))
                         }
                     }
-                    deleteNoteDir {
-                        viewModel.deleteNoteDir(it)
+                    deleteNoteDir { dir ->
+                        viewModel.deleteNoteDir(dir)
                     }
                 }
             }

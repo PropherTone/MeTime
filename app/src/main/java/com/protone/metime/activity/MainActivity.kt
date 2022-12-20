@@ -1,21 +1,18 @@
 package com.protone.metime.activity
 
-import android.graphics.Rect
-import android.util.Log
-import android.view.View
+import android.net.Uri
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.toast
 import com.protone.common.context.MApplication
+import com.protone.common.context.clipOutLine
 import com.protone.common.context.onGlobalLayout
 import com.protone.common.context.root
-import com.protone.common.context.statuesBarHeight
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
@@ -31,6 +28,7 @@ import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
 import com.protone.component.database.userConfig
 import com.protone.metime.adapter.TimeListAdapter
+import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
 import kotlinx.coroutines.launch
@@ -69,6 +67,9 @@ class MainActivity :
         return MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
             motionHeader.fitStatuesBarUsePadding()
+            musicPlayer.clipOutLine(
+                resources.getDimensionPixelSize(com.protone.metime.R.dimen.item_radius).toFloat()
+            )
             root.onGlobalLayout {
                 actionBtnContainer.also {
                     it.y = it.y + viewModel.btnH * 2
@@ -162,25 +163,12 @@ class MainActivity :
                 height = MApplication.screenHeight
             }
             layoutManager = LinearLayoutManager(this@MainActivity)
-            val margin = resources.getDimensionPixelSize(R.dimen.main_margin)
-            addItemDecoration(object : RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    super.getItemOffsets(outRect, view, parent, state)
-                    outRect.bottom = margin
-                    outRect.left = margin
-                    outRect.right = margin
-                    val position = parent.getChildAdapterPosition(view)
-                    if (position == 0) outRect.top = statuesBarHeight
-                    if (position >= (parent.layoutManager?.itemCount?.minus(1) ?: 0)) {
-                        outRect.bottom = outRect.bottom + binding.actionBtnContainer.measuredHeight
-                    }
-                }
-            })
+            addItemDecoration(
+                TimeListItemDecoration(
+                    resources.getDimensionPixelSize(R.dimen.main_margin),
+                    binding.actionBtnContainer.measuredHeight
+                )
+            )
             TimeListAdapter(object : TimeListAdapter.CardEvent {
                 override fun onPhotoClick(media: GalleryMedia) {
                     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
