@@ -19,17 +19,17 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gallery_bucket"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_action" />
 
         <ImageView
             android:id="@+id/gallery_action"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.finish()}"
+            android:onClick="@{()->activity.showBucket()}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_round_arrow_left__white_24"
             app:layout_constraintStart_toStartOf="parent"
@@ -49,8 +49,7 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/gallery_tab"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
+            android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/gallery_bucket"
             app:layout_constraintTop_toTopOf="parent"
@@ -75,6 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="?attr/actionBarSize"
+            android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/gallery_bucket"
@@ -84,8 +84,10 @@
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/main_color1"
+            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
             android:src="@drawable/ic_baseline_check_24_white"
+            app:backgroundTint="@color/main_color1"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

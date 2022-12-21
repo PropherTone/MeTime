@@ -7,13 +7,13 @@
         <Constraint
             android:id="@+id/gallery_bucket"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_action" />
 
         <Constraint
-            android:id="@+id/finish"
+            android:id="@+id/gallery_action"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:padding="@dimen/main_padding"
@@ -24,36 +24,47 @@
             android:id="@+id/gallery_actionMenu"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->activity.showPop()}"
             android:padding="@dimen/main_padding"
+            android:src="@drawable/ic_baseline_more_horiz_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_action"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/gallery_bar"
-            android:layout_width="0dp"
+            android:id="@+id/gallery_tab"
+            android:layout_width="wrap_content"
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/gallery_bucket"
+            app:layout_constraintStart_toEndOf="@id/gallery_bucket"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/gallery_list"
+            android:id="@+id/finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/gallery_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="?attr/actionBarSize"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/gallery_bucket"
-            app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/icon_margin"
-            android:layout_marginBottom="@dimen/icon_margin"
+            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:visibilityMode="ignore" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </ConstraintSet>
 
@@ -62,13 +73,13 @@
         <Constraint
             android:id="@+id/gallery_bucket"
             android:layout_width="@dimen/bucket_width"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_action" />
 
         <Constraint
-            android:id="@+id/finish"
+            android:id="@+id/gallery_action"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:padding="@dimen/main_padding"
@@ -79,36 +90,47 @@
             android:id="@+id/gallery_actionMenu"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->activity.showPop()}"
             android:padding="@dimen/main_padding"
-            app:layout_constraintStart_toEndOf="@id/finish"
+            android:src="@drawable/ic_baseline_more_horiz_24_white"
+            app:layout_constraintStart_toEndOf="@id/gallery_action"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/gallery_bar"
-            android:layout_width="0dp"
+            android:id="@+id/gallery_tab"
+            android:layout_width="wrap_content"
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/gallery_bucket"
+            app:layout_constraintStart_toEndOf="@id/gallery_bucket"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/gallery_list"
+            android:id="@+id/finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/gallery_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="?attr/actionBarSize"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/gallery_bucket"
-            app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/icon_margin"
-            android:layout_marginBottom="@dimen/icon_margin"
+            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:visibilityMode="ignore" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </ConstraintSet>
 

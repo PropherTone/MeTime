@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 
-abstract class BaseFragment<ViewBinding : ViewDataBinding, VM : ViewModel> : Fragment() {
+abstract class BaseFragment<ViewBinding : ViewDataBinding, VM : ViewModel> : Fragment(),
+    CoroutineScope by MainScope() {
 
     protected lateinit var binding: ViewBinding
     protected lateinit var viewModel: VM

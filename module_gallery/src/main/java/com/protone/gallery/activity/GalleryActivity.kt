@@ -10,7 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
+import com.protone.common.baseType.bufferCollect
+import com.protone.common.baseType.launchDefault
+import com.protone.common.context.intent
 import com.protone.common.context.root
+import com.protone.common.utils.ALL_GALLERY
+import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUriJson
@@ -22,11 +27,14 @@ import com.protone.gallery.adapter.MyFragmentStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryListFragment
+import com.protone.gallery.viewModel.GalleryFragmentViewModel
 import com.protone.gallery.viewModel.GalleryViewModel
 import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_MEDIA
 import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
 import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_VIDEO
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
@@ -34,6 +42,8 @@ import kotlin.math.abs
 class GalleryActivity :
     BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: GalleryViewModel by viewModels()
+
+    private var isInit = false
 
     override fun createView(): GalleryActivityBinding {
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
@@ -51,8 +61,40 @@ class GalleryActivity :
             binding.galleryChooseConfirm.isGone = chooseType.isEmpty()
             binding.galleryChooseConfirm.setOnClickListener { confirm() }
         }
+
+        sortData()
+        observeEvent()
         initList()
         initPager(chooseType)
+        isInit = true
+    }
+
+    private fun GalleryViewModel.observeEvent() {
+        launchDefault {
+            galleryFlow.bufferCollect {
+                while (!isInit) delay(20L)
+                when (it) {
+                    is GalleryViewModel.GalleryEvent.OnNewGallery -> {
+                        getBucketAdapter().insertBucket(it.gallery)
+                    }
+                    is GalleryViewModel.GalleryEvent.OnGalleryRemoved -> {
+                        getBucketAdapter().deleteBucket(it.gallery)
+                    }
+                    is GalleryViewModel.GalleryEvent.OnGalleryUpdated -> {
+                        viewModel.run {
+                            getBucketAdapter().apply {
+                                refreshBucket(it.gallery)
+                                getBucket(ALL_GALLERY)?.let { gallery -> refreshBucket(gallery) }
+                            }
+                        }
+                    }
+                    is GalleryViewModel.GalleryEvent.OnNewGalleries -> {
+                        getBucketAdapter().insertBucket(it.galleries)
+                    }
+                    else -> Unit
+                }
+            }
+        }
     }
 
     private fun initList() {
@@ -60,7 +102,12 @@ class GalleryActivity :
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
                 selectBucket { gallery ->
-
+                    launch {
+                        viewModel.rightGallery = gallery.name
+                        viewModel.sendListEvent(
+                            GalleryViewModel.GalleryListEvent.OnGallerySelected(gallery)
+                        )
+                    }
                 }
                 deleteGalleryBucket {
 
@@ -79,15 +126,22 @@ class GalleryActivity :
         binding.galleryPager.adapter = MyFragmentStateAdapter(
             this@GalleryActivity,
             mutableListOf<Fragment>().also { fs ->
-                val lock = userConfig.lockGallery.isNotEmpty()
                 when (chooseType) {
                     CHOOSE_PHOTO ->
-                        fs.add(GalleryListFragment())
+                        fs.add(GalleryListFragment().apply {
+                            connect(generateMailer(false), chooseData)
+                        })
                     CHOOSE_VIDEO ->
-                        fs.add(GalleryListFragment())
+                        fs.add(GalleryListFragment().apply {
+                            connect(generateMailer(true), chooseData)
+                        })
                     else -> {
-                        fs.add(GalleryListFragment())
-                        if (!combine) fs.add(GalleryListFragment())
+                        fs.add(GalleryListFragment().apply {
+                            connect(generateMailer(false), chooseData)
+                        })
+                        if (!combine) fs.add(GalleryListFragment().apply {
+                            connect(generateMailer(true), chooseData)
+                        })
                     }
                 }
             }
@@ -108,7 +162,7 @@ class GalleryActivity :
     }
 
     private fun confirm() {
-        viewModel.chooseData?.let { list ->
+        viewModel.chooseData.let { list ->
             if (list.size <= 0) return
             setResult(
                 RESULT_OK,
@@ -119,15 +173,20 @@ class GalleryActivity :
         finish()
     }
 
-    fun showPop() {
+    fun showBucket() {
         val progress = binding.motionRoot.progress
         ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
             addUpdateListener {
                 binding.motionRoot.progress = (it.animatedValue as Float)
             }
         }.start()
+    }
+
+    fun showPop() {
         showPop(binding.galleryActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
     }
+
+    private fun getBucketAdapter() = binding.galleryBucket.adapter as GalleryBucketAdapter
 
     override fun popDelete() {
         viewModel.chooseData?.let {
@@ -161,7 +220,7 @@ class GalleryActivity :
     }
 
     override fun popIntoBox() {
-        viewModel.intoBox()
+
     }
 
 }

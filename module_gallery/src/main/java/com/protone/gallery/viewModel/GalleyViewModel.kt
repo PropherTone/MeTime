@@ -1,9 +1,9 @@
 package com.protone.gallery.viewModel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.tabs.TabLayout
 import com.protone.common.R
-import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.toast
@@ -12,8 +12,9 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.EventCachePool
 import com.protone.component.BaseViewModel
+import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -30,50 +31,50 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     }
 
     sealed class GalleryEvent {
-        object SelectAll : GalleryEvent()
-        object OnActionBtn : GalleryEvent()
-        object IntoBox : GalleryEvent()
-
         data class OnNewGallery(val gallery: Gallery) : GalleryEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : GalleryEvent()
         data class OnGalleryUpdated(val gallery: Gallery) : GalleryEvent()
-
         data class OnNewGalleries(val galleries: List<Gallery>) : GalleryEvent()
+    }
 
-        data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : GalleryEvent()
+    sealed class GalleryListEvent : GalleryEvent() {
+        object SelectAll : GalleryListEvent()
+        data class OnGallerySelected(val gallery: Gallery) : GalleryListEvent()
 
-        sealed class MediaEvent(val galleryMedia: GalleryMedia) : GalleryEvent()
+        sealed class MediaEvent(val galleryMedia: GalleryMedia) : GalleryListEvent()
         data class OnMediaDeleted(val media: GalleryMedia) : MediaEvent(media)
         data class OnMediaInserted(val media: GalleryMedia) : MediaEvent(media)
         data class OnMediaUpdated(val media: GalleryMedia) : MediaEvent(media)
 
-        data class OnMediasInserted(val medias: List<GalleryMedia>) : GalleryEvent()
+        data class OnMediasInserted(val medias: List<GalleryMedia>) : GalleryListEvent()
     }
 
     private val _galleryFlow = MutableSharedFlow<GalleryEvent>()
     val galleryFlow = _galleryFlow.asSharedFlow()
 
-    private val mailers = arrayOfNulls<MutableSharedFlow<GalleryEvent>>(2)
+    private val mailers = arrayOfNulls<MutableSharedFlow<GalleryListEvent>>(2)
+    private fun getCurrentMailer() = mailers[rightMailer]
 
     private val galleryData = mutableListOf<Gallery>()
     private val galleryVideoData by lazy { mutableListOf<Gallery>() }
     private fun getGalleryData(isVideo: Boolean) = if (isVideo) galleryVideoData else galleryData
 
-    var chooseData: MutableList<GalleryMedia>? = null
-        private set
+    val chooseData by lazy { mutableListOf<GalleryMedia>() }
+    var rightGallery: String = ""
     private var rightMailer = 0
     private val combine = userConfig.combineGallery
     private var isDataSorted = false
     private val isLock = userConfig.lockGallery.isNotEmpty()
+    private val isVideoGallery: Boolean get() = rightMailer == 1
 
     private val pool =
         EventCachePool.get<GalleryEvent>(duration = 500L).apply {
             handleEvent { data ->
                 if (data.isNotEmpty()) when (data.first()) {
-                    is GalleryEvent.OnMediaInserted -> data.first().also { event ->
-                        if (event !is GalleryEvent.MediaEvent) return@also
+                    is GalleryListEvent.OnMediaInserted -> data.first().also { event ->
+                        if (event !is GalleryListEvent.MediaEvent) return@also
                         data.associate {
-                            (it as GalleryEvent.MediaEvent) to listOf(it.galleryMedia)
+                            (it as GalleryListEvent.MediaEvent) to listOf(it.galleryMedia)
                         }.run {
                             keys.forEach { event ->
                                 event.galleryMedia.bucket.let { galleryName ->
@@ -88,7 +89,7 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
                                     }
                                 }
                                 this[event]?.let {
-                                    sendEvent(GalleryEvent.OnMediasInserted(it))
+                                    sendListEvent(GalleryListEvent.OnMediasInserted(it))
                                 }
                             }
                         }
@@ -106,6 +107,7 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         }
 
     fun sortData() {
+        observeGallery()
         if (combine) {
             sortData(false)
         } else {
@@ -149,16 +151,113 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         }
     }
 
+    private fun observeGallery() {
+        viewModelScope.launchDefault {
+            suspend fun sortDeleteMedia(media: GalleryMedia) {
+                getGalleryData(media.isVideo).find { it.name == media.bucket }?.let {
+                    sendBucketEvent(GalleryEvent.OnGalleryUpdated(it), false)
+                }
+                if (media.isVideo != isVideoGallery && media.bucket != rightGallery) return
+                sendListEvent(GalleryListEvent.OnMediaDeleted(media), true)
+            }
+
+            suspend fun onGalleryMediaInserted(media: GalleryMedia) {
+                if (media.isVideo != isVideoGallery) return
+                getGalleryData(media.isVideo).find { it.name == media.bucket }?.let {
+                    sendBucketEvent(GalleryEvent.OnGalleryUpdated(it), false)
+                }
+                if (media.bucket != rightGallery) return
+                sendListEvent(GalleryListEvent.OnMediaInserted(media), false)
+            }
+
+            suspend fun onGalleryMediaUpdated(media: GalleryMedia) {
+                if (media.isVideo != isVideoGallery && media.bucket != rightGallery) return
+                sendListEvent(GalleryListEvent.OnMediaUpdated(media))
+            }
+
+            suspend fun sendGalleryRemoved(gallery: Gallery) {
+                getGalleryData(isVideoGallery).find { it.name == ALL_GALLERY }.let {
+                    it?.updateGallery(isVideoGallery)
+                    galleryData.remove(gallery)
+                    sendBucketEvent(GalleryEvent.OnGalleryRemoved(gallery))
+                }
+            }
+
+            observeGalleryData {
+                while (!isDataSorted) delay(200)
+                when (it) {
+                    is MediaAction.GalleryDataAction.OnGalleryMediaDeleted -> {
+                        sortDeleteMedia(it.media)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryMediasDeleted -> it.medias.forEach { media ->
+                        sortDeleteMedia(media)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryMediasInserted -> it.medias.forEach { media ->
+                        onGalleryMediaInserted(media)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryMediaInserted -> {
+                        onGalleryMediaInserted(it.media)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryMediasUpdated -> it.medias.forEach { media ->
+                        onGalleryMediaUpdated(media)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryMediaUpdated -> {
+                        onGalleryMediaUpdated(it.media)
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryDeleted -> {
+                        galleryData.find { gallery -> gallery.name == it.gallery }?.let { gallery ->
+                            sendGalleryRemoved(gallery)
+                        }
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryBucketInserted -> {
+                        if (!isLock) {
+                            Gallery(it.galleryBucket.type, 0, null, custom = true)
+                                .cacheAndNotice(isVideoGallery)
+                        } else {
+                            R.string.locked.getString().toast()
+                        }
+                    }
+                    is MediaAction.GalleryDataAction.OnGalleryBucketDeleted -> {
+                        galleryData.find { gallery ->
+                            gallery.name == it.galleryBucket.type
+                        }?.let { gallery ->
+                            sendGalleryRemoved(gallery)
+                        }
+                    }
+                    is MediaAction.GalleryDataAction.OnMediaWithGalleryBucketMultiInserted ->
+                        it.mediaWithGalleryBuckets
+                            .map { mwb -> mwb.galleryBucketId }
+                            .distinct()
+                            .forEach { bucketId ->
+                                galleryDAO.getGalleryBucket(bucketId)?.let { galleryBucket ->
+                                    if (rightGallery == galleryBucket.type) {
+                                        galleryDAO.getGalleryMediasByBucket(bucketId)
+                                            ?.let { medias ->
+                                                sendListEvent(
+                                                    GalleryListEvent.OnMediasInserted(
+                                                        medias
+                                                    )
+                                                )
+                                            }
+                                    }
+                                }
+                            }
+                    else -> Unit
+                }
+            }
+        }
+    }
+
     private suspend fun Gallery.cacheAndNotice(isVideo: Boolean) {
         getGalleryData(isVideo).add(this)
-        sendEvent(GalleryEvent.OnNewGallery(this), true)
+        sendBucketEvent(GalleryEvent.OnNewGallery(this), true)
     }
 
     private suspend fun Gallery.updateGallery(isVideo: Boolean) {
         val all = getGallerySize(name, isVideo)
             .takeIf { size ->
                 if (size <= 0) {
-                    sendEvent(GalleryEvent.OnGalleryRemoved(this))
+                    sendBucketEvent(GalleryEvent.OnGalleryRemoved(this))
                     return
                 }
                 size != this.size
@@ -176,25 +275,28 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
                 true
             } ?: false
         if (all) itemState = Gallery.ItemState.ALL_CHANGED
-        sendEvent(GalleryEvent.OnGalleryUpdated(this))
-    }
-
-    fun intoBox() {
-        viewModelScope.launch {
-            getCurrentMailer()?.emit(GalleryEvent.IntoBox)
-        }
+        sendBucketEvent(GalleryEvent.OnGalleryUpdated(this))
     }
 
     fun selectAll() {
         viewModelScope.launch {
-            getCurrentMailer()?.emit(GalleryEvent.SelectAll)
+            getCurrentMailer()?.emit(GalleryListEvent.SelectAll)
         }
     }
 
-    private fun getCurrentMailer() = mailers[rightMailer]
+    fun getBucket(bucket: String) = getGalleryData(rightMailer == 1).find { it.name == bucket }
 
-    suspend fun sendEvent(fragEvent: GalleryEvent, immediate: Boolean = true) {
+    fun generateMailer(isVideo: Boolean) = MutableSharedFlow<GalleryListEvent>().also {
+        mailers[if (isVideo) 1 else 0] = it
+    }.asSharedFlow()
+
+    private suspend fun sendBucketEvent(fragEvent: GalleryEvent, immediate: Boolean = true) {
         if (immediate) _galleryFlow.emit(fragEvent)
+        else pool.holdEvent(fragEvent)
+    }
+
+    suspend fun sendListEvent(fragEvent: GalleryListEvent, immediate: Boolean = true) {
+        if (immediate) getCurrentMailer()?.emit(fragEvent)
         else pool.holdEvent(fragEvent)
     }
 
