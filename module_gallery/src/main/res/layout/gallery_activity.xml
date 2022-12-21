@@ -16,6 +16,14 @@
         android:layout_height="match_parent"
         app:layoutDescription="@xml/gallery_activity_scene">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/gallery_bucket"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/gallery_action"
             android:layout_width="?attr/actionBarSize"
@@ -35,61 +43,48 @@
             android:onClick="@{()->activity.showPop()}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
-            app:layout_constraintStart_toEndOf="@id/finish"
+            app:layout_constraintStart_toEndOf="@id/gallery_action"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <RelativeLayout
-            android:id="@+id/gallery_bar"
-            android:layout_width="0dp"
-            android:layout_height="?attr/actionBarSize"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/gallery_list"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/gallery_tab"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                app:tabIndicatorColor="@color/white"
-                app:tabRippleColor="@color/glass"
-                app:tabSelectedTextColor="@color/white"
-                app:tabTextColor="@color/white" />
-
-            <ImageView
-                android:id="@+id/finish"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="@string/back"
-                android:onClick="@{()->activity.finish()}"
-                android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_round_arrow_left__white_24" />
-
-        </RelativeLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/gallery_list"
-            android:layout_width="0dp"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/gallery_tab"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_centerInParent="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/gallery_bucket"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tabIndicatorColor="@color/white"
+            app:tabRippleColor="@color/glass"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:contentDescription="@string/back"
+            android:onClick="@{()->activity.finish()}"
+            android:padding="@dimen/main_padding"
+            android:src="@drawable/ic_round_arrow_left__white_24"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/gallery_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="?attr/actionBarSize"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/gallery_list"
-            app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
+            app:layout_constraintStart_toEndOf="@+id/gallery_bucket"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/main_color1"
             android:src="@drawable/ic_baseline_check_24_white"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="parent"

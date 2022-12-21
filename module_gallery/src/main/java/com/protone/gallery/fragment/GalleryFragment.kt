@@ -35,7 +35,7 @@ import com.protone.gallery.activity.GallerySearchActivity
 import com.protone.gallery.activity.GalleryViewActivity
 import com.protone.gallery.activity.PictureBoxActivity
 import com.protone.gallery.adapter.GalleryBucketAdapter
-import com.protone.gallery.adapter.GalleryItemDecoration
+import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.databinding.GalleryFragmentLayoutBinding
 import com.protone.gallery.viewModel.GalleryFragmentViewModel
@@ -68,12 +68,10 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         onAttach: (MutableSharedFlow<GalleryFragmentViewModel.FragEvent>) -> Unit
     ): GalleryFragment {
         init = {
-            viewModel.apply {
-                this.isVideo = isVideo
-                this.isLock = isLock
-                this.combine = combine
-                this.onAttach = onAttach
-            }
+            this.isVideo = isVideo
+            this.isLock = isLock
+            this.combine = combine
+            this.onAttach = onAttach
         }
         return this
     }

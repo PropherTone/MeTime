@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
@@ -16,9 +17,11 @@ import com.protone.common.utils.json.toUriJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
+import com.protone.gallery.adapter.GalleryBucketAdapter
 import com.protone.gallery.adapter.MyFragmentStateAdapter
+import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
-import com.protone.gallery.fragment.GalleryFragment
+import com.protone.gallery.fragment.GalleryListFragment
 import com.protone.gallery.viewModel.GalleryViewModel
 import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_MEDIA
 import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
@@ -48,7 +51,25 @@ class GalleryActivity :
             binding.galleryChooseConfirm.isGone = chooseType.isEmpty()
             binding.galleryChooseConfirm.setOnClickListener { confirm() }
         }
+        initList()
         initPager(chooseType)
+    }
+
+    private fun initList() {
+        binding.galleryBucket.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = GalleryBucketAdapter(context) {
+                selectBucket { gallery ->
+
+                }
+                deleteGalleryBucket {
+
+                }
+            }
+            addItemDecoration(
+                GalleryBucketItemDecoration(resources.getDimension(R.dimen.icon_padding).toInt())
+            )
+        }
     }
 
     private suspend fun GalleryViewModel.initPager(
@@ -61,21 +82,12 @@ class GalleryActivity :
                 val lock = userConfig.lockGallery.isNotEmpty()
                 when (chooseType) {
                     CHOOSE_PHOTO ->
-                        fs.add(GalleryFragment().onInit(false, lock, false) { f ->
-                            setMailer(frag1 = f)
-                        })
+                        fs.add(GalleryListFragment())
                     CHOOSE_VIDEO ->
-                        fs.add(GalleryFragment().onInit(true, lock, false) { f ->
-                            setMailer(frag2 = f)
-                        })
+                        fs.add(GalleryListFragment())
                     else -> {
-                        fs.add(GalleryFragment().onInit(false, lock, combine) { f ->
-                            setMailer(frag1 = f)
-                        })
-                        if (!combine) fs.add(GalleryFragment()
-                            .onInit(true, lock, false) { f ->
-                                setMailer(frag2 = f)
-                            })
+                        fs.add(GalleryListFragment())
+                        if (!combine) fs.add(GalleryListFragment())
                     }
                 }
             }
@@ -126,7 +138,7 @@ class GalleryActivity :
     override fun popMoveTo() {
         viewModel.chooseData?.let {
             if (it.size <= 0) return
-            moveTo(binding.galleryBar, it[0].isVideo, it) { _, _ -> }
+            moveTo(binding.galleryActionMenu, it[0].isVideo, it) { _, _ -> }
         }
     }
 

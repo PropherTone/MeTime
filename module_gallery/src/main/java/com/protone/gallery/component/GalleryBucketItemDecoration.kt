@@ -1,10 +1,11 @@
-package com.protone.gallery.adapter
+package com.protone.gallery.component
 
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.protone.common.R
 
-class GalleryItemDecoration(private val interval: Int) : RecyclerView.ItemDecoration() {
+class GalleryBucketItemDecoration(private val margin: Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(
         outRect: Rect,
@@ -13,8 +14,7 @@ class GalleryItemDecoration(private val interval: Int) : RecyclerView.ItemDecora
         state: RecyclerView.State
     ) {
         super.getItemOffsets(outRect, view, parent, state)
-        outRect.top = interval
-        outRect.left = interval
+        outRect.top = margin
     }
 
 }

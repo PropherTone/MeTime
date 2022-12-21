@@ -26,12 +26,10 @@ import com.protone.common.utils.SearchModel
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
-import com.protone.gallery.adapter.GalleryItemDecoration
+import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.databinding.GallerySearchActivityBinding
 import com.protone.gallery.viewModel.GallerySearchViewModel
-import com.protone.gallery.viewModel.GalleryViewViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Route(path = RouterPath.GalleryRouterPath.Search)
