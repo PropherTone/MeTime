@@ -21,6 +21,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
+            android:id="@+id/gallery_detail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/gallery_action"
+            app:layout_constraintTop_toTopOf="@id/gallery_action" />
+
+        <Constraint
             android:id="@+id/gallery_actionMenu"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
@@ -85,6 +92,14 @@
             android:padding="@dimen/main_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/gallery_detail"
+            android:layout_width="@dimen/gallery_item_height"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/gallery_action"
+            app:layout_constraintTop_toTopOf="@id/gallery_action" />
+
 
         <Constraint
             android:id="@+id/gallery_actionMenu"

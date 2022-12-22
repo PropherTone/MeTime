@@ -1,6 +1,5 @@
 package com.protone.gallery.viewModel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.tabs.TabLayout
 import com.protone.common.R
@@ -21,15 +20,6 @@ import kotlinx.coroutines.launch
 
 class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
 
-    companion object {
-        const val CHOOSE_MODE = "ChooseData"
-        const val URI = "Uri"
-        const val Gallery_DATA = "GalleryData"
-        const val CHOOSE_PHOTO = "PHOTO"
-        const val CHOOSE_VIDEO = "VIDEO"
-        const val CHOOSE_MEDIA = "MEDIA"
-    }
-
     sealed class GalleryEvent {
         data class OnNewGallery(val gallery: Gallery) : GalleryEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : GalleryEvent()
@@ -38,8 +28,13 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     }
 
     sealed class GalleryListEvent : GalleryEvent() {
+        data class OnDrawerEvent(val isOpen: Boolean) : GalleryListEvent()
         object SelectAll : GalleryListEvent()
-        data class OnGallerySelected(val gallery: Gallery) : GalleryListEvent()
+        data class OnGallerySelected(
+            val gallery: Gallery,
+            val isVideo: Boolean,
+            val combine: Boolean
+        ) : GalleryListEvent()
 
         sealed class MediaEvent(val galleryMedia: GalleryMedia) : GalleryListEvent()
         data class OnMediaDeleted(val media: GalleryMedia) : MediaEvent(media)
@@ -62,10 +57,10 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     val chooseData by lazy { mutableListOf<GalleryMedia>() }
     var rightGallery: String = ""
     private var rightMailer = 0
-    private val combine = userConfig.combineGallery
     private var isDataSorted = false
-    private val isLock = userConfig.lockGallery.isNotEmpty()
+    private val combine = userConfig.combineGallery
     private val isVideoGallery: Boolean get() = rightMailer == 1
+    private val isLock = userConfig.lockGallery.isNotEmpty()
 
     private val pool =
         EventCachePool.get<GalleryEvent>(duration = 500L).apply {
@@ -250,7 +245,8 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
 
     private suspend fun Gallery.cacheAndNotice(isVideo: Boolean) {
         getGalleryData(isVideo).add(this)
-        sendBucketEvent(GalleryEvent.OnNewGallery(this), true)
+        if (isVideoGallery == isVideo)
+            sendBucketEvent(GalleryEvent.OnNewGallery(this), true)
     }
 
     private suspend fun Gallery.updateGallery(isVideo: Boolean) {
@@ -289,6 +285,13 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     fun generateMailer(isVideo: Boolean) = MutableSharedFlow<GalleryListEvent>().also {
         mailers[if (isVideo) 1 else 0] = it
     }.asSharedFlow()
+
+    fun onGallerySelected(gallery: Gallery) {
+        viewModelScope.launch {
+            rightGallery = gallery.name
+            sendListEvent(GalleryListEvent.OnGallerySelected(gallery, isVideoGallery, combine))
+        }
+    }
 
     private suspend fun sendBucketEvent(fragEvent: GalleryEvent, immediate: Boolean = true) {
         if (immediate) _galleryFlow.emit(fragEvent)

@@ -6,36 +6,41 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.whenCreated
+import androidx.lifecycle.withCreated
+import androidx.lifecycle.withStarted
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.launchDefault
-import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.utils.ALL_GALLERY
-import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_VIDEO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.URI
+import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUriJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
 import com.protone.gallery.adapter.GalleryBucketAdapter
+import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.adapter.MyFragmentStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryListFragment
-import com.protone.gallery.viewModel.GalleryFragmentViewModel
 import com.protone.gallery.viewModel.GalleryViewModel
-import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_MEDIA
-import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
-import com.protone.gallery.viewModel.GalleryViewModel.Companion.CHOOSE_VIDEO
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
@@ -62,11 +67,10 @@ class GalleryActivity :
             binding.galleryChooseConfirm.setOnClickListener { confirm() }
         }
 
-        sortData()
         observeEvent()
+        sortData()
         initList()
         initPager(chooseType)
-        isInit = true
     }
 
     private fun GalleryViewModel.observeEvent() {
@@ -102,12 +106,8 @@ class GalleryActivity :
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
                 selectBucket { gallery ->
-                    launch {
-                        viewModel.rightGallery = gallery.name
-                        viewModel.sendListEvent(
-                            GalleryViewModel.GalleryListEvent.OnGallerySelected(gallery)
-                        )
-                    }
+                    viewModel.onGallerySelected(gallery)
+                    Image.load(gallery.uri).with(this@GalleryActivity).into(binding.galleryAction)
                 }
                 deleteGalleryBucket {
 
@@ -119,29 +119,31 @@ class GalleryActivity :
         }
     }
 
-    private suspend fun GalleryViewModel.initPager(
-        chooseType: String = "",
-    ) = withContext(Dispatchers.Main) {
+    private fun GalleryViewModel.initPager(chooseType: String = "") {
         val combine = userConfig.combineGallery || chooseType == CHOOSE_MEDIA
         binding.galleryPager.adapter = MyFragmentStateAdapter(
             this@GalleryActivity,
             mutableListOf<Fragment>().also { fs ->
+                var initializeSize = 0
+                fun generateFragment(isVideo: Boolean) {
+                    GalleryListFragment().also {
+                        it.connect(generateMailer(isVideo).onStart {
+                            getBucket(ALL_GALLERY)?.let { viewModel.onGallerySelected(it) }
+                            initializeSize++
+                            if (initializeSize == fs.size) {
+                                isInit = true
+                            }
+                        }, chooseData)
+                        fs.add(it)
+                    }
+                }
+
                 when (chooseType) {
-                    CHOOSE_PHOTO ->
-                        fs.add(GalleryListFragment().apply {
-                            connect(generateMailer(false), chooseData)
-                        })
-                    CHOOSE_VIDEO ->
-                        fs.add(GalleryListFragment().apply {
-                            connect(generateMailer(true), chooseData)
-                        })
+                    CHOOSE_PHOTO -> generateFragment(false)
+                    CHOOSE_VIDEO -> generateFragment(true)
                     else -> {
-                        fs.add(GalleryListFragment().apply {
-                            connect(generateMailer(false), chooseData)
-                        })
-                        if (!combine) fs.add(GalleryListFragment().apply {
-                            connect(generateMailer(true), chooseData)
-                        })
+                        generateFragment(false)
+                        if (!combine) generateFragment(true)
                     }
                 }
             }
@@ -166,8 +168,8 @@ class GalleryActivity :
             if (list.size <= 0) return
             setResult(
                 RESULT_OK,
-                Intent().putExtra(GalleryViewModel.URI, list[0].uri.toUriJson())
-                    .putExtra(GalleryViewModel.Gallery_DATA, list[0].toJson())
+                Intent().putExtra(URI, list[0].uri.toUriJson())
+                    .putExtra(GALLERY_DATA, list[0].toJson())
             )
         }
         finish()
@@ -180,29 +182,30 @@ class GalleryActivity :
                 binding.motionRoot.progress = (it.animatedValue as Float)
             }
         }.start()
+        launch {
+            viewModel.sendListEvent(GalleryViewModel.GalleryListEvent.OnDrawerEvent(progress != 1f))
+        }
     }
 
     fun showPop() {
-        showPop(binding.galleryActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
+        showPop(binding.galleryActionMenu, viewModel.chooseData.size <= 0)
     }
 
     private fun getBucketAdapter() = binding.galleryBucket.adapter as GalleryBucketAdapter
 
     override fun popDelete() {
-        viewModel.chooseData?.let {
-            tryDelete(it) {}
-        }
+        tryDelete(viewModel.chooseData) {}
     }
 
     override fun popMoveTo() {
-        viewModel.chooseData?.let {
+        viewModel.chooseData.let {
             if (it.size <= 0) return
             moveTo(binding.galleryActionMenu, it[0].isVideo, it) { _, _ -> }
         }
     }
 
     override fun popRename() {
-        viewModel.chooseData?.let {
+        viewModel.chooseData.let {
             if (it.size <= 0) return
             tryRename(it)
         }
@@ -213,7 +216,7 @@ class GalleryActivity :
     }
 
     override fun popSetCate() {
-        viewModel.chooseData?.let { list ->
+        viewModel.chooseData.let { list ->
             if (list.size <= 0) return
             addCate(list)
         }

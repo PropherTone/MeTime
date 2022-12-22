@@ -17,15 +17,15 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
+        android:name="com.protone.component.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:name="com.protone.component.MainApplication"
         android:label="Gallery"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MeTime">
         <activity
-            android:name=".activity.GalleryActivity"
+            android:name=".debug.OpenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.GalleryActivity" />
         <activity android:name=".activity.GallerySearchActivity" />
         <activity android:name=".activity.GalleryViewActivity" />
         <activity android:name=".activity.PictureBoxActivity" />

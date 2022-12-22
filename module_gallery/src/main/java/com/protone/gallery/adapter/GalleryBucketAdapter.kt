@@ -61,10 +61,7 @@ class GalleryBucketAdapter(
 
     override val select: (GalleryBucketListLayoutBinding, Int, isSelect: Boolean) -> Unit =
         { binding, _, isSelect ->
-            binding.bucketCheck.apply {
-                isChecked = isSelect
-                isVisible = isSelect
-            }
+            binding.bucket.check = isSelect
         }
 
     override fun itemIndex(path: Gallery): Int {
@@ -77,19 +74,18 @@ class GalleryBucketAdapter(
     ): Holder<GalleryBucketListLayoutBinding> {
         return Holder(
             GalleryBucketListLayoutBinding.inflate(context.newLayoutInflater, parent, false).apply {
-                root.updateLayoutParams { height = MApplication.screenHeight / 10 }
-                bucketThumb.scaleType = ImageView.ScaleType.CENTER_CROP
+                bucket.thumb.scaleType = ImageView.ScaleType.CENTER_CROP
             })
     }
 
     private fun GalleryBucketListLayoutBinding.changedText(item: Gallery) {
-        bucketItemNumber.text = item.size.toString()
+        bucket.size.text = item.size.toString()
     }
 
     private fun GalleryBucketListLayoutBinding.changedUri(item: Gallery) {
-        if (bucketThumb.tag != item.uri) {
-            bucketThumb.tag = item.uri
-            Image.load(item.uri).with(context).into(bucketThumb)
+        if (bucket.thumb.tag != item.uri) {
+            bucket.thumb.tag = item.uri
+            Image.load(item.uri).with(context).into(bucket.thumb)
         }
     }
 
@@ -133,7 +129,7 @@ class GalleryBucketAdapter(
                         }.create().show()
                     false
                 }
-                bucketName.text = data.name
+                bucket.name.text = data.name
                 changedText(data)
                 changedUri(data)
                 bucket.setOnClickListener {

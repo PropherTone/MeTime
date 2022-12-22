@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 
 abstract class BaseFragment<ViewBinding : ViewDataBinding, VM : ViewModel> : Fragment(),
     CoroutineScope by MainScope() {
@@ -34,7 +35,12 @@ abstract class BaseFragment<ViewBinding : ViewDataBinding, VM : ViewModel> : Fra
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = createBinding(inflater, container, savedInstanceState).root
+    ): View? = createBinding(inflater, container, savedInstanceState).also { binding = it }.root
+
+    override fun onDestroy() {
+        cancel()
+        super.onDestroy()
+    }
 
     fun startActivity(routerPath: String) {
 

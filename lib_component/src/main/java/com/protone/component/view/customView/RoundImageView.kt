@@ -17,7 +17,7 @@ class RoundImageView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        val radius = w / 15.toFloat()
+        val radius = w / 12.toFloat()
         path.addRoundRect(
             RectF(radius, radius, w.toFloat() - radius, h.toFloat() - radius),
             radius,

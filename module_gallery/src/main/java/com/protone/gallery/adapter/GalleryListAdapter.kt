@@ -37,7 +37,7 @@ class GalleryListAdapter(
         data class NoticeListInsert(val medias: List<GalleryMedia>) : GalleryListEvent()
     }
 
-    private var itemLength = 0
+    var itemLength = 0
     private var onSelectMod = false
 
     @SuppressLint("NotifyDataSetChanged")
@@ -126,7 +126,9 @@ class GalleryListAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        itemLength = (recyclerView.width - recyclerView.paddingEnd - recyclerView.paddingStart) / 4
+        if (itemLength == 0) {
+            itemLength = recyclerView.run { (width - paddingEnd - paddingStart) / 4 }
+        }
         recyclerView.layoutAnimationListener = object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
                 recyclerView.suppressLayout(true)
@@ -151,12 +153,10 @@ class GalleryListAdapter(
             false
         ).apply {
             imageView.updateLayoutParams {
-                width = this@GalleryListAdapter.itemLength
-                height = width
+                height = this@GalleryListAdapter.itemLength
             }
             checkSeen.updateLayoutParams {
-                width = this@GalleryListAdapter.itemLength
-                height = width
+                height = this@GalleryListAdapter.itemLength
             }
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         })
