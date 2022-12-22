@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewAnimationUtils
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.transition.TransitionManager
 import com.protone.common.context.newLayoutInflater
 import com.protone.gallery.databinding.GalleryItemLayoutBinding
 import kotlin.math.hypot
@@ -47,19 +49,19 @@ class GalleryItemView @JvmOverloads constructor(
         if (visible) {
             val reveal =
                 ViewAnimationUtils.createCircularReveal(
-                    binding.root, mX.toInt(),
+                    binding.bucket, mX.toInt(),
                     mY.toInt(), 0f, radius
                 )
-            binding.root.isGone = false
+            binding.bucket.isGone = false
             reveal.start()
         } else {
             val reveal =
                 ViewAnimationUtils.createCircularReveal(
-                    binding.root, mX.toInt(),
+                    binding.bucket, mX.toInt(),
                     mY.toInt(), radius, 0f
                 )
             reveal.doOnEnd {
-                binding.root.isGone = true
+                binding.bucket.isGone = true
             }
             reveal.start()
         }

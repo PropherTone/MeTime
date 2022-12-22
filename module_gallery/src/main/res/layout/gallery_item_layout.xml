@@ -2,54 +2,58 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bucket"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/gallery_item_height"
-        android:background="@drawable/background_ripple_glass">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/bucket_thumb"
-            android:layout_width="@dimen/gallery_item_height"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bucket"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/gallery_item_height"
-            android:contentDescription="@string/photo"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@drawable/background_ripple_glass">
 
-        <TextView
-            android:id="@+id/bucket_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/texts_margin"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toTopOf="@id/bucket_itemNumber"
-            app:layout_constraintStart_toEndOf="@id/bucket_thumb"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            <ImageView
+                android:id="@+id/bucket_thumb"
+                android:layout_width="@dimen/gallery_item_height"
+                android:layout_height="@dimen/gallery_item_height"
+                android:contentDescription="@string/photo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/bucket_itemNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@id/bucket_name"
-            app:layout_constraintTop_toBottomOf="@id/bucket_name" />
+            <TextView
+                android:id="@+id/bucket_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/texts_margin"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toTopOf="@id/bucket_itemNumber"
+                app:layout_constraintStart_toEndOf="@id/bucket_thumb"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/bucket_itemNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/bucket_name"
+                app:layout_constraintTop_toBottomOf="@id/bucket_name" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:id="@+id/bucket_check"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="2dp"
+            android:layout_gravity="bottom"
             android:background="@color/white"
             android:clickable="false"
             android:focusable="false"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/bucket_thumb" />
+            android:visibility="invisible" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>

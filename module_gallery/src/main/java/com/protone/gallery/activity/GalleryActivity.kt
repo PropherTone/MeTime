@@ -1,14 +1,13 @@
 package com.protone.gallery.activity
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.view.ViewAnimationUtils
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.whenCreated
-import androidx.lifecycle.withCreated
-import androidx.lifecycle.withStarted
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayoutMediator
@@ -16,6 +15,7 @@ import com.protone.common.R
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.launchDefault
 import com.protone.common.context.root
+import com.protone.common.entity.Gallery
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
@@ -30,18 +30,16 @@ import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
 import com.protone.gallery.adapter.GalleryBucketAdapter
-import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.adapter.MyFragmentStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryListFragment
 import com.protone.gallery.viewModel.GalleryViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.hypot
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
@@ -106,15 +104,16 @@ class GalleryActivity :
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
                 selectBucket { gallery ->
-                    viewModel.onGallerySelected(gallery)
-                    Image.load(gallery.uri).with(this@GalleryActivity).into(binding.galleryAction)
+                    setSelectedGallery(gallery)
                 }
                 deleteGalleryBucket {
 
                 }
             }
             addItemDecoration(
-                GalleryBucketItemDecoration(resources.getDimension(R.dimen.icon_padding).toInt())
+                GalleryBucketItemDecoration(
+                    resources.getDimension(com.protone.gallery.R.dimen.bucket_margin).toInt()
+                )
             )
         }
     }
@@ -128,7 +127,10 @@ class GalleryActivity :
                 fun generateFragment(isVideo: Boolean) {
                     GalleryListFragment().also {
                         it.connect(generateMailer(isVideo).onStart {
-                            getBucket(ALL_GALLERY)?.let { viewModel.onGallerySelected(it) }
+                            getBucket(ALL_GALLERY)?.let { gallery ->
+                                getBucketAdapter().setSelected(gallery)
+                                setSelectedGallery(gallery)
+                            }
                             initializeSize++
                             if (initializeSize == fs.size) {
                                 isInit = true
@@ -161,6 +163,29 @@ class GalleryActivity :
                 binding.galleryPager
             ) { tab, position -> tab.setText(tabList[position]) }.attach()
         }
+    }
+
+    private fun setSelectedGallery(gallery: Gallery) {
+        binding.apply {
+            viewModel.onGallerySelected(gallery)
+            Image.load(gallery.uri)
+                .with(this@GalleryActivity)
+                .error(com.protone.component.R.drawable.ic_baseline_image_24_white)
+                .into(galleryAction)
+            galleryName.text = gallery.name
+            galleryItemNumber.text = gallery.size.toString()
+            getReveal()?.start()
+        }
+    }
+
+    private fun getReveal(): Animator? {
+        val mX = binding.galleryDetail.measuredWidth / 2
+        val mY = binding.galleryDetail.measuredHeight / 2
+        val radius = hypot(mX.toDouble(), mY.toDouble()).toFloat()
+        return ViewAnimationUtils.createCircularReveal(
+            binding.galleryDetail, mX,
+            mY, 0f, radius
+        )
     }
 
     private fun confirm() {

@@ -22,37 +22,40 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gallery_action" />
-
-        <ImageView
-            android:id="@+id/gallery_action"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:contentDescription="@string/action"
-            android:onClick="@{()->activity.showBucket()}"
-            android:padding="@dimen/main_padding"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_round_arrow_left__white_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/gallery_detail"
-            android:layout_width="@dimen/gallery_item_height"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@id/gallery_action"
-            app:layout_constraintTop_toTopOf="@id/gallery_action">
+            android:layout_width="@dimen/bucket_width"
+            android:layout_height="wrap_content"
+            android:background="@color/glass"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/main_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/gallery_action"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
+                android:contentDescription="@string/action"
+                android:elevation="@dimen/small_elevation"
+                android:onClick="@{()->activity.showBucket()}"
+                android:padding="@dimen/main_padding"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_round_arrow_left__white_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/gallery_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/texts_margin"
+                android:lines="1"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toTopOf="@id/gallery_itemNumber"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/gallery_action"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed" />
 
@@ -60,6 +63,7 @@
                 android:id="@+id/gallery_itemNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:lines="1"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -76,7 +80,7 @@
             android:onClick="@{()->activity.showPop()}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
-            app:layout_constraintStart_toEndOf="@id/gallery_action"
+            app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.tabs.TabLayout
@@ -118,6 +122,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/main_margin"
+            android:visibility="gone"
             android:layout_marginBottom="@dimen/main_margin"
             android:src="@drawable/ic_baseline_check_24_white"
             app:backgroundTint="@color/main_color1"

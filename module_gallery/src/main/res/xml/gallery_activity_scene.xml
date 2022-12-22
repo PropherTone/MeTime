@@ -10,22 +10,16 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gallery_action" />
-
-        <Constraint
-            android:id="@+id/gallery_action"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:padding="@dimen/main_padding"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />
 
         <Constraint
             android:id="@+id/gallery_detail"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/gallery_action"
-            app:layout_constraintTop_toTopOf="@id/gallery_action" />
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="wrap_content"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/main_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
             android:id="@+id/gallery_actionMenu"
@@ -35,7 +29,7 @@
             android:onClick="@{()->activity.showPop()}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
-            app:layout_constraintStart_toEndOf="@id/gallery_action"
+            app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
@@ -71,7 +65,8 @@
             android:layout_marginEnd="@dimen/main_margin"
             android:layout_marginBottom="@dimen/main_margin"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:visibilityMode="ignore" />
 
     </ConstraintSet>
 
@@ -83,23 +78,19 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gallery_action" />
-
-        <Constraint
-            android:id="@+id/gallery_action"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:padding="@dimen/main_padding"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />
 
         <Constraint
             android:id="@+id/gallery_detail"
-            android:layout_width="@dimen/gallery_item_height"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/gallery_action"
-            app:layout_constraintTop_toTopOf="@id/gallery_action" />
-
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/bucket_margin"
+            android:layout_marginEnd="@dimen/bucket_margin"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/main_margin"
+            app:layout_constraintEnd_toEndOf="@id/gallery_bucket"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
             android:id="@+id/gallery_actionMenu"
@@ -109,7 +100,7 @@
             android:onClick="@{()->activity.showPop()}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
-            app:layout_constraintStart_toEndOf="@id/gallery_action"
+            app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
@@ -145,7 +136,8 @@
             android:layout_marginEnd="@dimen/main_margin"
             android:layout_marginBottom="@dimen/main_margin"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:visibilityMode="ignore" />
 
     </ConstraintSet>
 

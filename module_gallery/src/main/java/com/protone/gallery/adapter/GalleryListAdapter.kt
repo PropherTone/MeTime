@@ -63,7 +63,7 @@ class GalleryListAdapter(
                     notifyItemRangeInsertedCO(mList.size - data.item.size, data.item.size)
                     return
                 }
-                notifyItemRangeChangedChecked(
+                notifyItemRangeChangedCO(
                     when {
                         firstPosition <= 0 -> 0
                         firstPosition >= preLoad -> firstPosition - preLoad

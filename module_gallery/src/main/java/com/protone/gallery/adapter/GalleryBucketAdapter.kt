@@ -31,6 +31,7 @@ class GalleryBucketAdapter(
         data class RefreshBucket(val bucket: Gallery) : GalleryBucketEvent()
         data class InsertBucket(val bucket: Gallery) : GalleryBucketEvent()
         data class InsertBuckets(val buckets: List<Gallery>) : GalleryBucketEvent()
+        data class SetSelected(val gallery: Gallery) : GalleryBucketEvent()
     }
 
     override suspend fun handleEventAsynchronous(data: GalleryBucketEvent) {
@@ -55,6 +56,16 @@ class GalleryBucketAdapter(
             is GalleryBucketEvent.InsertBuckets -> {
                 mList.addAll(data.buckets)
                 notifyItemRangeInsertedCO(mList.size - data.buckets.size, data.buckets.size)
+            }
+            is GalleryBucketEvent.SetSelected -> {
+                for (i in 0 until mList.size) {
+                    if (mList[i].name == data.gallery.name) {
+                        selectList.add(mList[i])
+                        notifyItemChangedCO(i)
+                        return
+                    }
+                }
+                selectList.add(data.gallery)
             }
         }
     }
@@ -147,6 +158,10 @@ class GalleryBucketAdapter(
         if (!multiChoose) clearSelected()
         selectList.add(item)
         notifyItemChangedChecked(position, (SELECT))
+    }
+
+    fun setSelected(gallery: Gallery) {
+        emit(GalleryBucketEvent.SetSelected(gallery))
     }
 
     fun deleteBucket(bucket: Gallery) {
