@@ -154,7 +154,7 @@
                 android:layout_height="0dp"
                 android:background="@drawable/black_gradient_left"
                 android:contentDescription="@string/action"
-                android:src="@drawable/ic_round_arrow_left__white_24"
+                android:src="@drawable/ic_round_arrow_left_white_24"
                 app:layout_constraintBottom_toTopOf="@+id/galleryV_time"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/galleryV_back"

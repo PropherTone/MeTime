@@ -1,6 +1,5 @@
 package com.protone.gallery.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,8 +11,8 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.component.R
+import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryListAdapterLayoutBinding
 
 class GalleryListAdapter(
@@ -29,7 +28,6 @@ class GalleryListAdapter(
     sealed class GalleryListEvent {
         object SelectAll : GalleryListEvent()
         object QuiteSelectAll : GalleryListEvent()
-        data class NoticeDataUpdate(val item: MutableList<GalleryMedia>) : GalleryListEvent()
         data class NoticeSelectChange(val item: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemUpdate(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemDelete(val media: GalleryMedia) : GalleryListEvent()
@@ -40,7 +38,6 @@ class GalleryListAdapter(
     var itemLength = 0
     private var onSelectMod = false
 
-    @SuppressLint("NotifyDataSetChanged")
     override suspend fun handleEventAsynchronous(data: GalleryListEvent) {
         when (data) {
             is GalleryListEvent.QuiteSelectAll -> {
@@ -50,31 +47,9 @@ class GalleryListAdapter(
             }
             is GalleryListEvent.SelectAll -> {
                 onSelectMod = true
-                for (i in 0 until mList.size) {
-                    selectList.add(mList[i])
-                    notifyItemChangedCO(i)
-                }
-            }
-            is GalleryListEvent.NoticeDataUpdate -> {
-                if (data.item.isEmpty()) return
-                super.setData(data.item)
-                if (mList.size > itemCount) {
-                    itemCount = mList.size
-                    notifyItemRangeInsertedCO(mList.size - data.item.size, data.item.size)
-                    return
-                }
-                notifyItemRangeChangedCO(
-                    when {
-                        firstPosition <= 0 -> 0
-                        firstPosition >= preLoad -> firstPosition - preLoad
-                        else -> 0
-                    },
-                    when {
-                        lastPosition >= itemCount || lastPosition == -1 -> itemCount
-                        lastPosition <= itemCount - preLoad -> lastPosition + preLoad
-                        else -> itemCount
-                    }
-                )
+                selectList.addAll(mList)
+                onSelectListener?.select(selectList)
+                notifyItemRangeChangedCO(0, mList.size, SELECT)
             }
             is GalleryListEvent.NoticeSelectChange -> {
                 val indexOf = mList.indexOf(data.item)
@@ -179,7 +154,6 @@ class GalleryListAdapter(
                 if (onSelectMod) {
                     checkSelect(position, mList[position])
                     onSelectListener?.select(mList[position])
-                    onSelectListener?.select(selectList)
                 } else onSelectListener?.openView(mList[position])
             }
             if (useSelect) {
@@ -187,7 +161,6 @@ class GalleryListAdapter(
                     onSelectMod = true
                     checkSelect(position, mList[position])
                     onSelectListener?.select(mList[position])
-                    onSelectListener?.select(selectList)
                     true
                 }
             }
@@ -198,11 +171,25 @@ class GalleryListAdapter(
 
     override fun setData(collection: Collection<GalleryMedia>) {
         refreshVisiblePosition()
-        noticeDataUpdate(collection as MutableList<GalleryMedia>)
-    }
-
-    private fun noticeDataUpdate(item: MutableList<GalleryMedia>) {
-        emit(GalleryListEvent.NoticeDataUpdate(item))
+        if (collection.isEmpty()) return
+        super.setData(collection)
+        if (mList.size > itemCount) {
+            itemCount = mList.size
+            notifyItemRangeInsertedChecked(mList.size - collection.size, collection.size)
+            return
+        }
+        notifyItemRangeChangedChecked(
+            when {
+                firstPosition <= 0 -> 0
+                firstPosition >= preLoad -> firstPosition - preLoad
+                else -> 0
+            },
+            when {
+                lastPosition >= itemCount || lastPosition == -1 -> itemCount
+                lastPosition <= itemCount - preLoad -> lastPosition + preLoad
+                else -> itemCount
+            }
+        )
     }
 
     fun selectAll() {

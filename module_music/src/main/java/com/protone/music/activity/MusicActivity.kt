@@ -1,6 +1,5 @@
 package com.protone.music.activity
 
-import android.os.Bundle
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.marginBottom
@@ -19,12 +18,11 @@ import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
-import com.protone.music.adapter.MusicBucketAdapter
-import com.protone.music.adapter.MusicListAdapter
 import com.protone.component.view.customView.StatusImageView
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
-import com.protone.music.R
+import com.protone.music.adapter.MusicBucketAdapter
+import com.protone.music.adapter.MusicListAdapter
 import com.protone.music.databinding.MusicActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 import com.protone.music.viewModel.MusicModel

@@ -1,6 +1,5 @@
 package com.protone.metime.activity
 
-import android.net.Uri
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
@@ -141,14 +140,29 @@ class MainActivity :
         onViewEvent {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
-                    startActivity(RouterPath.GalleryRouterPath.Main)
+                    startActivity(RouterPath.GalleryRouterPath.Main) {
+                        withTransition(
+                            com.protone.metime.R.anim.card_in_ltr,
+                            com.protone.metime.R.anim.card_out_ltr
+                        )
+                    }
                 MainViewModel.MainViewEvent.Note ->
                     if (userConfig.lockNote == "")
-                        startActivity(RouterPath.NoteRouterPath.Main)
+                        startActivity(RouterPath.NoteRouterPath.Main) {
+                            withTransition(
+                                com.protone.metime.R.anim.card_in_rtl,
+                                com.protone.metime.R.anim.card_out_rtl
+                            )
+                        }
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
                     if (userConfig.lockMusic == "")
-                        startActivity(RouterPath.MusicRouterPath.Main)
+                        startActivity(RouterPath.MusicRouterPath.Main) {
+                            withTransition(
+                                com.protone.metime.R.anim.card_top_in,
+                                com.protone.metime.R.anim.card_top_in
+                            )
+                        }
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig -> {
                     startActivity(RouterPath.ConfigRouterPath.UserConfig)

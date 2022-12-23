@@ -39,14 +39,12 @@
         <item name="colorButtonNormal">@color/black</item>
     </style>
 
-    <style name="PopAnimationUpToBot">
-        <item name="duration">100</item>
+    <style name="PopAnimationUpToBot" parent="android:Animation">
         <item name="android:windowEnterAnimation">@anim/pop_ani_y_in</item>
         <item name="android:windowExitAnimation">@anim/pop_ani_y_out</item>
     </style>
 
-    <style name="PopAnimationBotToUp">
-        <item name="duration">100</item>
+    <style name="PopAnimationBotToUp" parent="android:Animation">
         <item name="android:windowEnterAnimation">@anim/pop_ani_y_out</item>
         <item name="android:windowExitAnimation">@anim/pop_ani_y_in</item>
     </style>

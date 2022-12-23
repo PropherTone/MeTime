@@ -50,23 +50,10 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/action_btn"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:paddingTop="@dimen/icon_padding_mid"
-            android:paddingBottom="@dimen/icon_padding_mid"
-            app:layout_constraintEnd_toStartOf="@id/noteBook"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/userCard" />
-
-        <Constraint
-            android:id="@+id/noteBook"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/action_btn"
-            android:layout_gravity="center"
-            android:layout_weight="1"
             android:paddingTop="@dimen/icon_padding_mid"
             android:paddingBottom="@dimen/icon_padding_mid"
             app:layout_constraintEnd_toStartOf="@id/music"
-            app:layout_constraintStart_toEndOf="@id/gallery"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/userCard" />
 
         <Constraint
@@ -74,21 +61,22 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/action_btn"
             android:layout_gravity="center"
-            android:layout_weight="1"
             android:paddingTop="@dimen/icon_padding_mid"
             android:paddingBottom="@dimen/icon_padding_mid"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/noteBook"
+            app:layout_constraintEnd_toStartOf="@id/noteBook"
+            app:layout_constraintStart_toEndOf="@id/gallery"
             app:layout_constraintTop_toBottomOf="@id/userCard" />
 
         <Constraint
-            android:id="@+id/noteBook_line"
+            android:id="@+id/noteBook"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            app:layout_constraintBottom_toBottomOf="@+id/noteBook"
-            app:layout_constraintEnd_toEndOf="@+id/noteBook"
-            app:layout_constraintStart_toEndOf="@+id/gallery"
-            app:layout_constraintWidth_percent="0.1" />
+            android:layout_height="@dimen/action_btn"
+            android:layout_gravity="center"
+            android:paddingTop="@dimen/icon_padding_mid"
+            android:paddingBottom="@dimen/icon_padding_mid"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/music"
+            app:layout_constraintTop_toBottomOf="@id/userCard" />
 
         <Constraint
             android:id="@+id/gallery_line"
@@ -104,8 +92,17 @@
             android:layout_width="0dp"
             android:layout_height="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/music"
+            app:layout_constraintEnd_toEndOf="@id/music"
+            app:layout_constraintStart_toEndOf="@+id/gallery"
+            app:layout_constraintWidth_percent="0.1" />
+
+        <Constraint
+            android:id="@+id/noteBook_line"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/noteBook"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/noteBook"
+            app:layout_constraintStart_toEndOf="@+id/music"
             app:layout_constraintWidth_percent="0.1" />
 
         <Constraint
@@ -169,23 +166,10 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/action_btn"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:paddingTop="@dimen/icon_padding_mid"
-            android:paddingBottom="@dimen/icon_padding_mid"
-            app:layout_constraintEnd_toStartOf="@id/noteBook"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/userCard" />
-
-        <Constraint
-            android:id="@+id/noteBook"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/action_btn"
-            android:layout_gravity="center"
-            android:layout_weight="1"
             android:paddingTop="@dimen/icon_padding_mid"
             android:paddingBottom="@dimen/icon_padding_mid"
             app:layout_constraintEnd_toStartOf="@id/music"
-            app:layout_constraintStart_toEndOf="@id/gallery"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/userCard" />
 
         <Constraint
@@ -193,21 +177,22 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/action_btn"
             android:layout_gravity="center"
-            android:layout_weight="1"
             android:paddingTop="@dimen/icon_padding_mid"
             android:paddingBottom="@dimen/icon_padding_mid"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/noteBook"
+            app:layout_constraintEnd_toStartOf="@id/noteBook"
+            app:layout_constraintStart_toEndOf="@id/gallery"
             app:layout_constraintTop_toBottomOf="@id/userCard" />
 
         <Constraint
-            android:id="@+id/noteBook_line"
+            android:id="@+id/noteBook"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            app:layout_constraintBottom_toBottomOf="@+id/noteBook"
-            app:layout_constraintEnd_toEndOf="@+id/noteBook"
-            app:layout_constraintStart_toEndOf="@+id/gallery"
-            app:layout_constraintWidth_percent="0.1" />
+            android:layout_height="@dimen/action_btn"
+            android:layout_gravity="center"
+            android:paddingTop="@dimen/icon_padding_mid"
+            android:paddingBottom="@dimen/icon_padding_mid"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/music"
+            app:layout_constraintTop_toBottomOf="@id/userCard" />
 
         <Constraint
             android:id="@+id/gallery_line"
@@ -223,8 +208,17 @@
             android:layout_width="0dp"
             android:layout_height="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/music"
+            app:layout_constraintEnd_toEndOf="@id/music"
+            app:layout_constraintStart_toEndOf="@+id/gallery"
+            app:layout_constraintWidth_percent="0.1" />
+
+        <Constraint
+            android:id="@+id/noteBook_line"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/noteBook"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/noteBook"
+            app:layout_constraintStart_toEndOf="@+id/music"
             app:layout_constraintWidth_percent="0.1" />
 
         <Constraint

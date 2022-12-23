@@ -33,7 +33,7 @@
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.finish()}"
             android:padding="@dimen/icon_padding"
-            android:src="@drawable/ic_round_arrow_left__white_24"
+            android:src="@drawable/ic_round_arrow_left_white_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/showPlayList" />
 

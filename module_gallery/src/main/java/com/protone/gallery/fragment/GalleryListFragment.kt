@@ -11,10 +11,17 @@ import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchMain
 import com.protone.common.baseType.withMainContext
 import com.protone.common.context.intent
+import com.protone.common.context.putExtras
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.IntentDataHolder
+import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
+import com.protone.common.utils.json.toJson
 import com.protone.component.BaseFragment
+import com.protone.gallery.activity.GalleryViewActivity
 import com.protone.gallery.activity.PictureBoxActivity
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.component.GalleryItemDecoration
@@ -32,18 +39,29 @@ class GalleryListFragment :
     BaseFragment<GalleryListFragmentLayoutBinding, GalleryListFragmentViewModel>() {
 
     private var isInit = false
-    private lateinit var liveSelectData: MutableList<GalleryMedia>
+    private lateinit var liveSelectData: MutableLiveData<GalleryMedia>
+    private var galleryName = ALL_GALLERY
 
     private val onSelect by lazy {
         object : GalleryListAdapter.OnSelect {
             override fun select(galleryMedia: GalleryMedia) {
-                liveSelectData.add(galleryMedia)
+                liveSelectData.postValue(galleryMedia)
             }
 
             override fun select(galleryMedia: MutableList<GalleryMedia>) {
+                launchDefault {
+                    galleryMedia.forEach {
+                        liveSelectData.postValue(it)
+                    }
+                }
             }
 
             override fun openView(galleryMedia: GalleryMedia) {
+                startActivity(GalleryViewActivity::class.intent.putExtras {
+                    putString(MEDIA, galleryMedia.toJson())
+                    putBoolean(IS_VIDEO, galleryMedia.isVideo)
+                    putString(GALLERY, galleryName)
+                })
             }
 
         }
@@ -51,7 +69,7 @@ class GalleryListFragment :
 
     fun connect(
         mailer: Flow<GalleryViewModel.GalleryListEvent>,
-        liveData: MutableList<GalleryMedia>
+        liveData: MutableLiveData<GalleryMedia>
     ) {
         liveSelectData = liveData
         launchMain {
@@ -59,6 +77,7 @@ class GalleryListFragment :
                 while (!isInit) delay(20L)
                 when (it) {
                     is GalleryViewModel.GalleryListEvent.OnGallerySelected -> {
+                        galleryName = it.gallery.name
                         binding.galleryList.swapAdapter(
                             GalleryListAdapter(
                                 requireContext(),
@@ -75,6 +94,9 @@ class GalleryListFragment :
                     }
                     is GalleryViewModel.GalleryListEvent.SelectAll -> {
                         getListAdapter().selectAll()
+                    }
+                    is GalleryViewModel.GalleryListEvent.QuiteSelect -> {
+                        getListAdapter().quitSelectMod()
                     }
                     is GalleryViewModel.GalleryListEvent.OnDrawerEvent -> {
                         if (it.isOpen) {

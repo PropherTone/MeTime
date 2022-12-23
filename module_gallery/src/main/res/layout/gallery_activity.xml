@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:background="@color/glass"
             android:paddingStart="0dp"
-            android:paddingEnd="@dimen/main_margin"
+            android:paddingEnd="@dimen/border_distance"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -41,9 +41,9 @@
                 android:contentDescription="@string/action"
                 android:elevation="@dimen/small_elevation"
                 android:onClick="@{()->activity.showBucket()}"
-                android:padding="@dimen/main_padding"
+                android:padding="@dimen/border_distance"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_round_arrow_left__white_24"
+                android:src="@drawable/ic_round_arrow_left_white_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,8 +78,8 @@
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.showPop()}"
-            android:padding="@dimen/main_padding"
-            android:src="@drawable/ic_baseline_more_horiz_24_white"
+            android:padding="16dp"
+            android:src="@drawable/ic_baseline_menu_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -100,9 +100,9 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/back"
-            android:onClick="@{()->activity.finish()}"
-            android:padding="@dimen/main_padding"
-            android:src="@drawable/ic_round_arrow_left__white_24"
+            android:onClick="@{()->activity.finishEvent()}"
+            android:padding="@dimen/border_distance"
+            android:src="@drawable/ic_round_arrow_left_white_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -121,9 +121,9 @@
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginEnd="@dimen/border_distance"
             android:visibility="gone"
-            android:layout_marginBottom="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/border_distance"
             android:src="@drawable/ic_baseline_check_24_white"
             app:backgroundTint="@color/main_color1"
             app:fabSize="mini"

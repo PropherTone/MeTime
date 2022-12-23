@@ -4,13 +4,13 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/gallery_item_height"
+        android:background="@drawable/background_ripple_glass">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bucket"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/gallery_item_height"
-            android:background="@drawable/background_ripple_glass">
+            android:layout_height="@dimen/gallery_item_height">
 
             <ImageView
                 android:id="@+id/bucket_thumb"

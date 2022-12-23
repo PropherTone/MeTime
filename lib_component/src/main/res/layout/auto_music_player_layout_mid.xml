@@ -92,7 +92,7 @@
             android:layout_height="0dp"
             android:background="@drawable/oval_fore_ripple_dark"
             android:contentDescription="@string/action"
-            android:src="@drawable/ic_round_arrow_left__white_24"
+            android:src="@drawable/ic_round_arrow_left_white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/music_control"

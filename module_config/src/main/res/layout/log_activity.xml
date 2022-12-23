@@ -31,7 +31,7 @@
                 android:contentDescription="@string/action"
                 android:onClick="@{()->activity.finish()}"
                 android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_round_arrow_left__white_24" />
+                android:src="@drawable/ic_round_arrow_left_white_24" />
 
             <TextView
                 android:layout_width="0dp"

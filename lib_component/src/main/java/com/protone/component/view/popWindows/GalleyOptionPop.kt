@@ -14,8 +14,6 @@ class GalleryOptionPop(val context: Context, val view: View) : PopupWindow() {
         width = ViewGroup.LayoutParams.MATCH_PARENT
         isOutsideTouchable = true
         isFocusable = true
-        elevation = 10f
-        this.animationStyle = R.style.PopAnimationUpToBot
     }
 
     fun showPop(view: View) {

@@ -147,7 +147,6 @@ class GalleryBucketAdapter(
                     checkSelect(position, data)
                     selectBucket?.invoke(data)
                 }
-
             }
         }
     }
@@ -155,9 +154,24 @@ class GalleryBucketAdapter(
     override fun checkSelect(
         position: Int, item: Gallery
     ) {
+        if (selectList.contains(item)) return
         if (!multiChoose) clearSelected()
         selectList.add(item)
+        refreshVisiblePosition()
         notifyItemChangedChecked(position, (SELECT))
+    }
+
+    override fun setData(collection: Collection<Gallery>) {
+        if (collection.isEmpty()) return
+        notifyItemRangeRemoved(0, mList.size)
+        super.setData(collection)
+        selectList.clear()
+        notifyItemRangeInserted(0, mList.size)
+    }
+
+    override fun onFailedToRecycleView(holder: Holder<GalleryBucketListLayoutBinding>): Boolean {
+        holder.binding.bucket.stopAnimate()
+        return true
     }
 
     fun setSelected(gallery: Gallery) {

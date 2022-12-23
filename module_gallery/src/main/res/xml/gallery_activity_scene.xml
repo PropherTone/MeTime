@@ -17,7 +17,7 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="wrap_content"
             android:paddingStart="0dp"
-            android:paddingEnd="@dimen/main_margin"
+            android:paddingEnd="@dimen/border_distance"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,7 +27,7 @@
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.showPop()}"
-            android:padding="@dimen/main_padding"
+            android:padding="16dp"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +44,7 @@
             android:id="@+id/finish"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:padding="@dimen/main_padding"
+            android:padding="@dimen/border_distance"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -62,8 +62,8 @@
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/main_margin"
-            android:layout_marginBottom="@dimen/main_margin"
+            android:layout_marginEnd="@dimen/border_distance"
+            android:layout_marginBottom="@dimen/border_distance"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:visibilityMode="ignore" />
@@ -87,7 +87,7 @@
             android:layout_marginStart="@dimen/bucket_margin"
             android:layout_marginEnd="@dimen/bucket_margin"
             android:paddingStart="0dp"
-            android:paddingEnd="@dimen/main_margin"
+            android:paddingEnd="@dimen/border_distance"
             app:layout_constraintEnd_toEndOf="@id/gallery_bucket"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -98,7 +98,7 @@
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.showPop()}"
-            android:padding="@dimen/main_padding"
+            android:padding="16dp"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
@@ -115,7 +115,7 @@
             android:id="@+id/finish"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:padding="@dimen/main_padding"
+            android:padding="@dimen/border_distance"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -133,8 +133,8 @@
             android:id="@+id/gallery_choose_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/main_margin"
-            android:layout_marginBottom="@dimen/main_margin"
+            android:layout_marginEnd="@dimen/border_distance"
+            android:layout_marginBottom="@dimen/border_distance"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:visibilityMode="ignore" />

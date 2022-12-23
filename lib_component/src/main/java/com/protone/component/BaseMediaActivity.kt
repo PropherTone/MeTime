@@ -57,6 +57,13 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         pop?.showPop(anchor)
     }
 
+    fun doOnBackPressed(): Boolean {
+        return if (pop?.isShowing == true) {
+            pop?.dismiss()
+            true
+        } else false
+    }
+
     override fun onClick(v: View?) {
         popLayout.apply {
             when (v) {
@@ -117,7 +124,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         isVideo: Boolean,
         gms: MutableList<GalleryMedia>,
         callback: (GalleryBucket, MutableList<GalleryMedia>) -> Unit
-    )  =  launch {
+    ) = launch {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,

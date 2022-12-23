@@ -1,10 +1,13 @@
 package com.protone.gallery.viewModel
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.tabs.TabLayout
 import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.launchIO
 import com.protone.common.baseType.toast
 import com.protone.common.entity.Gallery
 import com.protone.common.entity.GalleryMedia
@@ -13,12 +16,13 @@ import com.protone.common.utils.EventCachePool
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
+import com.protone.gallery.adapter.GalleryListAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
+class GalleryViewModel : BaseViewModel() {
 
     sealed class GalleryEvent {
         data class OnNewGallery(val gallery: Gallery) : GalleryEvent()
@@ -30,6 +34,7 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     sealed class GalleryListEvent : GalleryEvent() {
         data class OnDrawerEvent(val isOpen: Boolean) : GalleryListEvent()
         object SelectAll : GalleryListEvent()
+        object QuiteSelect : GalleryListEvent()
         data class OnGallerySelected(
             val gallery: Gallery,
             val isVideo: Boolean,
@@ -53,9 +58,23 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     private val galleryData = mutableListOf<Gallery>()
     private val galleryVideoData by lazy { mutableListOf<Gallery>() }
     private fun getGalleryData(isVideo: Boolean) = if (isVideo) galleryVideoData else galleryData
+    fun getGalleryData() = if (isVideoGallery) galleryVideoData else galleryData
 
+    val liveData by lazy { MutableLiveData<GalleryMedia>() }
     val chooseData by lazy { mutableListOf<GalleryMedia>() }
-    var rightGallery: String = ""
+
+    private var rightMediaGallery = ALL_GALLERY
+    private var rightVideoGallery = ALL_GALLERY
+    private var rightGallery: String = ALL_GALLERY
+        set(value) {
+            if (isVideoGallery) rightVideoGallery = value
+            else rightMediaGallery = value
+            field = value
+        }
+        get() {
+            return if (isVideoGallery) rightVideoGallery else rightMediaGallery
+        }
+
     private var rightMailer = 0
     private var isDataSorted = false
     private val combine = userConfig.combineGallery
@@ -90,7 +109,7 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
                         }
                     }
                     is GalleryEvent.OnGalleryUpdated -> data.distinct().forEach { event ->
-                        val isVideo = rightMailer == 1
+                        val isVideo = isVideoGallery
                         (event as GalleryEvent.OnGalleryUpdated).gallery.updateGallery(isVideo)
                         galleryData.find { gallery ->
                             gallery.name == ALL_GALLERY
@@ -108,6 +127,63 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         } else {
             sortData(false)
             sortData(true)
+        }
+    }
+
+    fun deleteGalleryBucket(bucket: String) {
+        viewModelScope.launchIO {
+            galleryDAO.run {
+                getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
+            }
+        }
+    }
+
+    fun selectAll() {
+        viewModelScope.launch {
+            getCurrentMailer()?.emit(GalleryListEvent.SelectAll)
+        }
+    }
+
+    fun quiteSelect() {
+        viewModelScope.launch {
+            chooseData.clear()
+            liveData.postValue(null)
+            sendListEvent(GalleryListEvent.QuiteSelect)
+        }
+    }
+
+    fun getBucket(bucket: String) = getGalleryData(isVideoGallery).find { it.name == bucket }
+
+    fun getBucket() = getGalleryData(isVideoGallery).find { it.name == rightGallery }
+
+    fun generateMailer(isVideo: Boolean) = MutableSharedFlow<GalleryListEvent>().also {
+        mailers[if (isVideo) 1 else 0] = it
+    }.asSharedFlow()
+
+    fun onGallerySelected(gallery: Gallery) {
+        viewModelScope.launch {
+            rightGallery = gallery.name
+            sendListEvent(GalleryListEvent.OnGallerySelected(gallery, isVideoGallery, combine))
+        }
+    }
+
+    fun onTabChanged(tabText: CharSequence): Boolean {
+        val mailer = rightMailer
+        when (tabText) {
+            R.string.photo.getString() -> rightMailer = 0
+            R.string.video.getString() -> rightMailer = 1
+        }
+        return mailer != rightMailer
+    }
+
+    inline fun observeSelectData(
+        owner: LifecycleOwner,
+        crossinline onPost: (GalleryMedia) -> Unit
+    ) {
+        liveData.observe(owner) {
+            if (it == null) return@observe
+            chooseData.add(it)
+            onPost(it)
         }
     }
 
@@ -274,25 +350,6 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         sendBucketEvent(GalleryEvent.OnGalleryUpdated(this))
     }
 
-    fun selectAll() {
-        viewModelScope.launch {
-            getCurrentMailer()?.emit(GalleryListEvent.SelectAll)
-        }
-    }
-
-    fun getBucket(bucket: String) = getGalleryData(rightMailer == 1).find { it.name == bucket }
-
-    fun generateMailer(isVideo: Boolean) = MutableSharedFlow<GalleryListEvent>().also {
-        mailers[if (isVideo) 1 else 0] = it
-    }.asSharedFlow()
-
-    fun onGallerySelected(gallery: Gallery) {
-        viewModelScope.launch {
-            rightGallery = gallery.name
-            sendListEvent(GalleryListEvent.OnGallerySelected(gallery, isVideoGallery, combine))
-        }
-    }
-
     private suspend fun sendBucketEvent(fragEvent: GalleryEvent, immediate: Boolean = true) {
         if (immediate) _galleryFlow.emit(fragEvent)
         else pool.holdEvent(fragEvent)
@@ -320,13 +377,4 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         else getNewestMediaInGallery(gallery, isVideo)
     }
 
-    override fun onTabSelected(tab: TabLayout.Tab?) {
-        when (tab?.text) {
-            R.string.photo.getString() -> rightMailer = 0
-            R.string.video.getString() -> rightMailer = 1
-        }
-    }
-
-    override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
-    override fun onTabReselected(tab: TabLayout.Tab?) = Unit
 }

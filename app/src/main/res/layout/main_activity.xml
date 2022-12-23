@@ -103,31 +103,14 @@
                         android:layout_width="0dp"
                         android:layout_height="@dimen/action_btn"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
                         android:background="?android:selectableItemBackground"
                         android:contentDescription="@string/model_gallery"
                         android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Gallery.INSTANCE)}"
                         android:paddingTop="@dimen/icon_padding_mid"
                         android:paddingBottom="@dimen/icon_padding_mid"
                         android:src="@drawable/ic_baseline_image_24_white"
-                        app:layout_constraintEnd_toStartOf="@id/noteBook"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/userCard" />
-
-                    <ImageView
-                        android:id="@+id/noteBook"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/action_btn"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="?android:selectableItemBackground"
-                        android:contentDescription="@string/model_noteBook"
-                        android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Note.INSTANCE)}"
-                        android:paddingTop="@dimen/icon_padding_mid"
-                        android:paddingBottom="@dimen/icon_padding_mid"
-                        android:src="@drawable/ic_baseline_book_24_white"
                         app:layout_constraintEnd_toStartOf="@id/music"
-                        app:layout_constraintStart_toEndOf="@id/gallery"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/userCard" />
 
                     <ImageView
@@ -135,26 +118,30 @@
                         android:layout_width="0dp"
                         android:layout_height="@dimen/action_btn"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
                         android:background="?android:selectableItemBackground"
                         android:contentDescription="@string/model_music"
                         android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Music.INSTANCE)}"
                         android:paddingTop="@dimen/icon_padding_mid"
                         android:paddingBottom="@dimen/icon_padding_mid"
                         android:src="@drawable/ic_baseline_album_24_white"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/noteBook"
+                        app:layout_constraintEnd_toStartOf="@id/noteBook"
+                        app:layout_constraintStart_toEndOf="@id/gallery"
                         app:layout_constraintTop_toBottomOf="@id/userCard" />
 
-                    <View
-                        android:id="@+id/noteBook_line"
+                    <ImageView
+                        android:id="@+id/noteBook"
                         android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:background="@color/white"
-                        app:layout_constraintBottom_toBottomOf="@+id/noteBook"
-                        app:layout_constraintEnd_toEndOf="@+id/noteBook"
-                        app:layout_constraintStart_toEndOf="@+id/gallery"
-                        app:layout_constraintWidth_percent="0.1" />
+                        android:layout_height="@dimen/action_btn"
+                        android:layout_gravity="center"
+                        android:background="?android:selectableItemBackground"
+                        android:contentDescription="@string/model_noteBook"
+                        android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Note.INSTANCE)}"
+                        android:paddingTop="@dimen/icon_padding_mid"
+                        android:paddingBottom="@dimen/icon_padding_mid"
+                        android:src="@drawable/ic_baseline_book_24_white"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/music"
+                        app:layout_constraintTop_toBottomOf="@id/userCard" />
 
                     <View
                         android:id="@+id/gallery_line"
@@ -172,8 +159,18 @@
                         android:layout_height="2dp"
                         android:background="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/music"
+                        app:layout_constraintEnd_toEndOf="@id/music"
+                        app:layout_constraintStart_toEndOf="@+id/gallery"
+                        app:layout_constraintWidth_percent="0.1" />
+
+                    <View
+                        android:id="@+id/noteBook_line"
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:background="@color/white"
+                        app:layout_constraintBottom_toBottomOf="@+id/noteBook"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/noteBook"
+                        app:layout_constraintStart_toEndOf="@+id/music"
                         app:layout_constraintWidth_percent="0.1" />
 
                     <com.protone.component.view.customView.musicPlayer.MusicPlayerViewMid

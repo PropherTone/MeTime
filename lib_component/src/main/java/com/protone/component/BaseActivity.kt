@@ -202,7 +202,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == code.get()) {
-            launch { if (data != null) _activityResultMessenger.emit(data) }
+            launch { _activityResultMessenger.emit(data) }
         }
     }
 

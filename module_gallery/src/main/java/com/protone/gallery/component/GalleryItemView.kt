@@ -11,6 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import com.protone.common.context.newLayoutInflater
+import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.gallery.databinding.GalleryItemLayoutBinding
 import kotlin.math.hypot
 
@@ -39,31 +40,44 @@ class GalleryItemView @JvmOverloads constructor(
 
     var check: Boolean = false
         set(value) {
-            binding.bucketCheck.isVisible = value
             reveal(!value)
             field = value
         }
 
     private fun reveal(visible: Boolean) {
-        val radius = hypot(mX.toDouble(), mY.toDouble()).toFloat()
-        if (visible) {
-            val reveal =
-                ViewAnimationUtils.createCircularReveal(
-                    binding.bucket, mX.toInt(),
-                    mY.toInt(), 0f, radius
-                )
-            binding.bucket.isGone = false
-            reveal.start()
-        } else {
-            val reveal =
-                ViewAnimationUtils.createCircularReveal(
-                    binding.bucket, mX.toInt(),
-                    mY.toInt(), radius, 0f
-                )
-            reveal.doOnEnd {
-                binding.bucket.isGone = true
+        binding.apply {
+            val radius = hypot(mX.toDouble(), mY.toDouble()).toFloat()
+            if (visible) {
+                val reveal =
+                    ViewAnimationUtils.createCircularReveal(
+                        bucket, mX.toInt(),
+                        mY.toInt(), 0f, radius
+                    )
+                bucket.isGone = false
+                bucketCheck.animate().scaleX(0f).withEndAction {
+                    bucketCheck.isVisible = false
+                }.start()
+                reveal.start()
+            } else {
+                val reveal =
+                    ViewAnimationUtils.createCircularReveal(
+                        bucket, mX.toInt(),
+                        mY.toInt(), radius, 0f
+                    )
+                bucketCheck.animate().scaleX(1f).withStartAction {
+                    bucketCheck.isVisible = true
+                }.start()
+                reveal.doOnEnd {
+                    bucket.isGone = true
+                }
+                reveal.start()
             }
-            reveal.start()
         }
     }
+
+    fun stopAnimate() {
+        binding.bucket.animate().cancel()
+        binding.bucketCheck.animate().cancel()
+    }
+
 }
