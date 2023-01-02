@@ -2,9 +2,11 @@ package com.protone.gallery.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.widget.ImageView
+import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -138,30 +140,32 @@ class GalleryListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleryListAdapterLayoutBinding>, position: Int) {
-        if (position >= mList.size) {
-            //TODO 实现加载效果
-            holder.binding.imageView.setImageResource(R.drawable.none_state_background)
-            return
-        }
-        setSelect(holder.binding, position, mList[position] in selectList)
-        holder.binding.videoIcon.isGone = !mList[position].isVideo && !combine
-        holder.binding.imageView.let { image ->
-            Image.load(mList[position].thumbnailUri)
-                .with(context)
-                .placeholder(R.drawable.none_state_background)
-                .into(image)
-            image.setOnClickListener {
-                if (onSelectMod) {
-                    checkSelect(position, mList[position])
-                    onSelectListener?.select(mList[position])
-                } else onSelectListener?.openView(mList[position])
+        holder.binding.apply {
+            if (position >= mList.size) {
+                //TODO 实现加载效果
+                imageView.setImageResource(R.drawable.none_state_background)
+                return
             }
-            if (useSelect) {
-                image.setOnLongClickListener {
-                    onSelectMod = true
-                    checkSelect(position, mList[position])
-                    onSelectListener?.select(mList[position])
-                    true
+            setSelect(holder.binding, position, mList[position] in selectList)
+            videoIcon.isGone = !mList[position].isVideo && !combine
+            imageView.let { image ->
+                Image.load(mList[position].thumbnailUri)
+                    .with(context)
+                    .placeholder(R.drawable.none_state_background)
+                    .into(image)
+                image.setOnClickListener {
+                    if (onSelectMod) {
+                        checkSelect(position, mList[position])
+                        onSelectListener?.select(mList[position])
+                    } else onSelectListener?.openView(mList[position], imageView)
+                }
+                if (useSelect) {
+                    image.setOnLongClickListener {
+                        onSelectMod = true
+                        checkSelect(position, mList[position])
+                        onSelectListener?.select(mList[position])
+                        true
+                    }
                 }
             }
         }
@@ -225,7 +229,7 @@ class GalleryListAdapter(
     interface OnSelect {
         fun select(galleryMedia: GalleryMedia)
         fun select(galleryMedia: MutableList<GalleryMedia>)
-        fun openView(galleryMedia: GalleryMedia)
+        fun openView(galleryMedia: GalleryMedia, elementView: View)
     }
 
     fun setNewSelectList(list: MutableList<GalleryMedia>) {

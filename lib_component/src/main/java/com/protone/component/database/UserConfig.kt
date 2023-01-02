@@ -35,6 +35,8 @@ class UserConfig(context: Context) {
 
     var lastMusicBucket by config.string("PLAYED_MUSIC_BUCKET", ALL_MUSIC)
 
+    var lastMusicBucketCover by config.string("MUSIC_BUCKET_COVER", "")
+
     var lastMusic by config.string("LAST_TIME_PLAYED_MUSIC", "")
 
     var lastMusicProgress by config.long("LAST_MUSIC_PROGRESS", 0L)

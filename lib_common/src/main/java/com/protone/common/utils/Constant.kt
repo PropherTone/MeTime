@@ -4,9 +4,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import com.alibaba.android.arouter.facade.Postcard
-import com.protone.common.R
-import com.protone.common.baseType.getString
-import com.protone.common.utils.json.toJson
 
 const val TAG = "MeTimeLogTAG"
 

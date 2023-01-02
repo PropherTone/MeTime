@@ -26,6 +26,8 @@ import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
 import com.protone.component.database.userConfig
+import com.protone.component.toGallery
+import com.protone.component.view.customView.musicPlayer.getBitmap
 import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding
@@ -140,30 +142,31 @@ class MainActivity :
         onViewEvent {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
-                    startActivity(RouterPath.GalleryRouterPath.Main) {
+                    toGallery {
                         withTransition(
-                            com.protone.metime.R.anim.card_in_ltr,
-                            com.protone.metime.R.anim.card_out_ltr
+                            com.protone.component.R.anim.card_in_ltr,
+                            com.protone.component.R.anim.card_out_ltr
                         )
                     }
                 MainViewModel.MainViewEvent.Note ->
                     if (userConfig.lockNote == "")
                         startActivity(RouterPath.NoteRouterPath.Main) {
                             withTransition(
-                                com.protone.metime.R.anim.card_in_rtl,
-                                com.protone.metime.R.anim.card_out_rtl
+                                com.protone.component.R.anim.card_in_rtl,
+                                com.protone.component.R.anim.card_out_rtl
                             )
                         }
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
-                    if (userConfig.lockMusic == "")
+                    if (userConfig.lockMusic == "") {
                         startActivity(RouterPath.MusicRouterPath.Main) {
                             withTransition(
-                                com.protone.metime.R.anim.card_top_in,
-                                com.protone.metime.R.anim.card_top_in
+                                com.protone.component.R.anim.card_top_in,
+                                com.protone.component.R.anim.card_top_out
                             )
                         }
-                    else R.string.locked.getString().toast()
+                        userConfig.lastMusicBucketCover.getBitmap()
+                    } else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig -> {
                     startActivity(RouterPath.ConfigRouterPath.UserConfig)
                 }

@@ -274,7 +274,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         }
     }
 
-    override fun openView(galleryMedia: GalleryMedia) {
+    override fun openView(galleryMedia: GalleryMedia, elementView: View) {
         startActivity(GalleryViewActivity::class.intent.putExtras {
             putString(MEDIA, galleryMedia.toJson())
             putBoolean(IS_VIDEO, galleryMedia.isVideo)

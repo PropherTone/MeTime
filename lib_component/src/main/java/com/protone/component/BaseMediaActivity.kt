@@ -1,6 +1,5 @@
 package com.protone.component
 
-import android.util.Log
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
@@ -11,14 +10,15 @@ import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.component.databinding.GalleryOptionPopBinding
 import com.protone.component.view.dialog.cateDialog
 import com.protone.component.view.dialog.checkListDialog
 import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.component.view.popWindows.GalleryOptionPop
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
 abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
@@ -106,9 +106,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
             }
         }, addCon = {
             launchDefault {
-                startActivityForResult(RouterPath.GalleryRouterPath.Main) {
-                    galleryMainPostcard(CHOOSE_MEDIA)
-                }.let { result ->
+                toGallery(CHOOSE_MEDIA).let { result ->
                     val uri =
                         result?.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.URI)
                     if (uri != null) {

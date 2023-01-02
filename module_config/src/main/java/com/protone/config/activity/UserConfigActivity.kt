@@ -18,11 +18,11 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.json.toEntity
 import com.protone.component.BaseActivity
 import com.protone.component.database.userConfig
 import com.protone.component.databinding.UserConfigItemLayoutBinding
+import com.protone.component.toGallery
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
 import com.protone.component.view.dialog.checkListDialog
@@ -160,9 +160,7 @@ class UserConfigActivity : BaseActivity<
         }.root
 
     private suspend fun startIconPick() {
-        startActivityForResult(RouterPath.GalleryRouterPath.Main) {
-            galleryMainPostcard(CHOOSE_PHOTO)
-        }.let { re ->
+        toGallery(CHOOSE_PHOTO).let { re ->
             if (re == null) {
                 R.string.come_up_unknown_error.getString().toast()
                 return@let

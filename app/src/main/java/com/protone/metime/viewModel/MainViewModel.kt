@@ -41,7 +41,7 @@ class MainViewModel : BaseViewModel() {
     suspend fun loadBlurIcon(path: String): Bitmap? = withDefaultContext {
         return@withDefaultContext try {
             Blur.blur(
-                withIOContext { path.toBitmap() },
+                path.toBitmap(),
                 radius = 10,
                 sampling = 10
             )

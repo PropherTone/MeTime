@@ -26,6 +26,7 @@ import com.protone.common.utils.SearchModel
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
+import com.protone.component.toGalleryView
 import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.databinding.GallerySearchActivityBinding
@@ -127,12 +128,12 @@ class GallerySearchActivity : BaseMediaActivity<
         }
     }
 
-    override fun openView(galleryMedia: GalleryMedia) {
-        startActivity(GalleryViewActivity::class.intent.putExtras {
-            putString(MEDIA, galleryMedia.toJson())
-            putBoolean(IS_VIDEO, galleryMedia.isVideo)
-            putString(GALLERY, intent.extras?.getString("gallery") ?: ALL_GALLERY)
-        })
+    override fun openView(galleryMedia: GalleryMedia, elementView: View) {
+        toGalleryView(
+            galleryMedia.toJson(),
+            galleryMedia.isVideo,
+            intent.extras?.getString("gallery") ?: ALL_GALLERY
+        )
     }
 
     override fun popDelete() {

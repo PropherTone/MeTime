@@ -18,7 +18,6 @@ import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_VIDEO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.RouterPath.MusicRouterPath.PickPostcard.PICK_MUSIC
 import com.protone.common.utils.RouterPath.MusicRouterPath.PickPostcard.pickMusicPostcard
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.CONTENT_TITLE
@@ -32,10 +31,11 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.spans.ISpanForUse
 import com.protone.common.utils.spans.SpanStates
 import com.protone.component.BaseActivity
-import com.protone.component.view.dialog.imageListDialog
-import com.protone.component.view.dialog.titleDialog
+import com.protone.component.toGallery
 import com.protone.component.view.customView.richText.RichNoteImageLoader
 import com.protone.component.view.customView.richText.RichNoteView
+import com.protone.component.view.dialog.imageListDialog
+import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.note.databinding.NoteEditActivityBinding
 import com.protone.note.viewModel.NoteEditViewModel
@@ -250,9 +250,7 @@ class NoteEditActivity :
     }
 
     private suspend fun startGalleryPick(isPhoto: Boolean) =
-        startActivityForResult(RouterPath.GalleryRouterPath.Main) {
-            galleryMainPostcard(if (isPhoto) CHOOSE_PHOTO else CHOOSE_VIDEO)
-        }?.let { re ->
+        toGallery(if (isPhoto) CHOOSE_PHOTO else CHOOSE_VIDEO)?.let { re ->
             re.getStringExtra(GALLERY_DATA)?.toEntity(GalleryMedia::class.java)
         }
 

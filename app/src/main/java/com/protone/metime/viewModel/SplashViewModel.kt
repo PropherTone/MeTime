@@ -65,6 +65,7 @@ class SplashViewModel : BaseViewModel() {
                 isFirstBoot = false
                 lastMusicBucket = ALL_MUSIC
                 playedMusicPosition = -1
+                lastMusicBucketCover = allMusicRs[0].uri.toString()
             }
         }
     }

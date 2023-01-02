@@ -49,6 +49,7 @@ class GalleryViewActivity : BaseMediaActivity<
     override val viewModel: GalleryViewViewModel by viewModels()
 
     override fun createView(): GalleryViewActivityBinding {
+        postponeEnterTransition()
         return GalleryViewActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GalleryViewActivity
             galleryVCover.fitStatuesBarUsePadding()
@@ -101,13 +102,13 @@ class GalleryViewActivity : BaseMediaActivity<
         }
 
         val mediaIndex = getMediaIndex()
-        initViewPager(mediaIndex, galleryMedias) { position ->
-            curPosition = position
-            setMediaInfo(position)
-        }
+        initViewPager(mediaIndex, galleryMedias)
         setMediaInfo(mediaIndex)
         setInfo()
+        observeEvent()
+    }
 
+    private fun GalleryViewViewModel.observeEvent() {
         onViewEvent {
             when (it) {
                 GalleryViewViewModel.GalleryViewEvent.SetNote -> setInfo()
@@ -156,11 +157,7 @@ class GalleryViewActivity : BaseMediaActivity<
         co.resumeWith(Result.success(indexOf))
     }
 
-    private fun initViewPager(
-        position: Int,
-        data: MutableList<GalleryMedia>,
-        onChange: (Int) -> Unit
-    ) {
+    private fun initViewPager(position: Int, data: MutableList<GalleryMedia>) {
         binding.galleryVView.apply {
             adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
                 override fun getItemCount(): Int = data.size
@@ -177,7 +174,8 @@ class GalleryViewActivity : BaseMediaActivity<
 
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
-                    onChange.invoke(position)
+                    viewModel.curPosition = position
+                    viewModel.setMediaInfo(position)
                     super.onPageSelected(position)
                 }
 

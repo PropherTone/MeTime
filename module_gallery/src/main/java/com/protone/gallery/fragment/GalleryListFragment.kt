@@ -2,7 +2,9 @@ package com.protone.gallery.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.GridLayoutManager
@@ -19,8 +21,10 @@ import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseFragment
+import com.protone.component.toGalleryView
 import com.protone.gallery.activity.GalleryViewActivity
 import com.protone.gallery.activity.PictureBoxActivity
 import com.protone.gallery.adapter.GalleryListAdapter
@@ -56,12 +60,8 @@ class GalleryListFragment :
                 }
             }
 
-            override fun openView(galleryMedia: GalleryMedia) {
-                startActivity(GalleryViewActivity::class.intent.putExtras {
-                    putString(MEDIA, galleryMedia.toJson())
-                    putBoolean(IS_VIDEO, galleryMedia.isVideo)
-                    putString(GALLERY, galleryName)
-                })
+            override fun openView(galleryMedia: GalleryMedia, elementView: View) {
+                toGalleryView(galleryMedia.toJson(), galleryMedia.isVideo, galleryName, elementView)
             }
 
         }

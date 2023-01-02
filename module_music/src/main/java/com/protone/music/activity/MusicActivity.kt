@@ -16,11 +16,14 @@ import com.protone.common.utils.RouterPath
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
+import com.protone.common.utils.json.toUri
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
+import com.protone.component.database.userConfig
 import com.protone.component.view.customView.StatusImageView
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
+import com.protone.component.view.customView.musicPlayer.getBitmap
 import com.protone.music.adapter.MusicBucketAdapter
 import com.protone.music.adapter.MusicListAdapter
 import com.protone.music.databinding.MusicActivityBinding
@@ -29,6 +32,7 @@ import com.protone.music.viewModel.MusicModel
 import com.protone.music.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.Main)
@@ -59,6 +63,13 @@ class MusicActivity :
 
     override fun createView(): MusicActivityBinding {
         return MusicActivityBinding.inflate(layoutInflater, root, false).apply {
+            runBlocking {
+                blurredBucketCover.setImageBitmap(
+                    userConfig.lastMusicBucketCover.getBitmap()?.let {
+                        Blur.blur(it, 24, 10)
+                    }
+                )
+            }
             activity = this@MusicActivity
             musicBucketContainer.fitStatuesBar()
             mySmallMusicPlayer.interceptAlbumCover = true
@@ -97,6 +108,36 @@ class MusicActivity :
             binding.musicPlayerCover.setImageBitmap(it)
         }
 
+        observeEvent(controller)
+
+        initMusicList()
+        initMusicBucketList()
+        bindMusicService {
+            controller.getPlayingMusic()?.let { music ->
+                getMusicListAdapter()?.playPosition(music)
+            }
+            controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
+                getMusicListAdapter()?.playPosition(music)
+            })
+            controller.onClick {
+                binding.musicShowBucket.performClick()
+            }
+            binding.apply {
+                mySmallMusicPlayer.coverSwitcher.setOnClickListener {
+                    startActivity(MusicViewActivity::class.intent)
+                }
+                val location = intArrayOf(0, 0)
+                musicBucketName.getLocationOnScreen(location)
+                musicBucketNamePhanton.y = location[1].toFloat()
+                musicFinish.getLocationOnScreen(location)
+                musicFinishPhanton.y = location[1].toFloat()
+                musicBucketNamePhanton.isGone = false
+                musicFinishPhanton.isGone = false
+            }
+        }
+    }
+
+    private fun MusicModel.observeEvent(controller: MusicControllerIMP) {
         onViewEvent {
             when (it) {
                 is MusicModel.MusicEvent.PlayMusic -> withContext(Dispatchers.Default) {
@@ -109,16 +150,12 @@ class MusicActivity :
                     controller.play(it.music)
                 }
                 is MusicModel.MusicEvent.SetBucketCover -> getBucket(it.name)?.let {
+                    userConfig.lastMusicBucketCover = it.icon ?: ""
                     withContext(Dispatchers.Main) {
                         binding.apply {
                             if (it.icon != null) {
-                                Image.load(it.icon).with(this@MusicActivity)
-                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                    .overwrite(
-                                        musicBucketIcon.measuredWidth,
-                                        musicBucketIcon.measuredHeight
-                                    ).into(musicBucketIcon)
-                                it.icon?.toBitmap()?.let { bm ->
+                                it.icon?.getBitmap()?.let { bm ->
+                                    musicBucketIcon.setImageBitmap(bm)
                                     binding.blurredBucketCover.setImageBitmap(Blur.blur(bm, 24, 10))
                                 }
                             } else {
@@ -205,34 +242,7 @@ class MusicActivity :
                     )
             }
         }
-
-        initMusicList()
-        initMusicBucketList()
-        bindMusicService {
-            controller.getPlayingMusic()?.let { music ->
-                getMusicListAdapter()?.playPosition(music)
-            }
-            controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
-                getMusicListAdapter()?.playPosition(music)
-            })
-            controller.onClick {
-                binding.musicShowBucket.performClick()
-            }
-            binding.apply {
-                mySmallMusicPlayer.coverSwitcher.setOnClickListener {
-                    startActivity(MusicViewActivity::class.intent)
-                }
-                val location = intArrayOf(0, 0)
-                musicBucketName.getLocationOnScreen(location)
-                musicBucketNamePhanton.y = location[1].toFloat()
-                musicFinish.getLocationOnScreen(location)
-                musicFinishPhanton.y = location[1].toFloat()
-                musicBucketNamePhanton.isGone = false
-                musicFinishPhanton.isGone = false
-            }
-        }
     }
-
 
     private fun initMusicList() {
         binding.musicMusicList.apply {
@@ -359,6 +369,13 @@ class MusicActivity :
                 doBlur = false
             })
         }
+    }
+
+    override fun getSwapAnim(): Pair<Int, Int> {
+        return Pair(
+            com.protone.component.R.anim.card_bot_in,
+            com.protone.component.R.anim.card_bot_out
+        )
     }
 
 }

@@ -13,6 +13,7 @@ import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.withMainContext
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.isInDebug
+import com.protone.common.utils.json.toUri
 import com.protone.component.R
 import com.protone.component.view.customView.ColorfulProgressBar
 import com.protone.component.view.customView.SwitchImageView
@@ -22,6 +23,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 val bitmapCachePool by lazy { BitmapCachePool() }
+
+suspend fun Uri.getBitmap() = bitmapCachePool.get(this)
+
+suspend fun String.getBitmap() = bitmapCachePool.get(this)
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null

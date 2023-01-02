@@ -52,6 +52,10 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 
     private val gestureDetector = GestureDetector(context, this)
 
+    var onLoadingStatesListener: LoadingStatesListener? = null
+
+    private var isFirstLoading = true
+
     //缩放相关
     private var mFinger1DownX = 0f
     private var mFinger1DownY = 0f
@@ -208,7 +212,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     }
 
     override fun onDrawForeground(canvas: Canvas?) {
-
         super.onDrawForeground(canvas)
     }
 
@@ -318,6 +321,10 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 
     override suspend fun onDecode() {
         invalidate()
+        if (isFirstLoading) {
+            onLoadingStatesListener?.onFinish()
+            isFirstLoading = false
+        }
     }
 
     private fun performZoom() {
@@ -794,4 +801,8 @@ class FlingInterpolator : Interpolator {
 interface DecodeListener {
     suspend fun onResource()
     suspend fun onDecode()
+}
+
+fun interface LoadingStatesListener {
+    fun onFinish()
 }

@@ -14,11 +14,11 @@ import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.URI
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toUri
 import com.protone.component.BaseActivity
+import com.protone.component.toGallery
 import com.protone.music.databinding.AddBucketActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 
@@ -84,9 +84,7 @@ class AddBucketActivity : BaseActivity<
     }
 
     private suspend fun chooseIcon() = withMainContext {
-        startActivityForResult(RouterPath.GalleryRouterPath.Main) {
-            galleryMainPostcard(CHOOSE_PHOTO)
-        }.let { result ->
+        toGallery(CHOOSE_PHOTO).let { result ->
             uri = result?.getStringExtra(URI)?.toUri()
         }
     }

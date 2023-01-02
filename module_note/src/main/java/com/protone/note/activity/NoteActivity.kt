@@ -155,4 +155,11 @@ class NoteActivity :
     private fun getNoteTypeAdapter(): NoteTypeListAdapter? {
         return (binding.noteBucketList.adapter as NoteTypeListAdapter?)
     }
+
+    override fun getSwapAnim(): Pair<Int, Int> {
+        return Pair(
+            com.protone.component.R.anim.card_in_ltr,
+            com.protone.component.R.anim.card_out_ltr
+        )
+    }
 }

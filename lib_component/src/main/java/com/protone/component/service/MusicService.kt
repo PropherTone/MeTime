@@ -11,6 +11,9 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.protone.common.context.*
+import com.protone.common.entity.Music
+import com.protone.common.entity.getEmptyMusic
 import com.protone.component.MusicControllerIMP.Companion.LOOP_LIST
 import com.protone.component.MusicControllerIMP.Companion.LOOP_SINGLE
 import com.protone.component.MusicControllerIMP.Companion.NO_LOOP
@@ -20,10 +23,7 @@ import com.protone.component.R
 import com.protone.component.broadcast.ApplicationBroadCast
 import com.protone.component.broadcast.MusicReceiver
 import com.protone.component.broadcast.musicBroadCastManager
-import com.protone.common.baseType.toBitmap
-import com.protone.common.context.*
-import com.protone.common.entity.Music
-import com.protone.common.entity.getEmptyMusic
+import com.protone.component.view.customView.musicPlayer.getBitmap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -110,7 +110,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
                                 R.id.notify_music_name,
                                 playList[playPosition.get()].title
                             )
-                            playList[playPosition.get()].uri.toBitmap()?.let { ba ->
+                            playList[playPosition.get()].uri.getBitmap()?.let { ba ->
                                 remoteViews?.setImageViewBitmap(R.id.notify_music_icon, ba)
                             }
                         }

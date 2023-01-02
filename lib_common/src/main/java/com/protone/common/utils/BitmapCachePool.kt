@@ -2,14 +2,25 @@ package com.protone.common.utils
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.collection.LruCache
 import com.protone.common.baseType.toBitmap
+import com.protone.common.baseType.withDefaultContext
+import com.protone.common.utils.json.toUri
 
 class BitmapCachePool {
 
     private val blurMemCache by lazy {
-        val maxMemory = Runtime.getRuntime().maxMemory() / 1024
+        val maxMemory = Runtime.getRuntime().maxMemory()
         BlurMemCache((maxMemory / 8).toInt())
+    }
+
+    suspend fun get(path: String): Bitmap? = withDefaultContext {
+        if (path.isEmpty()) return@withDefaultContext null
+        return@withDefaultContext blurMemCache.get(path) ?: path.toBitmap().let {
+            blurMemCache.put(path, it)
+            it
+        }
     }
 
     suspend fun get(uri: Uri): Bitmap? {

@@ -296,14 +296,22 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         }
     }
 
+    open fun getSwapAnim(): Pair<Int,Int>? {
+        return null
+    }
+
     override fun finish() {
         try {
             launch {
                 Log.d(TAG, "finish: ${this@BaseActivity::class.simpleName}")
                 onFinish?.invoke() ?: doFinish()
+                getSwapAnim()?.let {
+                    overridePendingTransition(it.first,it.second)
+                }
             }
         } finally {
             super.finish()
+
         }
     }
 
@@ -313,8 +321,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
             binding.unbind()
             activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
         } finally {
-            super.onDestroy()
             cancel()
+            super.onDestroy()
         }
     }
 

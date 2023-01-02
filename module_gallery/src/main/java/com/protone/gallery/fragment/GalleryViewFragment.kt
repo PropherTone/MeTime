@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
+import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
 import com.protone.component.databinding.RichVideoLayoutBinding
+import com.protone.component.view.customView.LoadingStatesListener
 import com.protone.gallery.databinding.GalleryVp2AdapterLayoutBinding
 
 class GalleryViewFragment(
@@ -47,8 +50,19 @@ class GalleryViewFragment(
         super.onResume()
         if (!galleryMedia.isVideo) {
             if (galleryMedia.name.contains("gif")) {
-                imageBinding?.image?.let { Image.load(galleryMedia.uri).with(this).into(it) }
+                imageBinding?.image?.let {
+                    Image.load(galleryMedia.uri).with(this)
+                        .setInterceptor(object : RequestInterceptor() {
+                            override fun onLoadSuccess(result: LoadSuccessResult) {
+                                super.onLoadSuccess(result)
+                                activity?.startPostponedEnterTransition()
+                            }
+                        }).into(it)
+                }
             } else {
+                imageBinding?.image?.onLoadingStatesListener = LoadingStatesListener {
+                    activity?.startPostponedEnterTransition()
+                }
                 imageBinding?.image?.setImageResource(galleryMedia.uri)
             }
             imageBinding?.image?.locate()

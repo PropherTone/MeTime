@@ -267,6 +267,14 @@ class GalleryActivity :
 
     private fun getBucketAdapter() = binding.galleryBucket.adapter as GalleryBucketAdapter
 
+    override fun getSwapAnim(): Pair<Int, Int>? {
+        if (!binding.galleryChooseConfirm.isGone) return null
+        return Pair(
+            com.protone.component.R.anim.card_in_rtl,
+            com.protone.component.R.anim.card_out_rtl
+        )
+    }
+
     override fun onBackPressed() {
         if (!doOnBackPressed()) {
             if (onSelectMode) {
