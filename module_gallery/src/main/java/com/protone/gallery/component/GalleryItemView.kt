@@ -7,6 +7,8 @@ import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.animation.doOnEnd
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnDetach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
@@ -25,7 +27,7 @@ class GalleryItemView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     private val binding =
         GalleryItemLayoutBinding.inflate(context.newLayoutInflater, this, true).apply {
-            root.setOnTouchListener { v, event ->
+            root.setOnTouchListener { _, event ->
                 mX = event.x
                 mY = event.y
                 false
@@ -40,7 +42,9 @@ class GalleryItemView @JvmOverloads constructor(
 
     var check: Boolean = false
         set(value) {
-            reveal(!value)
+            try {
+                reveal(!value)
+            } catch (e: Exception) { }
             field = value
         }
 

@@ -61,9 +61,11 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
             }
             is MusicListEvent.InsertMusics -> {
                 if (data.musics.isEmpty()) return
-                val oldSize = mList.size - 1
+                val oldSize = mList.size
+                mList.clear()
+                notifyItemRangeRemoved(0, oldSize)
                 mList.addAll(data.musics)
-                notifyItemRangeInsertedCO(oldSize, mList.size - 1)
+                notifyItemRangeInsertedCO(0, mList.size)
             }
         }
     }

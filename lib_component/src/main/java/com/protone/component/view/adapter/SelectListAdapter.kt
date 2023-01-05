@@ -64,9 +64,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
     abstract val select: (content: VB, position: Int, isSelect: Boolean) -> Unit
     abstract fun itemIndex(path: Item): Int
 
-    fun setSelect(content: VB, position: Int, state: Boolean) = launch {
-        select(content, position, state)
-    }
+    fun setSelect(content: VB, position: Int, state: Boolean) = select(content, position, state)
 
     fun clearSelected() {
         if (selectList.size > 0) {

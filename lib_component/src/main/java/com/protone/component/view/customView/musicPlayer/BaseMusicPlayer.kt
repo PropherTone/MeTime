@@ -21,12 +21,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.lang.NullPointerException
 
 val bitmapCachePool by lazy { BitmapCachePool() }
 
 suspend fun Uri.getBitmap() = bitmapCachePool.get(this)
 
-suspend fun String.getBitmap() = bitmapCachePool.get(this)
+suspend fun String.getBitmap() = try {
+    bitmapCachePool.get(this)
+} catch (e: NullPointerException) {
+    null
+}
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null

@@ -11,6 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import com.protone.common.context.MApplication
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.R
@@ -104,7 +105,7 @@ class GalleryListAdapter(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         if (itemLength == 0) {
-            itemLength = recyclerView.run { (width - paddingEnd - paddingStart) / 4 }
+            itemLength = MApplication.screenWidth / 4
         }
         recyclerView.layoutAnimationListener = object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
