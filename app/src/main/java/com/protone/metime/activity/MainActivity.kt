@@ -1,5 +1,6 @@
 package com.protone.metime.activity
 
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
@@ -8,10 +9,7 @@ import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.toast
-import com.protone.common.context.MApplication
-import com.protone.common.context.clipOutLine
-import com.protone.common.context.onGlobalLayout
-import com.protone.common.context.root
+import com.protone.common.context.*
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
@@ -26,6 +24,8 @@ import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
 import com.protone.component.database.userConfig
+import com.protone.component.service.MusicService
+import com.protone.component.service.WorkService
 import com.protone.component.toGallery
 import com.protone.component.view.customView.musicPlayer.getBitmap
 import com.protone.metime.adapter.TimeListAdapter
@@ -103,10 +103,6 @@ class MainActivity :
                 userIcon = userConfig.userIcon.also {
                     musicController.setInterceptAlbumCover(it.isEmpty())
                 }
-            }
-            onFinish {
-                userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
-                userConfig.lastMusic = musicController.getPlayingMusic()?.toJson() ?: ""
             }
         }
 

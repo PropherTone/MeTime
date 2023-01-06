@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 
-abstract class LifecycleService : Service(), LifecycleOwner {
+abstract class LifecycleService : BaseService(), LifecycleOwner {
 
     private lateinit var lifecycleRegistry: LifecycleRegistry
 

@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlin.coroutines.CoroutineContext
 
-class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatchers.Default) {
+class WorkService : LifecycleService() {
 
     companion object {
         private const val UPDATE_MUSIC = 1

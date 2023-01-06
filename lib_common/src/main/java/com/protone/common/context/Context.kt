@@ -2,7 +2,9 @@ package com.protone.common.context
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
@@ -62,6 +64,13 @@ fun Context.linkInput(target: View, input: View) {
         false
     }
 }
+
+fun Context.isServiceRunning(clazz: Class<*>): Boolean =
+    (getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager?).let {
+        return it?.getRunningServices(Int.MAX_VALUE)?.find { runningServiceInfo ->
+            runningServiceInfo.service.className == clazz.name
+        } != null
+    }
 
 inline fun Context.onUiThread(crossinline function: () -> Unit) {
     if (Looper.getMainLooper() == Looper.myLooper()) {

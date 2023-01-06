@@ -3,12 +3,16 @@ package com.protone.metime.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.viewModels
 import com.protone.common.context.*
+import com.protone.common.utils.SCrashHandler
 import com.protone.metime.databinding.SplashActivityBinding
 import com.protone.metime.viewModel.SplashViewModel
 import com.protone.component.BaseActivity
 import com.protone.component.broadcast.workLocalBroadCast
+import com.protone.component.service.MusicService
+import com.protone.component.service.WorkService
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity :
@@ -28,6 +32,7 @@ class SplashActivity :
     }
 
     override suspend fun SplashViewModel.init() {
+        SCrashHandler.setIntent(SplashActivity::class.intent)
         onViewEvent {
             when (it) {
                 SplashViewModel.SplashEvent.InitConfig -> {

@@ -21,6 +21,16 @@ import com.protone.common.utils.isInDebug
 val activityOperationBroadcast: LocalBroadcastManager =
     LocalBroadcastManager.getInstance(MApplication.app)
 
+val activities = mutableListOf<Activity>()
+
+fun finishAll() {
+    val iterator: MutableIterator<Activity> = activities.iterator()
+    while (iterator.hasNext()) {
+        iterator.next().finish()
+        iterator.remove()
+    }
+}
+
 fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
     var name = ""
     contentResolver.query(

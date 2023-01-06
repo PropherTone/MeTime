@@ -42,9 +42,7 @@ class GalleryItemView @JvmOverloads constructor(
 
     var check: Boolean = false
         set(value) {
-            try {
-                reveal(!value)
-            } catch (e: Exception) { }
+            reveal(!value)
             field = value
         }
 
@@ -52,29 +50,37 @@ class GalleryItemView @JvmOverloads constructor(
         binding.apply {
             val radius = hypot(mX.toDouble(), mY.toDouble()).toFloat()
             if (visible) {
-                val reveal =
+                val reveal = try {
                     ViewAnimationUtils.createCircularReveal(
                         bucket, mX.toInt(),
                         mY.toInt(), 0f, radius
                     )
+                } catch (e: Exception) {
+                    null
+                }
                 bucket.isGone = false
                 bucketCheck.animate().scaleX(0f).withEndAction {
                     bucketCheck.isVisible = false
                 }.start()
-                reveal.start()
+                reveal?.start()
             } else {
-                val reveal =
+                val reveal = try {
                     ViewAnimationUtils.createCircularReveal(
                         bucket, mX.toInt(),
                         mY.toInt(), radius, 0f
                     )
+                } catch (e: Exception) {
+                    null
+                }
                 bucketCheck.animate().scaleX(1f).withStartAction {
                     bucketCheck.isVisible = true
                 }.start()
-                reveal.doOnEnd {
+                if (reveal == null) {
+                    bucket.isGone = true
+                } else reveal.doOnEnd {
                     bucket.isGone = true
                 }
-                reveal.start()
+                reveal?.start()
             }
         }
     }

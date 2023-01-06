@@ -90,8 +90,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 ACTIVITY_FINISH -> {
-                    finish()
-                    exitProcess(0)
+                    finishAll()
                 }
                 ACTIVITY_RESTART -> {}
             }
@@ -296,7 +295,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         }
     }
 
-    open fun getSwapAnim(): Pair<Int,Int>? {
+    open fun getSwapAnim(): Pair<Int, Int>? {
         return null
     }
 
@@ -306,7 +305,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
                 Log.d(TAG, "finish: ${this@BaseActivity::class.simpleName}")
                 onFinish?.invoke() ?: doFinish()
                 getSwapAnim()?.let {
-                    overridePendingTransition(it.first,it.second)
+                    overridePendingTransition(it.first, it.second)
                 }
             }
         } finally {

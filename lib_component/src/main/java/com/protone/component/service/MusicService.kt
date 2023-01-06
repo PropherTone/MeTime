@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import com.protone.common.context.*
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
+import com.protone.common.utils.json.toJson
 import com.protone.component.MusicControllerIMP.Companion.LOOP_LIST
 import com.protone.component.MusicControllerIMP.Companion.LOOP_SINGLE
 import com.protone.component.MusicControllerIMP.Companion.NO_LOOP
@@ -23,6 +24,7 @@ import com.protone.component.R
 import com.protone.component.broadcast.ApplicationBroadCast
 import com.protone.component.broadcast.MusicReceiver
 import com.protone.component.broadcast.musicBroadCastManager
+import com.protone.component.database.userConfig
 import com.protone.component.view.customView.musicPlayer.getBitmap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -34,9 +36,7 @@ import kotlin.concurrent.timerTask
 /**
  * MusicService by ProTone 2022/03/23
  */
-class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Default),
-    IMusicService,
-    MediaPlayer.OnCompletionListener {
+class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListener {
 
     companion object {
         const val MUSIC_NOTIFICATION_NAME = "MUSIC_NOTIFICATION"
@@ -52,7 +52,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
     private fun initMusicPlayer(): MediaPlayer? {
         if (playList.isEmpty()) return null
         if (musicPlayer == null) {
-
             musicPlayer = MediaPlayer.create(
                 MApplication.app,
                 playList[playPosition.get()].uri
@@ -150,11 +149,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
             Log.d("TAG", "onDestroy")
         }
         notificationManager?.cancelAll()
+        userConfig.lastMusic = onMusicPlaying().value?.toJson() ?: ""
+        userConfig.lastMusicProgress = progress.value ?: 0L
         super.onDestroy()
         cancel()
         activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
     }
-
 
     private fun initMusicNotification(): Notification {
         remoteViews = RemoteViews(packageName, R.layout.music_notification_layout).apply {
