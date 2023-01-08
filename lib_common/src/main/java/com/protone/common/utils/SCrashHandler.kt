@@ -34,7 +34,6 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
     override fun uncaughtException(t: Thread, e: Throwable) {
         if (path != null) {
             writeLog(e, t)
-            defaultUncaughtExceptionHandler?.uncaughtException(t, e)
             intent?.let {
                 it.addFlags(
                     Intent.FLAG_ACTIVITY_CLEAR_TOP

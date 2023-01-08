@@ -77,30 +77,31 @@ class GalleryActivity :
         val chooseType =
             intent.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE) ?: ""
 
-        if (chooseType.isNotEmpty()) {
+        val notEmpty = chooseType.isNotEmpty()
+        if (notEmpty) {
             binding.galleryActionMenu.isVisible = false
-            binding.galleryChooseConfirm.isGone = chooseType.isEmpty()
+            binding.galleryChooseConfirm.isGone = !notEmpty
             binding.galleryChooseConfirm.setOnClickListener {
                 chooseData.let { list ->
                     if (list.size <= 0) return@let
                     setResult(
                         RESULT_OK,
-                        Intent().putExtra(URI, list[0].uri.toUriJson())
-                            .putExtra(GALLERY_DATA, list[0].toJson())
+                        Intent().putExtra(URI, list.last().uri.toUriJson())
+                            .putExtra(GALLERY_DATA, list.last().toJson())
                     )
                 }
                 finish()
             }
         }
 
-        observeEvent()
+        observeEvent(!notEmpty)
         sortData()
         initList()
         initPager(chooseType)
     }
 
-    private fun GalleryViewModel.observeEvent() {
-        observeSelectData(this@GalleryActivity) {
+    private fun GalleryViewModel.observeEvent(multiChoose: Boolean) {
+        observeSelectData(multiChoose, this@GalleryActivity) {
             onSelectMode = chooseData.isNotEmpty()
         }
         launchDefault {
@@ -157,7 +158,7 @@ class GalleryActivity :
                 var initializeSize = 0
                 fun generateFragment(isVideo: Boolean) {
                     GalleryListFragment().also {
-                        it.connect(generateMailer(isVideo).onSubscription {
+                        it.connect(chooseType.isEmpty(), generateMailer(isVideo).onSubscription {
                             getBucket(ALL_GALLERY)?.let { gallery ->
                                 getBucketAdapter().setSelected(gallery)
                                 setSelectedGallery(gallery)

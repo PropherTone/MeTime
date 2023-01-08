@@ -47,6 +47,8 @@ class AddBucketActivity : BaseActivity<
             field = value
         }
 
+    private var onConfirm = false
+
     override fun createView(): AddBucketActivityBinding {
         return AddBucketActivityBinding.inflate(layoutInflater, root, false).apply {
             root.fitStatuesBarUsePadding()
@@ -95,6 +97,8 @@ class AddBucketActivity : BaseActivity<
     }
 
     private suspend fun AddBucketViewModel.confirm() = withMainContext {
+        if (onConfirm) return@withMainContext
+        onConfirm = true
         var intent: Intent?
         if (editName != null) {
             val re = musicBucket?.let {

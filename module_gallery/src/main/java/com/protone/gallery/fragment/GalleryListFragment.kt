@@ -68,6 +68,7 @@ class GalleryListFragment :
     }
 
     fun connect(
+        multiChoose: Boolean,
         mailer: Flow<GalleryViewModel.GalleryListEvent>,
         liveData: MutableLiveData<GalleryMedia>
     ) {
@@ -85,7 +86,7 @@ class GalleryListFragment :
                                 itemCount = it.gallery.size
                             ).also { adapter ->
                                 adapter.itemLength = getListAdapter().itemLength
-                                adapter.multiChoose = true
+                                adapter.multiChoose = multiChoose
                                 adapter.setOnSelectListener(onSelect)
                             }, false
                         )

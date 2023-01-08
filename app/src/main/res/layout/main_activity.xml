@@ -222,22 +222,22 @@
                 android:layout_height="@dimen/action_icon"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:contentDescription="@string/model_noteBook"
-                android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Note.INSTANCE)}"
+                android:contentDescription="@string/model_music"
+                android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Music.INSTANCE)}"
                 android:paddingTop="@dimen/main_padding"
                 android:paddingBottom="@dimen/main_padding"
-                android:src="@drawable/ic_baseline_book_24_white" />
+                android:src="@drawable/ic_baseline_album_24_white" />
 
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="@dimen/action_icon"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:contentDescription="@string/model_music"
-                android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Music.INSTANCE)}"
+                android:contentDescription="@string/model_noteBook"
+                android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Note.INSTANCE)}"
                 android:paddingTop="@dimen/main_padding"
                 android:paddingBottom="@dimen/main_padding"
-                android:src="@drawable/ic_baseline_album_24_white" />
+                android:src="@drawable/ic_baseline_book_24_white" />
 
         </LinearLayout>
 

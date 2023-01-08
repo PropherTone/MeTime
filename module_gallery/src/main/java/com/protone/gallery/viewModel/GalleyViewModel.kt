@@ -177,11 +177,13 @@ class GalleryViewModel : BaseViewModel() {
     }
 
     inline fun observeSelectData(
+        multiChoose: Boolean,
         owner: LifecycleOwner,
         crossinline onPost: (GalleryMedia) -> Unit
     ) {
         liveData.observe(owner) {
             if (it == null) return@observe
+            if (!multiChoose) chooseData.clear()
             chooseData.add(it)
             onPost(it)
         }
