@@ -1,14 +1,8 @@
 package com.protone.gallery.viewModel
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.tabs.TabLayout
 import com.protone.common.R
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.launchDefault
-import com.protone.common.baseType.launchIO
-import com.protone.common.baseType.toast
+import com.protone.common.baseType.*
 import com.protone.common.entity.Gallery
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
@@ -16,7 +10,6 @@ import com.protone.common.utils.EventCachePool
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
-import com.protone.gallery.adapter.GalleryListAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -60,7 +53,7 @@ class GalleryViewModel : BaseViewModel() {
     private fun getGalleryData(isVideo: Boolean) = if (isVideo) galleryVideoData else galleryData
     fun getGalleryData() = if (isVideoGallery) galleryVideoData else galleryData
 
-    val liveData by lazy { MutableLiveData<GalleryMedia>() }
+    val dataFlow by lazy { MutableSharedFlow<GalleryListFragmentViewModel.GallerySelectData?>() }
     val chooseData by lazy { mutableListOf<GalleryMedia>() }
 
     private var rightMediaGallery = ALL_GALLERY
@@ -75,7 +68,8 @@ class GalleryViewModel : BaseViewModel() {
             return if (isVideoGallery) rightVideoGallery else rightMediaGallery
         }
 
-    private var rightMailer = 0
+    var rightMailer = 0
+        private set
     private var isDataSorted = false
     private val combine = userConfig.combineGallery
     private val isVideoGallery: Boolean get() = rightMailer == 1
@@ -147,7 +141,7 @@ class GalleryViewModel : BaseViewModel() {
     fun quiteSelect() {
         viewModelScope.launch {
             chooseData.clear()
-            liveData.postValue(null)
+            dataFlow.emit(null)
             sendListEvent(GalleryListEvent.QuiteSelect)
         }
     }
@@ -176,16 +170,24 @@ class GalleryViewModel : BaseViewModel() {
         return mailer != rightMailer
     }
 
-    inline fun observeSelectData(
-        multiChoose: Boolean,
-        owner: LifecycleOwner,
-        crossinline onPost: (GalleryMedia) -> Unit
-    ) {
-        liveData.observe(owner) {
-            if (it == null) return@observe
-            if (!multiChoose) chooseData.clear()
-            chooseData.add(it)
-            onPost(it)
+    inline fun observeSelectData(crossinline onPost: (Boolean) -> Unit) {
+        viewModelScope.launchDefault {
+            dataFlow.bufferCollect {
+                when (it) {
+                    is GalleryListFragmentViewModel.GallerySelectData.OnGalleryMediaSelect -> {
+                        chooseData.add(it.media)
+                        onPost(true)
+                    }
+                    is GalleryListFragmentViewModel.GallerySelectData.OnGalleryMediasSelect -> {
+                        chooseData.addAll(it.medias)
+                        onPost(true)
+                    }
+                    null -> {
+                        chooseData.clear()
+                        onPost(false)
+                    }
+                }
+            }
         }
     }
 

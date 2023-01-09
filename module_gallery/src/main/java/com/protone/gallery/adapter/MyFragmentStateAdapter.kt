@@ -8,4 +8,5 @@ class MyFragmentStateAdapter(context: FragmentActivity, private val fragments: L
     FragmentStateAdapter(context) {
     override fun createFragment(position: Int): Fragment = fragments[position]
     override fun getItemCount(): Int = fragments.size
+    fun getFragment(position: Int) = if (position >= fragments.size) null else fragments[position]
 }

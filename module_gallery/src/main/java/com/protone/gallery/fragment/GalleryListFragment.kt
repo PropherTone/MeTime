@@ -5,13 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import com.protone.common.baseType.bufferCollect
-import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchMain
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseFragment
 import com.protone.component.toGalleryView
@@ -22,30 +19,40 @@ import com.protone.gallery.viewModel.GalleryListFragmentViewModel
 import com.protone.gallery.viewModel.GalleryViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class GalleryListFragment :
     BaseFragment<GalleryListFragmentLayoutBinding, GalleryListFragmentViewModel>() {
 
     private var isInit = false
-    private lateinit var liveSelectData: MutableLiveData<GalleryMedia>
+    private lateinit var selectFlow: MutableSharedFlow<GalleryListFragmentViewModel.GallerySelectData?>
     private var galleryName = ""
 
     private val onSelect by lazy {
         object : GalleryListAdapter.OnSelect {
-            override fun select(galleryMedia: GalleryMedia) {
-                liveSelectData.postValue(galleryMedia)
+            override fun select(media: GalleryMedia) {
+                launch {
+                    selectFlow.emit(
+                        GalleryListFragmentViewModel
+                            .GallerySelectData
+                            .OnGalleryMediaSelect(media)
+                    )
+                }
             }
 
-            override fun select(galleryMedia: List<GalleryMedia>) {
-                launchDefault {
-                    galleryMedia.forEach {
-                        liveSelectData.postValue(it)
-                    }
+            override fun select(medias: List<GalleryMedia>) {
+                launch {
+                    selectFlow.emit(
+                        GalleryListFragmentViewModel
+                            .GallerySelectData
+                            .OnGalleryMediasSelect(medias)
+                    )
                 }
             }
 
             override fun openView(galleryMedia: GalleryMedia, elementView: View) {
-                toGalleryView(galleryMedia.toJson(), galleryMedia.isVideo, galleryName, elementView)
+                toGalleryView(galleryMedia.toJson(), galleryMedia.isVideo, galleryName)
             }
 
         }
@@ -54,9 +61,9 @@ class GalleryListFragment :
     fun connect(
         multiChoose: Boolean,
         mailer: Flow<GalleryViewModel.GalleryListEvent>,
-        liveData: MutableLiveData<GalleryMedia>
+        flow: MutableSharedFlow<GalleryListFragmentViewModel.GallerySelectData?>
     ) {
-        liveSelectData = liveData
+        selectFlow = flow
         launchMain {
             mailer.bufferCollect {
                 while (!isInit) delay(20L)
@@ -108,6 +115,8 @@ class GalleryListFragment :
             }
         }
     }
+
+    fun getGalleryData() = getListAdapter().mList
 
     override fun createViewModel(): GalleryListFragmentViewModel {
         val model: GalleryListFragmentViewModel by viewModels()

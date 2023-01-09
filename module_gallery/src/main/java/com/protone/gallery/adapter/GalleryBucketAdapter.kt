@@ -144,6 +144,7 @@ class GalleryBucketAdapter(
                 changedText(data)
                 changedUri(data)
                 bucket.setOnClickListener {
+                    if (selectList.contains(data)) return@setOnClickListener
                     checkSelect(position, data)
                     selectBucket?.invoke(data)
                 }
@@ -154,7 +155,6 @@ class GalleryBucketAdapter(
     override fun checkSelect(
         position: Int, item: Gallery
     ) {
-        if (selectList.contains(item)) return
         if (!multiChoose) clearSelected()
         selectList.add(item)
         refreshVisiblePosition()

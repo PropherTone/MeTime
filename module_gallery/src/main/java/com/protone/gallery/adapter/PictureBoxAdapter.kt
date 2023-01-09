@@ -80,7 +80,7 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
     override fun onViewRecycled(holder: Holder<ViewDataBinding>) {
         when (holder.binding) {
             is PictureBoxAdapterLayoutBinding ->
-                (holder.binding as PictureBoxAdapterGifLayoutBinding).apply {
+                (holder.binding as PictureBoxAdapterLayoutBinding).apply {
                     image.clear()
                 }
             is PictureBoxAdapterVideoLayoutBinding ->

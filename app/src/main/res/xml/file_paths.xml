@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 物理路径为Context.getCacheDir() + /files/* -->
+    <external-cache-path path="CrashLog/" name="cache" />
+    <files-path path="SharedMedia/" name="share" />
+
+</paths>

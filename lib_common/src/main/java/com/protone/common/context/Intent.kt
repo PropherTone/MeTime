@@ -16,7 +16,6 @@ const val MUSIC_REFRESH = "RefreshNotification"
 const val FINISH = "FINISH"
 const val ACTIVITY_FINISH = "ACTIVITY_FINISH"
 const val ACTIVITY_RESTART = "ACTIVITY_RESTART"
-const val MUSIC = "MUSIC"
 
 const val UPDATE_MUSIC = "UPDATE_MUSIC"
 const val UPDATE_GALLERY = "UPDATE_GALLERY"
@@ -46,7 +45,6 @@ val appIntentFilter: IntentFilter
     get() {
         return IntentFilter().apply {
             addAction(FINISH)
-            addAction(MUSIC)
         }
     }
 

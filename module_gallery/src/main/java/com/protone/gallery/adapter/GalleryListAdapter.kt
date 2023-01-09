@@ -227,8 +227,8 @@ class GalleryListAdapter(
     private var onSelectListener: OnSelect? = null
 
     interface OnSelect {
-        fun select(galleryMedia: GalleryMedia)
-        fun select(galleryMedia: List<GalleryMedia>)
+        fun select(media: GalleryMedia)
+        fun select(medias: List<GalleryMedia>)
         fun openView(galleryMedia: GalleryMedia, elementView: View)
     }
 

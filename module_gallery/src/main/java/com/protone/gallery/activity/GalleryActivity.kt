@@ -3,7 +3,6 @@ package com.protone.gallery.activity
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
-import android.util.Log
 import android.view.ViewAnimationUtils
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -45,7 +44,6 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.hypot
-import kotlin.system.measureTimeMillis
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
@@ -94,16 +92,14 @@ class GalleryActivity :
             }
         }
 
-        observeEvent(!notEmpty)
+        observeEvent()
         sortData()
         initList()
         initPager(chooseType)
     }
 
-    private fun GalleryViewModel.observeEvent(multiChoose: Boolean) {
-        observeSelectData(multiChoose, this@GalleryActivity) {
-            onSelectMode = chooseData.isNotEmpty()
-        }
+    private fun GalleryViewModel.observeEvent() {
+        observeSelectData { onSelectMode = it }
         launchDefault {
             galleryFlow.bufferCollect {
                 while (!isInit) delay(20L)
@@ -166,7 +162,7 @@ class GalleryActivity :
                             if (++initializeSize == fs.size) {
                                 isInit = true
                             }
-                        }, liveData)
+                        }, dataFlow)
                         fs.add(it)
                     }
                 }
@@ -316,6 +312,12 @@ class GalleryActivity :
     }
 
     override fun popIntoBox() {
+        if (viewModel.chooseData.isEmpty()) {
+            ((binding.galleryPager.adapter as MyFragmentStateAdapter)
+                .getFragment(viewModel.rightMailer) as GalleryListFragment?)
+                ?.getGalleryData()
+                ?.let { viewModel.chooseData.addAll(it) }
+        }
         IntentDataHolder.put(viewModel.chooseData)
         startActivity(PictureBoxActivity::class.intent)
     }

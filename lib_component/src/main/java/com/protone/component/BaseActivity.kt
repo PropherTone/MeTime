@@ -310,7 +310,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
             }
         } finally {
             super.finish()
-
         }
     }
 

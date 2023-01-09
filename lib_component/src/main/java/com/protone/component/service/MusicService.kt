@@ -1,6 +1,9 @@
 package com.protone.component.service
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
@@ -14,7 +17,6 @@ import androidx.lifecycle.MutableLiveData
 import com.protone.common.context.*
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
-import com.protone.common.utils.SCrashHandler
 import com.protone.common.utils.json.toJson
 import com.protone.component.MusicControllerIMP.Companion.LOOP_LIST
 import com.protone.component.MusicControllerIMP.Companion.LOOP_SINGLE
@@ -27,9 +29,12 @@ import com.protone.component.broadcast.MusicReceiver
 import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.database.userConfig
 import com.protone.component.view.customView.musicPlayer.getBitmap
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.timerTask
@@ -83,11 +88,6 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
                 onDestroy()
             }
         }
-
-        override fun music() {
-            MApplication.startActivity("com.protone.music.activity.MusicViewActivity", 0L)
-        }
-
     }
 
     private val receiver = object : MusicServiceReceiver(this) {
@@ -183,10 +183,13 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
                 intentFlags
             ).let { setOnClickPendingIntent(R.id.notify_music_next, it) }
 
-            PendingIntent.getBroadcast(
+            PendingIntent.getActivity(
                 this@MusicService,
                 0,
-                Intent(MUSIC),
+                Intent(
+                    MApplication.app,
+                    Class.forName("com.protone.music.activity.MusicViewActivity")
+                ),
                 intentFlags
             ).let { setOnClickPendingIntent(R.id.notify_music_parent, it) }
 

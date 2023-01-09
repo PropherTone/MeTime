@@ -1,5 +1,6 @@
 package com.protone.music.activity
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.transition.TransitionManager
@@ -16,6 +17,7 @@ import com.protone.component.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.MusicControllerIMP
 import com.protone.common.R
+import com.protone.common.context.activities
 import com.protone.common.utils.RouterPath
 import com.protone.music.adapter.TransparentPlayListAdapter
 import com.protone.component.view.customView.blurView.DefaultBlurController
@@ -87,5 +89,11 @@ class MusicViewActivity :
     fun showPop() {
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup?)
         binding.pop.isGone = !binding.pop.isGone
+    }
+
+    override suspend fun doFinish() {
+        if (activities.size == 1 && activities.contains(this)) {
+            startActivity(Intent(this, Class.forName("com.protone.metime.activity.SplashActivity")))
+        }
     }
 }
