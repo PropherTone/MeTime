@@ -119,10 +119,10 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
 
     fun getPlayingPosition(): Int {
         if (mList.size <= 0) return -1
-        return mList.indexOf(selectList.getOrNull(0) ?: mList[0])
+        return mList.indexOf(selectList.first ?: mList[0])
     }
 
-    fun getPlayingMusic(): Music? = selectList.getOrNull(0)
+    fun getPlayingMusic(): Music? = selectList.first
 
     fun getPlayList() = mList.toMutableList()
 

@@ -22,10 +22,9 @@ import com.protone.component.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.service.MusicBinder
-import com.protone.music.adapter.AddMusicListAdapter
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
-import com.protone.music.R
+import com.protone.music.adapter.AddMusicListAdapter
 import com.protone.music.databinding.PickMusicActivityBinding
 import com.protone.music.viewModel.PickMusicViewModel
 import com.protone.music.viewModel.PickMusicViewModel.Companion.ADD_BUCKET
@@ -92,7 +91,7 @@ class PickMusicActivity :
         val selectList = getSelectList()
         if (selectList != null && selectList.isNotEmpty()) {
             setResult(RESULT_OK, Intent().apply {
-                data = selectList[0].uri
+                data = selectList.first.uri
             })
         } else com.protone.common.R.string.cancel.getString().toast()
         finish()

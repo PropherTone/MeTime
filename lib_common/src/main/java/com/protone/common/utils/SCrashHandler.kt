@@ -25,45 +25,6 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
         Thread.setDefaultUncaughtExceptionHandler(this)
     }
 
-    private var intent: Intent? = null
-
-    fun setIntent(intent: Intent) {
-        this.intent = intent
-    }
-
-    override fun uncaughtException(t: Thread, e: Throwable) {
-        if (path != null) {
-            writeLog(e, t)
-            intent?.let {
-                it.addFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            or Intent.FLAG_ACTIVITY_NEW_TASK
-                )
-                val flag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                } else {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                }
-                val restartIntent = PendingIntent.getActivity(MApplication.app, 0, intent, flag)
-                (MApplication.app.getSystemService(Context.ALARM_SERVICE) as AlarmManager?)?.set(
-                    AlarmManager.RTC,
-                    System.currentTimeMillis() + 1000L,
-                    restartIntent
-                )
-            }
-            val iterator: MutableIterator<Activity> = activities.iterator()
-            while (iterator.hasNext()) {
-                iterator.next().finish()
-                iterator.remove()
-            }
-            android.os.Process.killProcess(android.os.Process.myPid())
-            exitProcess(0)
-        } else {
-            defaultUncaughtExceptionHandler?.uncaughtException(t, e)
-        }
-    }
-
     fun writeLog(e: Throwable, t: Thread? = null) {
         val writer = StringWriter()
         val printWriter = PrintWriter(writer)
@@ -79,5 +40,24 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
         val fileWriter = FileWriter(crashFile)
         fileWriter.write(cause)
         fileWriter.close()
+    }
+
+    override fun uncaughtException(t: Thread, e: Throwable) {
+        if (path != null) {
+            writeLog(e, t)
+            MApplication.startActivity(
+                "com.protone.metime.activity.SplashActivity",
+                System.currentTimeMillis() + 1000L
+            )
+            val iterator: MutableIterator<Activity> = activities.iterator()
+            while (iterator.hasNext()) {
+                iterator.next().finish()
+                iterator.remove()
+            }
+            android.os.Process.killProcess(android.os.Process.myPid())
+            exitProcess(0)
+        } else {
+            defaultUncaughtExceptionHandler?.uncaughtException(t, e)
+        }
     }
 }

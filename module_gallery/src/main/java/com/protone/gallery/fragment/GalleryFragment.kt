@@ -268,7 +268,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
     override fun select(galleryMedia: GalleryMedia) = Unit
 
-    override fun select(galleryMedia: MutableList<GalleryMedia>) {
+    override fun select(galleryMedia: List<GalleryMedia>) {
         launch {
             viewModel.sendEvent(GalleryFragmentViewModel.FragEvent.OnSelect(galleryMedia), true)
         }

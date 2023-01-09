@@ -44,7 +44,7 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel
                         Intent.EXTRA_STREAM,
                         FileProvider.getUriForFile(
                             this@LogActivity,
-                            "com.protone.seenn.fileProvider",
+                            "com.protone.MeTime.fileProvider",
                             File(path)
                         )
                     )

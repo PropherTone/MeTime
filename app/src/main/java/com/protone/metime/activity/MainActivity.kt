@@ -23,6 +23,7 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
+import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
 import com.protone.component.service.MusicService
 import com.protone.component.service.WorkService
@@ -32,6 +33,7 @@ import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class MainActivity :
@@ -113,7 +115,7 @@ class MainActivity :
         observeViewEvent()
     }
 
-    private fun MusicControllerIMP.bindMusicService() {
+    private suspend fun MusicControllerIMP.bindMusicService() {
         bindMusicService {
             setBinder(this@MainActivity, it) { loopMode ->
                 userConfig.musicLoopMode = loopMode
@@ -195,13 +197,24 @@ class MainActivity :
                     }
                 }
             }).let { timeListAdapter ->
+                adapter = timeListAdapter
                 launchDefault {
                     viewModel.getTimeMediaPager(2).collect {
                         timeListAdapter.submitData(it)
                     }
                 }
-                adapter = timeListAdapter
+                launchDefault observer@{
+                    viewModel.observeGalleryData {
+                        when (it) {
+                            is MediaAction.GalleryDataAction.OnGalleryMediasInserted ->
+                                if (timeListAdapter.itemCount <= 0) timeListAdapter.retry()
+                            else -> Unit
+                        }
+                        this@observer.cancel()
+                    }
+                }
             }
         }
     }
+
 }

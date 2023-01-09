@@ -8,12 +8,11 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
-import com.protone.common.utils.BitmapCachePool
-import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.withDefaultContext
 import com.protone.common.baseType.withMainContext
+import com.protone.common.utils.BitmapCachePool
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.isInDebug
-import com.protone.common.utils.json.toUri
 import com.protone.component.R
 import com.protone.component.view.customView.ColorfulProgressBar
 import com.protone.component.view.customView.SwitchImageView
@@ -21,7 +20,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.lang.NullPointerException
 
 val bitmapCachePool by lazy { BitmapCachePool() }
 
@@ -99,22 +97,22 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         }
     }
 
-    private fun loadBlurCover(albumBitmap: Bitmap?) {
-        launchDefault {
+    private suspend fun loadBlurCover(albumBitmap: Bitmap?) {
+        withDefaultContext {
             try {
                 if (albumBitmap == null) {
-                    if (interceptAlbumCover) return@launchDefault
+                    if (interceptAlbumCover) return@withDefaultContext
                     withMainContext {
                         switcher.setImageDrawable(baseCoverDrawable)
                     }
-                    return@launchDefault
+                    return@withDefaultContext
                 }
                 val blur = Blur.blur(albumBitmap, radius = 12, sampling = 10)
                 if (interceptAlbumCover) {
                     withMainContext {
                         onBlurAlbumCover?.invoke(blur)
                     }
-                    return@launchDefault
+                    return@withDefaultContext
                 }
                 withMainContext {
                     switcher.setImageBitmap(blur)

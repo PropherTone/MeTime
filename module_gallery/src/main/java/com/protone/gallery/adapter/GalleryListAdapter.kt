@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.widget.ImageView
-import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -51,7 +50,7 @@ class GalleryListAdapter(
             is GalleryListEvent.SelectAll -> {
                 onSelectMod = true
                 selectList.addAll(mList)
-                onSelectListener?.select(selectList)
+                onSelectListener?.select(selectList.toList())
                 notifyItemRangeChangedCO(0, mList.size, SELECT)
             }
             is GalleryListEvent.NoticeSelectChange -> {
@@ -229,12 +228,13 @@ class GalleryListAdapter(
 
     interface OnSelect {
         fun select(galleryMedia: GalleryMedia)
-        fun select(galleryMedia: MutableList<GalleryMedia>)
+        fun select(galleryMedia: List<GalleryMedia>)
         fun openView(galleryMedia: GalleryMedia, elementView: View)
     }
 
-    fun setNewSelectList(list: MutableList<GalleryMedia>) {
-        selectList = list
+    fun setNewSelectList(list: List<GalleryMedia>) {
+        selectList.clear()
+        selectList.addAll(list)
     }
 
     fun setOnSelectListener(listener: OnSelect?) {

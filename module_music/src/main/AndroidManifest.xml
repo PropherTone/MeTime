@@ -5,7 +5,10 @@
     <application>
         <activity android:name=".activity.MusicActivity" />
         <activity android:name=".activity.AddBucketActivity" />
-        <activity android:name=".activity.MusicViewActivity" />
+        <activity
+            android:name=".activity.MusicViewActivity"
+            android:exported="true"
+            android:launchMode="singleTask" />
         <activity android:name=".activity.PickMusicActivity" />
     </application>
 

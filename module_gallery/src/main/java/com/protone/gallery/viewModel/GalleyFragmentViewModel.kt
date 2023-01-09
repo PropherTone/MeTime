@@ -43,7 +43,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
 
         data class OnNewGalleries(val galleries: List<Gallery>) : FragEvent()
 
-        data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : FragEvent()
+        data class OnSelect(val galleryMedia: List<GalleryMedia>) : FragEvent()
 
         sealed class MediaEvent(val galleryMedia: GalleryMedia) : FragEvent()
         data class OnMediaDeleted(val media: GalleryMedia) : MediaEvent(media)

@@ -118,7 +118,7 @@ class GalleryViewActivity : BaseMediaActivity<
                             Intent.EXTRA_STREAM,
                             FileProvider.getUriForFile(
                                 this@GalleryViewActivity,
-                                "com.protone.seenn.fileProvider",
+                                "com.protone.MeTime.fileProvider",
                                 File(path)
                             )
                         )

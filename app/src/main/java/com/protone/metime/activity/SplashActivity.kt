@@ -32,7 +32,6 @@ class SplashActivity :
     }
 
     override suspend fun SplashViewModel.init() {
-        SCrashHandler.setIntent(SplashActivity::class.intent)
         onViewEvent {
             when (it) {
                 SplashViewModel.SplashEvent.InitConfig -> {

@@ -88,5 +88,5 @@ fun shutdownDataBase() {
 }
 
 fun showRoomDB(context: Context) {
-    RoomExplorer.show(context, DataBase::class.java, "SeennDB")
+    RoomExplorer.show(context, DataBase::class.java, "MeTimeDB")
 }

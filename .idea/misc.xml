@@ -22,6 +22,7 @@
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_note/src/main/res/layout/note_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_note/src/main/res/layout/note_list_adapter_layout.xml" value="0.15729166666666666" />
+        <entry key="..\:/MeTime/app/src/main/res/layout/button_item_layout.xml" value="0.180078125" />
         <entry key="..\:/MeTime/app/src/main/res/layout/main_activity.xml" value="0.1" />
         <entry key="..\:/MeTime/app/src/main/res/layout/music_card.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/app/src/main/res/layout/photo_card.xml" value="0.24114583333333334" />
@@ -61,6 +62,7 @@
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_data_usage_24_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_load_animation.xml" value="0.1" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_round_close_24_white.xml" value="0.1705" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/load_animation.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/main_background.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/oval_back_white.xml" value="0.1225" />

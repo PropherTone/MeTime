@@ -14,21 +14,17 @@ import com.protone.common.baseType.launchMain
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.linkInput
-import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
 import com.protone.common.utils.SearchModel
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.toGalleryView
-import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
+import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.databinding.GallerySearchActivityBinding
 import com.protone.gallery.viewModel.GallerySearchViewModel
 import kotlinx.coroutines.launch
@@ -118,7 +114,7 @@ class GallerySearchActivity : BaseMediaActivity<
         }
     }
 
-    override fun select(galleryMedia: MutableList<GalleryMedia>) {
+    override fun select(galleryMedia: List<GalleryMedia>) {
         if (galleryMedia.isEmpty()) {
             binding.apply {
                 (resultGalleries.adapter as GalleryListAdapter).quitSelectMod()

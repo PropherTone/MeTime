@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import com.protone.common.context.*
 import com.protone.common.entity.Music
 import com.protone.common.entity.getEmptyMusic
+import com.protone.common.utils.SCrashHandler
 import com.protone.common.utils.json.toJson
 import com.protone.component.MusicControllerIMP.Companion.LOOP_LIST
 import com.protone.component.MusicControllerIMP.Companion.LOOP_SINGLE
@@ -84,6 +85,7 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
         }
 
         override fun music() {
+            MApplication.startActivity("com.protone.music.activity.MusicViewActivity", 0L)
         }
 
     }

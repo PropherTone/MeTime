@@ -12,13 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.protone.component.R
 import com.protone.common.utils.displayUtils.AnimationHelper
 import kotlinx.coroutines.launch
+import java.util.concurrent.LinkedBlockingDeque
 
 abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
     context: Context,
     handleEvent: Boolean = false
 ) : BaseAdapter<Item, VB, Event>(context, handleEvent) {
 
-    var selectList = mutableListOf<Item>()
+    var selectList = LinkedBlockingDeque<Item>()
     var multiChoose = false
 
     var hasFixedSize = true
@@ -68,7 +69,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
 
     fun clearSelected() {
         if (selectList.size > 0) {
-            val itemIndex = itemIndex(selectList[0])
+            val itemIndex = itemIndex(selectList.first)
             selectList.clear()
             if (itemIndex != -1) {
                 launch {

@@ -11,6 +11,7 @@ import com.protone.common.context.musicIntentFilter
 import com.protone.component.broadcast.MusicReceiver
 import com.protone.component.service.MusicBinder
 import com.protone.component.service.MusicService
+import com.protone.component.service.observeServiceStatues
 import com.protone.component.service.serviceObserver
 import com.protone.component.view.customView.musicPlayer.bitmapCachePool
 import kotlinx.coroutines.cancel
@@ -22,21 +23,10 @@ abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : 
 
     private var serviceConnection: ServiceConnection? = null
 
-    var musicReceiver: MusicReceiver? = null
-        set(value) {
-            value?.let { registerReceiver(it, musicIntentFilter) }
-            field = value
-        }
-
     fun bindMusicService(block: suspend (MusicBinder) -> Unit) {
         if (!isServiceRunning(MusicService::class.java)) {
-            launchDefault {
-                serviceObserver.collect {
-                    if (it == "CREATE:${MusicService::class.java.name}") {
-                        connectService(block)
-                        cancel()
-                    }
-                }
+            observeServiceStatues(this, MusicService::class.java) {
+                connectService(block)
             }
             startService(MusicService::class.intent)
         } else {
@@ -68,7 +58,6 @@ abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : 
 
     override fun onDestroy() {
         serviceConnection?.let { unbindService(it) }
-        musicReceiver?.let { unregisterReceiver(it) }
         super.onDestroy()
     }
 }
