@@ -2,10 +2,7 @@ package com.protone.note.viewModel
 
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
-import com.protone.common.baseType.deleteFile
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.launchDefault
-import com.protone.common.baseType.launchIO
+import com.protone.common.baseType.*
 import com.protone.common.context.MApplication
 import com.protone.component.database.MediaAction
 import com.protone.common.entity.Note
@@ -32,8 +29,8 @@ class NoteViewModel : BaseViewModel() {
 
     private var noteDirWatcherJob: Job? = null
 
-    private var dirEmitter: ((List<NoteDir>) -> Unit)? = null
-    private var notesEmitter: ((List<Note>) -> Unit)? = null
+    private var dirEmitter: (suspend (List<NoteDir>) -> Unit)? = null
+    private var notesEmitter: (suspend (List<Note>) -> Unit)? = null
 
     private fun createNoteDirJob(dir: NoteDir) {
         noteDirWatcherJob?.cancel()
@@ -58,11 +55,11 @@ class NoteViewModel : BaseViewModel() {
         viewModelScope.launchDefault { observeNoteDate { callBack(it) } }
     }
 
-    fun watchNoteDirs(func: (List<NoteDir>) -> Unit) {
+    fun watchNoteDirs(func: suspend (List<NoteDir>) -> Unit) {
         this.dirEmitter = func
     }
 
-    fun watchNotes(func: (List<Note>) -> Unit) {
+    fun watchNotes(func: suspend (List<Note>) -> Unit) {
         this.notesEmitter = func
     }
 
@@ -123,7 +120,7 @@ class NoteViewModel : BaseViewModel() {
     }
 
     fun deleteNoteCache(note: Note) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launchIO {
             note.imagePath?.deleteFile()
             "${MApplication.app.filesDir.absolutePath}/${note.title}/".deleteFile()
         }
@@ -134,16 +131,16 @@ class NoteViewModel : BaseViewModel() {
     }
 
     fun deleteNoteDir(noteType: NoteDir) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launchIO {
             noteDAO.doDeleteNoteDirRs(noteType)
         }
     }
 
-    suspend fun getNote(title: String) = withContext(Dispatchers.IO) {
+    suspend fun getNote(title: String) = withIOContext {
         noteDAO.getNoteByName(title)
     }
 
-    suspend fun queryAllNote() = withContext(Dispatchers.IO) {
+    suspend fun queryAllNote() = withIOContext {
         noteDAO.getALLNoteDir()?.let {
             noteList[R.string.all.getString().also { s -> selected = s }] =
                 mutableListOf<Note>().apply { addAll(noteDAO.getAllNote() ?: mutableListOf()) }
@@ -155,9 +152,8 @@ class NoteViewModel : BaseViewModel() {
         } ?: mutableListOf()
     }
 
-    suspend fun queryAllNoteType() = withContext(Dispatchers.IO) {
+    suspend fun queryAllNoteType() =
         (noteDAO.getALLNoteDir() ?: mutableListOf()) as MutableList<NoteDir>
-    }
 
     suspend fun insertNoteDir(type: String?, image: String?) =
         noteDAO.insertNoteDirRs(NoteDir(type, image))

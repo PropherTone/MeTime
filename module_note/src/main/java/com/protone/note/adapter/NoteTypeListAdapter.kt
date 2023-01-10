@@ -41,20 +41,22 @@ class NoteTypeListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<NoteTpyeListAdapterBinding>, position: Int) {
-        setSelect(holder.binding, position, mList[position] in selectList)
+        setSelect(holder.binding, holder.layoutPosition, mList[holder.layoutPosition] in selectList)
         holder.binding.apply {
             root.setOnClickListener {
-                if (mList[position] in selectList) return@setOnClickListener
-                checkSelect(position, mList[position])
-                onTypeSelected?.invoke(mList[position])
+                if (mList[holder.layoutPosition] in selectList) return@setOnClickListener
+                checkSelect(holder.layoutPosition, mList[holder.layoutPosition])
+                onTypeSelected?.invoke(mList[holder.layoutPosition])
             }
             root.setOnLongClickListener {
                 AlertDialog.Builder(context).setPositiveButton(
                     context.getString(R.string.confirm)
                 ) { dialog, _ ->
-                    val noteType = mList[position]
+                    val noteType = mList[holder.layoutPosition]
                     deleteNoteDir?.invoke(noteType)
-                    notifyItemRemovedChecked(position)
+                    mList.removeAt(holder.layoutPosition)
+                    notifyItemRemovedChecked(holder.layoutPosition)
+                    selectDefault()
                     dialog.dismiss()
                 }.setNegativeButton(R.string.cancel.getString()) { dialog, _ ->
                     dialog.dismiss()
@@ -65,6 +67,16 @@ class NoteTypeListAdapter(
             noteTypeAddNote.setOnClickListener {
                 addNote?.invoke(noteTypeName.text.toString())
             }
+        }
+    }
+
+    private fun selectDefault() {
+        val index = mList.indexOfFirst { it.name == R.string.all.getString() }
+        if (index == -1) return
+        selectList.clear()
+        mList[index].also {
+            checkSelect(index, it)
+            onTypeSelected?.invoke(it)
         }
     }
 

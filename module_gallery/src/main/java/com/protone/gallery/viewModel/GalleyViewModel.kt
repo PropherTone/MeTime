@@ -1,6 +1,5 @@
 package com.protone.gallery.viewModel
 
-import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
 import com.protone.common.baseType.*
@@ -219,7 +218,7 @@ class GalleryViewModel : BaseViewModel() {
             Gallery(
                 ALL_GALLERY,
                 getGallerySize(isVideo),
-                if (combine) getNewestMedia() else getNewestMedia(isVideo)
+                getNewestMediaChecked(isVideo)
             ).cacheAndNotice(isVideo)
 
             galleries.forEach {
@@ -346,27 +345,31 @@ class GalleryViewModel : BaseViewModel() {
     }
 
     private suspend fun Gallery.updateGallery(isVideo: Boolean) {
-        val all = getGallerySize(name, isVideo)
-            .takeIf { size ->
-                if (size <= 0) {
-                    sendBucketEvent(GalleryEvent.OnGalleryRemoved(this))
-                    return
-                }
-                size != this.size
-            }?.let { size ->
-                this.size = size
-                itemState = Gallery.ItemState.SIZE_CHANGED
-                true
-            } ?: false
-                && getNewestMedia(name, isVideo)
-            .takeIf { uri ->
-                uri != this.uri
-            }?.let { uri ->
-                this.uri = uri
-                itemState = Gallery.ItemState.URI_CHANGED
-                true
-            } ?: false
-        if (all) itemState = Gallery.ItemState.ALL_CHANGED
+        val newSize = if (name == ALL_GALLERY) getGallerySize(isVideo)
+        else getGallerySize(name, isVideo)
+        val sizeChanged = newSize.takeIf { size ->
+            if (size <= 0) {
+                sendBucketEvent(GalleryEvent.OnGalleryRemoved(this))
+                return
+            }
+            size != this.size
+        }?.let { size ->
+            this.size = size
+            itemState = Gallery.ItemState.SIZE_CHANGED
+            true
+        } ?: false
+
+        val media = if (name == ALL_GALLERY) getNewestMediaChecked(isVideo)
+        else getNewestMedia(name, isVideo)
+        val uriChanged = media.takeIf { uri ->
+            uri != this.uri
+        }?.let { uri ->
+            this.uri = uri
+            itemState = Gallery.ItemState.URI_CHANGED
+            true
+        } ?: false
+
+        if (sizeChanged && uriChanged) itemState = Gallery.ItemState.ALL_CHANGED
         sendBucketEvent(GalleryEvent.OnGalleryUpdated(this))
     }
 
@@ -395,6 +398,11 @@ class GalleryViewModel : BaseViewModel() {
     private suspend fun getNewestMedia(gallery: String, isVideo: Boolean) = galleryDAO.run {
         if (combine) getNewestMediaInGallery(gallery)
         else getNewestMediaInGallery(gallery, isVideo)
+    }
+
+    private suspend fun getNewestMediaChecked(isVideo: Boolean) = galleryDAO.run {
+        if (combine) getNewestMedia()
+        else getNewestMedia(isVideo)
     }
 
 }

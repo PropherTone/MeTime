@@ -45,7 +45,9 @@ class NoteActivity :
 
         collectNoteEvent {
             when (it) {
-                is MediaAction.NoteDataAction.OnNoteDeleted -> deleteNoteCache(it.note)
+                is MediaAction.NoteDataAction.OnNoteDeleted -> {
+                    deleteNoteCache(it.note)
+                }
                 else -> Unit
             }
         }
