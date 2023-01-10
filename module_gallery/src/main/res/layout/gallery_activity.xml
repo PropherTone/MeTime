@@ -20,7 +20,7 @@
             android:id="@+id/gallery_bucket"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/add_gallery"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />
 
@@ -73,6 +73,32 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
+            android:id="@+id/search"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/background_ripple_glass"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->activity.toSearch()}"
+            android:padding="@dimen/border_distance"
+            android:src="@drawable/ic_baseline_search_24_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/add_gallery"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/add_gallery"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/background_ripple_glass"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->activity.addBucket()}"
+            android:padding="@dimen/border_distance"
+            android:src="@drawable/ic_baseline_add_24_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/gallery_bucket"
+            app:layout_constraintStart_toEndOf="@+id/search" />
+
+        <ImageView
             android:id="@+id/gallery_actionMenu"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
@@ -122,9 +148,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/border_distance"
-            android:visibility="gone"
             android:layout_marginBottom="@dimen/border_distance"
             android:src="@drawable/ic_baseline_check_24_white"
+            android:visibility="gone"
             app:backgroundTint="@color/main_color1"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -24,7 +24,7 @@ abstract class BaseMusicNotification(private val notificationManager: Notificati
                 NotificationManager.IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
-            Notification.Builder(this, getNotificationName()).apply {
+            Notification.Builder(this, getNotificationIdName()).apply {
                 setCustomContentView(content)
                 if (bigContent != null) setCustomBigContentView(bigContent)
                 setSmallIcon(getNotificationIcon())

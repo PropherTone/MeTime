@@ -121,10 +121,10 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
                             collection[newItemPosition]
                         )
                     }
-                }).apply {
+                }).also {
                     setData(collection)
                     withMainContext {
-                        dispatchUpdatesTo(this@BaseAdapter)
+                        it.dispatchUpdatesTo(this@BaseAdapter)
                     }
                 }
             }

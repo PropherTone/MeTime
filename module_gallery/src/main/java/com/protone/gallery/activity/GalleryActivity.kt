@@ -14,7 +14,9 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
 import com.protone.common.baseType.bufferCollect
+import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.entity.Gallery
@@ -33,6 +35,7 @@ import com.protone.common.utils.json.toUriJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
+import com.protone.component.view.dialog.titleDialog
 import com.protone.gallery.adapter.GalleryBucketAdapter
 import com.protone.gallery.adapter.MyFragmentStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
@@ -225,6 +228,21 @@ class GalleryActivity :
         showPop(binding.galleryActionMenu, viewModel.chooseData.size <= 0)
     }
 
+    fun toSearch() {
+        val gallery = viewModel.rightGallery
+        IntentDataHolder.put(getGalleryData())
+        startActivity(GallerySearchActivity::class.intent.also { intent ->
+            intent.putExtra("gallery", gallery)
+        })
+    }
+
+    fun addBucket() {
+        titleDialog(R.string.user_name.getString(), "") {
+            if (it.isNotEmpty()) viewModel.addBucket(it)
+            else R.string.enter.getString().toast()
+        }
+    }
+
     private fun onGalleryTabSwapped() {
         getBucketAdapter().setData(viewModel.getGalleryData())
         viewModel.getBucket()?.let { gallery ->
@@ -263,6 +281,10 @@ class GalleryActivity :
     }
 
     private fun getBucketAdapter() = binding.galleryBucket.adapter as GalleryBucketAdapter
+
+    private fun getGalleryData() = ((binding.galleryPager.adapter as MyFragmentStateAdapter)
+        .getFragment(viewModel.rightMailer) as GalleryListFragment?)
+        ?.getGalleryData()
 
     override fun getSwapAnim(): Pair<Int, Int>? {
         if (!binding.galleryChooseConfirm.isGone) return null
@@ -313,10 +335,7 @@ class GalleryActivity :
 
     override fun popIntoBox() {
         if (viewModel.chooseData.isEmpty()) {
-            ((binding.galleryPager.adapter as MyFragmentStateAdapter)
-                .getFragment(viewModel.rightMailer) as GalleryListFragment?)
-                ?.getGalleryData()
-                ?.let { viewModel.chooseData.addAll(it) }
+            getGalleryData()?.let { viewModel.chooseData.addAll(it) }
         }
         IntentDataHolder.put(viewModel.chooseData)
         startActivity(PictureBoxActivity::class.intent)

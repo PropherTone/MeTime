@@ -8,7 +8,7 @@
             android:id="@+id/gallery_bucket"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/add_gallery"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />
 
@@ -20,6 +20,24 @@
             android:paddingEnd="@dimen/border_distance"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/search"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/border_distance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/add_gallery"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+            android:id="@+id/add_gallery"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/border_distance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/gallery_bucket"
+            app:layout_constraintStart_toEndOf="@+id/search" />
 
         <Constraint
             android:id="@+id/gallery_actionMenu"
@@ -76,7 +94,7 @@
             android:id="@+id/gallery_bucket"
             android:layout_width="@dimen/bucket_width"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/add_gallery"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />
 
@@ -91,6 +109,24 @@
             app:layout_constraintEnd_toEndOf="@id/gallery_bucket"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/search"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/border_distance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/add_gallery"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+            android:id="@+id/add_gallery"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="@dimen/border_distance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/gallery_bucket"
+            app:layout_constraintStart_toEndOf="@+id/search" />
 
         <Constraint
             android:id="@+id/gallery_actionMenu"

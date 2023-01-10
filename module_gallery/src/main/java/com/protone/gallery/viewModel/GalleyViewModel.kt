@@ -1,9 +1,11 @@
 package com.protone.gallery.viewModel
 
+import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.entity.Gallery
+import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.EventCachePool
@@ -58,8 +60,8 @@ class GalleryViewModel : BaseViewModel() {
 
     private var rightMediaGallery = ALL_GALLERY
     private var rightVideoGallery = ALL_GALLERY
-    private var rightGallery: String = ALL_GALLERY
-        set(value) {
+    var rightGallery: String = ALL_GALLERY
+        private set(value) {
             if (isVideoGallery) rightVideoGallery = value
             else rightMediaGallery = value
             field = value
@@ -149,6 +151,20 @@ class GalleryViewModel : BaseViewModel() {
     fun getBucket(bucket: String) = getGalleryData(isVideoGallery).find { it.name == bucket }
 
     fun getBucket() = getGalleryData(isVideoGallery).find { it.name == rightGallery }
+
+    fun addBucket(name: String) {
+        galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideoGallery)) { re, reName ->
+            if (re) {
+                if (!isLock) {
+                    galleryData.add(Gallery(reName, 0, null, custom = true))
+                } else {
+                    R.string.locked.getString().toast()
+                }
+            } else {
+                R.string.failed_msg.getString().toast()
+            }
+        }
+    }
 
     fun generateMailer(isVideo: Boolean) = MutableSharedFlow<GalleryListEvent>().also {
         mailers[if (isVideo) 1 else 0] = it

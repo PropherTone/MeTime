@@ -61,34 +61,6 @@ class GalleryViewActivity : BaseMediaActivity<
             previous.setOnClickListener {
                 galleryVView.setCurrentItem(galleryVView.currentItem - 1, true)
             }
-            galleryVLinks.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
-                    it.startNote = {
-                        startActivity(RouterPath.NoteRouterPath.NoteView) { noteViewPostcard(it) }
-                    }
-                }
-            }
-            galleryVCatoContainer.apply {
-                layoutManager = LinearLayoutManager(context).also {
-                    it.orientation = LinearLayoutManager.HORIZONTAL
-                }
-                adapter = CatoListAdapter(this@GalleryViewActivity,
-                    object : CatoListAdapter.CatoListDataProxy {
-                        override suspend fun getMedia(cate: String): GalleryMedia? =
-                            viewModel.getMediaByUri(cate.toUri())
-                    }).also {
-                    it.setItemClick { cate ->
-                        launch {
-                            val media = viewModel.getMediaByUri(cate.toUri())
-                            startActivity(GalleryViewActivity::class.intent.putExtras {
-                                putString(MEDIA, media?.toJson())
-                                putBoolean(IS_VIDEO, media?.isVideo ?: false)
-                            })
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -103,9 +75,74 @@ class GalleryViewActivity : BaseMediaActivity<
 
         val mediaIndex = getMediaIndex()
         initViewPager(mediaIndex, galleryMedias)
+        binding.initList()
         setMediaInfo(mediaIndex)
         setInfo()
         observeEvent()
+    }
+
+    private fun initViewPager(position: Int, data: MutableList<GalleryMedia>) {
+        binding.galleryVView.apply {
+            adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
+                override fun getItemCount(): Int = data.size
+                override fun getItemViewType(position: Int): Int = position
+                override fun createFragment(position: Int): Fragment =
+                    GalleryViewFragment(data[position], singleClick = {
+                        binding.galleryVCover.isVisible = !binding.galleryVCover.isVisible
+                        if (binding.galleryVCover.isVisible) {
+                            sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+                        }
+                    })
+            }
+            binding.galleryVCover.isVisible = false
+
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    viewModel.curPosition = position
+                    viewModel.setMediaInfo(position)
+                    super.onPageSelected(position)
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    if (state == ViewPager2.SCREEN_STATE_OFF && binding.galleryVCover.isVisible) {
+                        sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+                    }
+                }
+            })
+            setCurrentItem(position, false)
+        }
+    }
+
+    private fun GalleryViewActivityBinding.initList() {
+        galleryVLinks.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
+                it.startNote = {
+                    startActivity(RouterPath.NoteRouterPath.NoteView) { noteViewPostcard(it) }
+                }
+            }
+        }
+        galleryVCatoContainer.apply {
+            layoutManager = LinearLayoutManager(context).also {
+                it.orientation = LinearLayoutManager.HORIZONTAL
+            }
+            adapter = CatoListAdapter(this@GalleryViewActivity,
+                object : CatoListAdapter.CatoListDataProxy {
+                    override suspend fun getMedia(cate: String): GalleryMedia? =
+                        viewModel.getMediaByUri(cate.toUri())
+                }).also {
+                it.setItemClick { cate ->
+                    launch {
+                        val media = viewModel.getMediaByUri(cate.toUri())
+                        startActivity(GalleryViewActivity::class.intent.putExtras {
+                            putString(MEDIA, media?.toJson())
+                            putBoolean(IS_VIDEO, media?.isVideo ?: false)
+                        })
+                    }
+                }
+            }
+        }
     }
 
     private fun GalleryViewViewModel.observeEvent() {
@@ -157,39 +194,6 @@ class GalleryViewActivity : BaseMediaActivity<
         co.resumeWith(Result.success(indexOf))
     }
 
-    private fun initViewPager(position: Int, data: MutableList<GalleryMedia>) {
-        binding.galleryVView.apply {
-            adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
-                override fun getItemCount(): Int = data.size
-                override fun getItemViewType(position: Int): Int = position
-                override fun createFragment(position: Int): Fragment =
-                    GalleryViewFragment(data[position], singleClick = {
-                        binding.galleryVCover.isVisible = !binding.galleryVCover.isVisible
-                        if (binding.galleryVCover.isVisible) {
-                            sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
-                        }
-                    })
-            }
-            binding.galleryVCover.isVisible = false
-
-            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    viewModel.curPosition = position
-                    viewModel.setMediaInfo(position)
-                    super.onPageSelected(position)
-                }
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    super.onPageScrollStateChanged(state)
-                    if (state == ViewPager2.SCREEN_STATE_OFF && binding.galleryVCover.isVisible) {
-                        sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
-                    }
-                }
-            })
-            setCurrentItem(position, false)
-        }
-    }
-
     private fun setMediaInfo(
         title: String,
         time: String,
@@ -216,7 +220,6 @@ class GalleryViewActivity : BaseMediaActivity<
 
     private suspend fun refreshCate(cate: List<String>?) = withContext(Dispatchers.Main) {
         (binding.galleryVCatoContainer.adapter as CatoListAdapter).refresh(cate)
-
     }
 
     fun showPop() {

@@ -15,6 +15,19 @@ class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListD
 
     private var itemClick: ((String) -> Unit)? = null
 
+    init {
+        setAdapterDiff(object : AdapterDiff<String>{
+            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
+                return oldItem == newItem
+            }
+
+            override fun getChangePayload(oldItem: String, newItem: String): Boolean {
+                return oldItem == newItem
+            }
+
+        })
+    }
+
     override fun getItemViewType(position: Int): Int {
         return if (mList[position].contains("content://")) 1 else 0
     }
@@ -26,7 +39,6 @@ class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListD
                 else -> TextCateLayoutBinding.inflate(context.newLayoutInflater, parent, false)
             }
         )
-
 
     override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
         holder.binding.apply {
