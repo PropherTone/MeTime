@@ -1,5 +1,6 @@
 package com.protone.note.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Animatable
 import android.net.Uri
@@ -51,7 +52,7 @@ class NoteEditActivity :
     private var popWindow: ColorfulPopWindow? = null
     private fun getPopWindow(): ColorfulPopWindow? {
         return if (popWindow != null) {
-            if (popWindow?.isShowing == false) {
+            if (popWindow?.isShowing == true) {
                 popWindow?.dismiss()
             }
             popWindow = null
@@ -68,6 +69,7 @@ class NoteEditActivity :
         }
         get() = binding.noteEditTitle.text.toString()
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun createView(): NoteEditActivityBinding {
         return NoteEditActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@NoteEditActivity
@@ -85,6 +87,10 @@ class NoteEditActivity :
             }
             noteEditRichNote.isEditable = true
             noteEditRichNote.setImageLoader(RichNoteImageLoader())
+            noteEditTool.setOnTouchListener { _, _ ->
+                getPopWindow()?.dismiss()
+                false
+            }
         }
     }
 

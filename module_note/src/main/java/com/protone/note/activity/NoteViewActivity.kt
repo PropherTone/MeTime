@@ -21,7 +21,6 @@ import com.protone.component.service.MusicBinder
 import com.protone.component.view.customView.richText.RichNoteImageLoader
 import com.protone.component.view.customView.richText.RichNoteView
 import com.protone.note.databinding.NoteViewActivityBinding
-import com.protone.note.viewModel.NoteEditViewModel
 import com.protone.note.viewModel.NoteViewViewModel
 import kotlinx.coroutines.launch
 

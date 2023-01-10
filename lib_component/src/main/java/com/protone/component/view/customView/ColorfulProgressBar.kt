@@ -37,7 +37,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
     private var blurRadius = 0
     private var moveLength = 0f
     private var isTouch = false
-    var barDuration: Long = 0
+    var barDuration: Long = -1
         set(value) {
             if (value >= 0) {
                 start()

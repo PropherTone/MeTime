@@ -78,9 +78,11 @@ data class Music(
 
 }
 
+const val NO_MUSIC = "NO MUSIC"
+
 fun getEmptyMusic() = Music(
     0,
-    "NO MUSIC",
+    NO_MUSIC,
     0,
     null,
     null,

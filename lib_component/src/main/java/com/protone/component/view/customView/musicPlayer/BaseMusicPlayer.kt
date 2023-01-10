@@ -45,11 +45,16 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     abstract val control: ImageView
     abstract val previous: ImageView?
     abstract val progress: ColorfulProgressBar?
-    abstract var duration: Long?
     abstract val switcher: SwitchImageView
     abstract val coverSwitcher: SwitchImageView
     abstract var looper: ImageView?
     abstract val root: View
+
+    open var duration: Long? = 0L
+        set(value) {
+            progress?.barDuration = value ?: 0L
+            field = value
+        }
 
     var cover: Uri = Uri.EMPTY
         set(value) {

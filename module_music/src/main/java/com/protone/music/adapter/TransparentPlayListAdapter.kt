@@ -11,7 +11,7 @@ import com.protone.music.databinding.TpPlaylistAdapterLayoutBinding
 class TransparentPlayListAdapter(
     context: Context,
     onPlay: Music?,
-    playList: MutableList<Music>
+    playList: List<Music>
 ) : SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music, Any>(context) {
     override val select: (TpPlaylistAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
         { binding, _, isSelect ->

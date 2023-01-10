@@ -40,13 +40,13 @@
     </style>
 
     <style name="PopAnimationUpToBot" parent="android:Animation">
-        <item name="android:windowEnterAnimation">@anim/pop_ani_y_in</item>
-        <item name="android:windowExitAnimation">@anim/pop_ani_y_out</item>
+        <item name="android:windowEnterAnimation">@anim/pop_top_y_in</item>
+        <item name="android:windowExitAnimation">@anim/pop_top_y_out</item>
     </style>
 
     <style name="PopAnimationBotToUp" parent="android:Animation">
-        <item name="android:windowEnterAnimation">@anim/pop_ani_y_out</item>
-        <item name="android:windowExitAnimation">@anim/pop_ani_y_in</item>
+        <item name="android:windowEnterAnimation">@anim/pop_bot_y_in</item>
+        <item name="android:windowExitAnimation">@anim/pop_bot_y_out</item>
     </style>
 
 </resources>

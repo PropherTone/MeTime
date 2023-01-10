@@ -27,12 +27,6 @@ class MusicPlayerViewFull @JvmOverloads constructor(
     override var looper: ImageView? = binding.loopMode
     override val root: View = binding.controller
 
-    override var duration: Long? = 0L
-        set(value) {
-            binding.musicProgress.barDuration = value ?: 0L
-            field = value
-        }
-
     override fun onPlay() {
         binding.musicControl.setImageResource(R.drawable.ic_round_paused_white_24)
     }

@@ -74,7 +74,7 @@ class MusicViewActivity :
     }
 
     private fun initPlayList(
-        playList: MutableList<Music>, onPlay: Music?,
+        playList: List<Music>, onPlay: Music?,
         listener: TransparentPlayListAdapter.OnPlayListClk
     ) {
         binding.playList.apply {

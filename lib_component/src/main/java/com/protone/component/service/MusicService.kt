@@ -1,79 +1,86 @@
 package com.protone.component.service
 
-import android.app.Notification
-import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.protone.common.context.*
 import com.protone.common.entity.Music
+import com.protone.common.entity.NO_MUSIC
 import com.protone.common.entity.getEmptyMusic
+import com.protone.common.media.musicPlayer.MusicPlayer
 import com.protone.common.utils.json.toJson
 import com.protone.component.MusicControllerIMP.Companion.LOOP_LIST
 import com.protone.component.MusicControllerIMP.Companion.LOOP_SINGLE
 import com.protone.component.MusicControllerIMP.Companion.NO_LOOP
 import com.protone.component.MusicControllerIMP.Companion.PLAY_LIST
 import com.protone.component.MusicControllerIMP.Companion.RANDOM
-import com.protone.component.R
 import com.protone.component.broadcast.ApplicationBroadCast
 import com.protone.component.broadcast.MusicReceiver
 import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.database.userConfig
+import com.protone.component.notification.music.remoteViews.MusicNotification
 import com.protone.component.view.customView.musicPlayer.getBitmap
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.timerTask
 
 /**
  * MusicService by ProTone 2022/03/23
  */
-class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListener {
+class MusicService : BaseService(), IMusicService {
 
-    companion object {
-        const val MUSIC_NOTIFICATION_NAME = "MUSIC_NOTIFICATION"
-        const val NOTIFICATION_ID = 0x01
+    private val musicNotification by lazy {
+        MusicNotification(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
     }
 
-    private var notificationManager: NotificationManager? = null
-    private var notification: Notification? = null
-    private var remoteViews: RemoteViews? = null
-
-    private var musicPlayer: MediaPlayer? = null
-
-    private fun initMusicPlayer(): MediaPlayer? {
-        if (playList.isEmpty()) return null
-        if (musicPlayer == null) {
-            musicPlayer = MediaPlayer.create(
-                MApplication.app,
-                playList[playPosition.get()].uri
-            ).also {
-                it?.setOnCompletionListener(this)
+    private var musicPlayer = MusicPlayer().apply {
+        init(this@MusicService)
+        onPlayState {
+            onStart {
+                currentMusic.postValue(rightMusic)
+                playState.postValue(true)
+            }
+            onPause {
+                playState.postValue(false)
+            }
+            onCompletion {
+                playState.postValue(false)
+                when (loopModeLive.value) {
+                    LOOP_LIST -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
+                    LOOP_SINGLE -> {
+                        playPosition.decrementAndGet()
+                        musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
+                    }
+                    NO_LOOP -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
+                    RANDOM -> {
+                        playPosition.set((0 until playList.size - 1).random())
+                        repeat(2) {
+                            musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+                        }
+                    }
+                    PLAY_LIST -> {
+                        if (playPosition.get() <= playList.size - 1)
+                            musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
+                        else musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
+                    }
+                }
+            }
+            onProgress {
+                this@MusicService.progress.postValue(it)
             }
         }
-        return musicPlayer
     }
 
-    private var progressTimer: Timer? = null
-
-    private val mutex by lazy { Mutex() }
-
     private var playPosition = AtomicInteger(0)
-    private val playList = mutableListOf<Music>()
+    private val playList = LinkedBlockingDeque<Music>()
+    private val rightMusic: Music get() = playList.elementAt(playPosition.get())
+
     private val progress = MutableLiveData<Long>()
     private val playState = MutableLiveData<Boolean>()
     private val currentMusic = MutableLiveData<Music>()
@@ -86,6 +93,7 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
                 isDestroy = true
                 MApplication.app.stopService(MusicService::class.intent)
                 onDestroy()
+                activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
             }
         }
     }
@@ -95,29 +103,19 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
         override fun refresh(b: Boolean, ref: Boolean): Unit = notificationPlayState(b, ref)
 
         private fun notificationPlayState(state: Boolean, ref: Boolean) {
-            launch(Dispatchers.Default) {
-                mutex.withLock {
-                    if (playList.isEmpty()) return@launch
-                    playState.postValue(state)
-                    initMusicNotification()
-                    withContext(Dispatchers.Main) {
-                        remoteViews?.setImageViewResource(
-                            R.id.notify_music_control,
-                            if (state) R.drawable.ic_baseline_pause_24
-                            else R.drawable.ic_baseline_play_arrow_24
-                        )
-                        if (state || ref) {
-                            remoteViews?.setTextViewText(
-                                R.id.notify_music_name,
-                                playList[playPosition.get()].title
-                            )
-                            playList[playPosition.get()].uri.getBitmap()?.let { ba ->
-                                remoteViews?.setImageViewBitmap(R.id.notify_music_icon, ba)
-                            }
-                        }
+            launch {
+                if (playList.isEmpty()) return@launch
+                playState.postValue(state)
+                musicNotification.initNotification(this@MusicService)
+                musicNotification.setPlayState(state)
+                if (state || ref) {
+                    val music = rightMusic
+                    musicNotification.setTitle(music.title)
+                    music.uri.getBitmap()?.let { ba ->
+                        musicNotification.setMusicCover(ba)
                     }
-                    notificationManager?.notify(NOTIFICATION_ID, notification)
                 }
+                musicNotification.doNotify()
             }
         }
     }
@@ -131,13 +129,14 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
 
     override fun onBind(intent: Intent?): IBinder {
         if (playList.isNotEmpty())
-            currentMusic.postValue(playList[playPosition.get()])
+            currentMusic.postValue(rightMusic)
         return MusicBinder(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        startForeground(0x01, initMusicNotification())
+        startForeground(
+            0x01,
+            musicNotification.initNotification(this).apply { musicNotification.doNotify() })
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -150,78 +149,12 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
         } catch (e: IllegalArgumentException) {
             Log.d("TAG", "onDestroy")
         }
-        notificationManager?.cancelAll()
+        musicNotification.cancelAll()
+        musicNotification.release()
         userConfig.lastMusic = onMusicPlaying().value?.toJson() ?: ""
         userConfig.lastMusicProgress = progress.value ?: 0L
         super.onDestroy()
         cancel()
-        activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
-    }
-
-    private fun initMusicNotification(): Notification {
-        remoteViews = RemoteViews(packageName, R.layout.music_notification_layout).apply {
-            val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-
-            PendingIntent.getBroadcast(
-                this@MusicService,
-                0,
-                Intent(MUSIC_PLAY),
-                intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_control, it) }
-
-            PendingIntent.getBroadcast(
-                this@MusicService,
-                0,
-                Intent(MUSIC_PREVIOUS),
-                intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_previous, it) }
-
-            PendingIntent.getBroadcast(
-                this@MusicService,
-                0,
-                Intent(MUSIC_NEXT),
-                intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_next, it) }
-
-            PendingIntent.getActivity(
-                this@MusicService,
-                0,
-                Intent(
-                    MApplication.app,
-                    Class.forName("com.protone.music.activity.MusicViewActivity")
-                ),
-                intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_parent, it) }
-
-            PendingIntent.getBroadcast(
-                this@MusicService,
-                0,
-                Intent(FINISH),
-                intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_close, it) }
-        }
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                MUSIC_NOTIFICATION_NAME,
-                "SEEN_MUSIC",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            notificationManager?.createNotificationChannel(channel)
-            Notification.Builder(this, MUSIC_NOTIFICATION_NAME).apply {
-                setCustomContentView(remoteViews)
-                setSmallIcon(R.drawable.ic_baseline_music_note_24)
-            }.build()
-        } else {
-            @Suppress("DEPRECATION") Notification().apply {
-                contentView = remoteViews
-                icon = R.drawable.ic_baseline_music_note_24
-            }
-        }.also {
-            it.flags = Notification.FLAG_NO_CLEAR
-            notification = it
-            notificationManager?.notify(NOTIFICATION_ID, it)
-        }
     }
 
     override fun setLoopMode(mode: Int) {
@@ -229,48 +162,25 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
     }
 
     override fun play(music: Music?) {
-        launch {
-            mutex.withLock {
-                (if (music != null) {
-                    finishMusic()
-                    if (playList.isEmpty()) {
-                        currentMusic.postValue(getEmptyMusic())
-                        return@launch
-                    }
-                    if (music !in playList) {
-                        playList.add(music)
-                    }
-                    val index = playList.indexOf(music)
-                    playPosition.set(index)
-                    initMusicPlayer()
-                } else musicPlayer)?.apply {
-                    start()
-                    currentMusic.postValue(playList[playPosition.get()])
-                    playState.postValue(true)
-                    if (progressTimer == null) progressTimer = Timer()
-                    progressTimer?.schedule(timerTask {
-                        try {
-                            if (isPlaying) progress.postValue(currentPosition.toLong())
-                        } catch (ignored: Exception) {
-                        }
-                    }, 0, 100)
-                }
+        if (music != null) {
+            if (playList.isEmpty()) {
+                currentMusic.postValue(getEmptyMusic())
+                return
             }
+            if (music !in playList) {
+                playList.add(music)
+            }
+            val index = playList.indexOf(music)
+            playPosition.set(index)
+            musicPlayer.play(music)
+            return
         }
+        if (playList.isEmpty()) return
+        musicPlayer.play(rightMusic)
     }
 
     override fun pause() {
-        launch {
-            mutex.withLock {
-                if (musicPlayer?.isPlaying == true)
-                    musicPlayer?.apply {
-                        pause()
-                        playState.postValue(false)
-                        progressTimer?.cancel()
-                        progressTimer = null
-                    }
-            }
-        }
+        musicPlayer.pause()
     }
 
     override fun next() {
@@ -278,7 +188,6 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
         launch {
             if (playPosition.incrementAndGet() > playList.size - 1) playPosition.set(0)
             finishMusic()
-            initMusicPlayer()
             play()
         }
     }
@@ -288,27 +197,20 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
         launch {
             if (playPosition.decrementAndGet() <= 0) playPosition.set(playList.size - 1)
             finishMusic()
-            initMusicPlayer()
             play()
         }
     }
 
-    override fun getPlayList(): MutableList<Music> {
-        synchronized(playList) {
-            return playList.ifEmpty { mutableListOf(getEmptyMusic()) }
-        }
+    override fun getPlayList(): List<Music> {
+        return (playList.toList()).ifEmpty { mutableListOf(getEmptyMusic()) }
     }
 
-    override fun setPlayList(list: MutableList<Music>) {
-        launch(Dispatchers.Default) {
-            mutex.withLock(playList) {
-                playList.clear()
-                playList.addAll(list)
-            }
-        }
+    override fun setPlayList(list: List<Music>) {
+        playList.clear()
+        playList.addAll(list)
     }
 
-    override fun getPlayState(): Boolean = musicPlayer?.isPlaying == true
+    override fun getPlayState(): Boolean = playState.value == true
 
     override fun onProgress(): LiveData<Long> = progress
 
@@ -317,72 +219,32 @@ class MusicService : BaseService(), IMusicService, MediaPlayer.OnCompletionListe
     override fun onLoopMode(): LiveData<Int> = loopModeLive
 
     override fun setProgress(progress: Long) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            musicPlayer?.seekTo(
-                progress * playList[playPosition.get()].duration / 100,
-                MediaPlayer.SEEK_CLOSEST
-            )
-        } else {
-            musicPlayer?.seekTo((progress * playList[playPosition.get()].duration).toInt())
-        }
+        musicPlayer.seekTo(progress)
     }
 
     override fun onMusicPlaying(): LiveData<Music> = currentMusic
 
     override fun init(music: Music, progress: Long) {
-        launch(Dispatchers.Default) {
-            mutex.withLock {
-                currentMusic.postValue(
-                    if (playList.isNotEmpty() && music.title != "NO MUSIC") {
-                        val index = playList.indexOf(music)
-                        if (index == -1) {
-                            playPosition.set(0)
-                            getEmptyMusic()
-                        } else {
-                            playPosition.set(index)
-                            initMusicPlayer()
-                            playList[playPosition.get()]
-                        }
-                    } else getEmptyMusic()
-                )
-            }
-        }
+        currentMusic.postValue(
+            if (playList.isNotEmpty() && music.title != NO_MUSIC) {
+                val index = playList.indexOf(music)
+                if (index == -1) {
+                    playPosition.set(0)
+                    getEmptyMusic()
+                } else {
+                    playPosition.set(index)
+                    rightMusic.also {
+                        musicPlayer.prepare(it)
+                    }
+                }
+            } else getEmptyMusic()
+        )
     }
 
     override fun finishMusic() {
-        musicPlayer?.apply {
-            stop()
-            reset()
-            release()
-            musicPlayer = null
-        }
+        musicPlayer.release()
     }
 
-    override fun onCompletion(mp: MediaPlayer?) {
-        playState.postValue(false)
-        when (loopModeLive.value) {
-            LOOP_LIST -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
-            LOOP_SINGLE -> {
-                playPosition.decrementAndGet()
-                musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
-            }
-            NO_LOOP -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
-            RANDOM -> {
-                playPosition.set((0 until playList.size - 1).random())
-                repeat(2) {
-                    musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
-                }
-            }
-            PLAY_LIST -> {
-                if (playPosition.get() <= playList.size - 1) musicBroadCastManager.sendBroadcast(
-                    Intent(
-                        MUSIC_NEXT
-                    )
-                )
-                else musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
-            }
-        }
-    }
 }
 
 class MusicBinder(private val iMusic: IMusicService) : Binder(), IMusicService {
@@ -392,8 +254,8 @@ class MusicBinder(private val iMusic: IMusicService) : Binder(), IMusicService {
     override fun next() = iMusic.next()
     override fun previous() = iMusic.previous()
     override fun finishMusic() = iMusic.finishMusic()
-    override fun getPlayList(): MutableList<Music> = iMusic.getPlayList()
-    override fun setPlayList(list: MutableList<Music>) = iMusic.setPlayList(list)
+    override fun getPlayList(): List<Music> = iMusic.getPlayList()
+    override fun setPlayList(list: List<Music>) = iMusic.setPlayList(list)
     override fun getPlayState(): Boolean = iMusic.getPlayState()
     override fun onProgress(): LiveData<Long> = iMusic.onProgress()
     override fun onPlayState(): LiveData<Boolean> = iMusic.onPlayState()
@@ -429,8 +291,8 @@ interface IMusicService {
     fun next()
     fun previous()
     fun finishMusic()
-    fun getPlayList(): MutableList<Music>
-    fun setPlayList(list: MutableList<Music>)
+    fun getPlayList(): List<Music>
+    fun setPlayList(list: List<Music>)
     fun getPlayState(): Boolean
     fun onProgress(): LiveData<Long>
     fun onPlayState(): LiveData<Boolean>
