@@ -1,23 +1,20 @@
 package com.protone.music.activity
 
-import android.content.Intent
 import android.view.ViewGroup
-import androidx.core.view.isGone
-import androidx.core.view.marginBottom
-import androidx.core.view.updateLayoutParams
+import androidx.core.view.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.baseType.*
+import com.protone.common.baseType.getDrawable
+import com.protone.common.baseType.getString
+import com.protone.common.baseType.toast
+import com.protone.common.baseType.withDefaultContext
 import com.protone.common.context.*
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.displayUtils.Blur
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
-import com.protone.common.utils.json.toUri
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
 import com.protone.component.database.userConfig
@@ -150,24 +147,22 @@ class MusicActivity :
                     }
                     controller.play(it.music)
                 }
-                is MusicModel.MusicEvent.SetBucketCover -> getBucket(it.name)?.let {
-                    userConfig.lastMusicBucketCover = it.icon ?: ""
-                    withContext(Dispatchers.Main) {
-                        binding.apply {
-                            if (it.icon != null) {
-                                it.icon?.getBitmap()?.let { bm ->
-                                    musicBucketIcon.setImageBitmap(bm)
-                                    binding.blurredBucketCover.setImageBitmap(Blur.blur(bm, 24, 10))
-                                }
-                            } else {
-                                blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
-                                musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
+                is MusicModel.MusicEvent.SetBucketCover -> getBucket(it.name)?.let { mb ->
+                    userConfig.lastMusicBucketCover = mb.icon ?: ""
+                    binding.apply {
+                        if (mb.icon != null) {
+                            mb.icon?.getBitmap()?.let { bm ->
+                                musicBucketIcon.setImageBitmap(bm)
+                                binding.blurredBucketCover.setImageBitmap(Blur.blur(bm, 24, 10))
                             }
-                            musicBucketName.text = it.name
-                            musicBucketNamePhanton.text = it.name
-                            musicBucketMsg.text =
-                                if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else com.protone.common.R.string.none.getString()
+                        } else {
+                            blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
+                            musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
                         }
+                        musicBucketName.text = mb.name
+                        musicBucketNamePhanton.text = mb.name
+                        musicBucketMsg.text =
+                            if (mb.date != null && mb.detail != null) "${mb.date} ${mb.detail}" else com.protone.common.R.string.none.getString()
                     }
                 }
                 is MusicModel.MusicEvent.AddMusic -> {

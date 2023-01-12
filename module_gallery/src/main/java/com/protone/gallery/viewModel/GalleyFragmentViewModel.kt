@@ -190,7 +190,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
                 size != this.size
             }?.let { size ->
                 this.size = size
-                itemState = Gallery.ItemState.SIZE_CHANGED
+//                itemState = Gallery.ItemState.SIZE_CHANGED
                 true
             } ?: false
                 && getNewestMedia(name)
@@ -198,10 +198,10 @@ class GalleryFragmentViewModel : BaseViewModel() {
                 uri != this.uri
             }?.let { uri ->
                 this.uri = uri
-                itemState = Gallery.ItemState.URI_CHANGED
+//                itemState = Gallery.ItemState.URI_CHANGED
                 true
             } ?: false
-        if (all) itemState = Gallery.ItemState.ALL_CHANGED
+//        if (all) itemState = Gallery.ItemState.ALL_CHANGED
         sendEvent(FragEvent.OnGalleryUpdated(this))
     }
 

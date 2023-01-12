@@ -65,24 +65,33 @@ class GalleryListFragment :
     ) {
         selectFlow = flow
         launchMain {
+            fun changeSpanCount(isOpen: Boolean, layoutManager: GridLayoutManager) {
+                val count = if (isOpen) 2 else 4
+                if (layoutManager.spanCount == count) return
+                layoutManager.spanCount = count
+                layoutManager.requestSimpleAnimationsInNextLayout()
+            }
             mailer.bufferCollect {
                 while (!isInit) delay(20L)
                 when (it) {
                     is GalleryViewModel.GalleryListEvent.OnGallerySelected -> {
                         if (galleryName == it.gallery.name) return@bufferCollect
                         galleryName = it.gallery.name
-                        binding.galleryList.swapAdapter(
-                            GalleryListAdapter(
-                                requireContext(),
-                                true,
-                                itemCount = it.gallery.size
-                            ).also { adapter ->
-                                adapter.itemLength = getListAdapter().itemLength
-                                adapter.multiChoose = multiChoose
-                                adapter.setOnSelectListener(onSelect)
-                            }, false
-                        )
-                        viewModel.getGallery(it.gallery, it.isVideo, it.combine)?.let { data ->
+                        if (it.isDrawerOpen) changeSpanCount(true, getLayoutManager())
+                        if (getListAdapter().itemCount > 0) {
+                            binding.galleryList.swapAdapter(
+                                GalleryListAdapter(
+                                    requireContext(),
+                                    true,
+                                    itemCount = it.gallery.size
+                                ).also { adapter ->
+                                    adapter.itemLength = getListAdapter().itemLength
+                                    adapter.multiChoose = multiChoose
+                                    adapter.setOnSelectListener(onSelect)
+                                }, false
+                            )
+                        }
+                        viewModel.getGalleryData(it.gallery, it.isVideo, it.combine)?.let { data ->
                             getListAdapter().setData(data)
                         }
                     }
@@ -93,12 +102,7 @@ class GalleryListFragment :
                         getListAdapter().quitSelectMod()
                     }
                     is GalleryViewModel.GalleryListEvent.OnDrawerEvent -> {
-                        if (it.isOpen) {
-                            getLayoutManager().spanCount = 2
-                        } else {
-                            getLayoutManager().spanCount = 4
-                        }
-                        getLayoutManager().requestSimpleAnimationsInNextLayout()
+                        changeSpanCount(it.isOpen, getLayoutManager())
                     }
                     is GalleryViewModel.GalleryListEvent.OnMediaDeleted -> {
                         getListAdapter().noticeListItemDelete(it.media)

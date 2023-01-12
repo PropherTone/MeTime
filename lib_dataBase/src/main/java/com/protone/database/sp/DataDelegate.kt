@@ -22,7 +22,7 @@ class DataDelegate(private val dataStore: DataStore<Preferences>) : IGetNSet,
     }
 
     override fun getInt(key: String, defValue: Int): Int {
-        return runBlocking {
+        return runBlocking(coroutineContext) {
             dataStore.data.catch {
                 emit(emptyPreferences())
             }.map {
@@ -40,7 +40,7 @@ class DataDelegate(private val dataStore: DataStore<Preferences>) : IGetNSet,
     }
 
     override fun getLong(key: String, defValue: Long): Long {
-        return runBlocking {
+        return runBlocking(coroutineContext) {
             dataStore.data.catch {
                 emit(emptyPreferences())
             }.map {
@@ -58,7 +58,7 @@ class DataDelegate(private val dataStore: DataStore<Preferences>) : IGetNSet,
     }
 
     override fun getString(key: String, defValue: String): String {
-        return runBlocking {
+        return runBlocking(coroutineContext) {
             dataStore.data.catch {
                 emit(emptyPreferences())
             }.map {
@@ -76,7 +76,7 @@ class DataDelegate(private val dataStore: DataStore<Preferences>) : IGetNSet,
     }
 
     override fun getBoolean(key: String, defValue: Boolean): Boolean {
-        return runBlocking {
+        return runBlocking(coroutineContext) {
             dataStore.data.catch {
                 emit(emptyPreferences())
             }.map {

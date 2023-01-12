@@ -174,8 +174,8 @@ class GalleryListAdapter(
     override fun getItemCount(): Int = itemCount
 
     override fun setData(collection: Collection<GalleryMedia>) {
-        refreshVisiblePosition()
         if (collection.isEmpty()) return
+        refreshVisiblePosition()
         super.setData(collection)
         if (mList.size > itemCount) {
             itemCount = mList.size

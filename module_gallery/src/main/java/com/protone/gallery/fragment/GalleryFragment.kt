@@ -39,6 +39,7 @@ import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.databinding.GalleryFragmentLayoutBinding
 import com.protone.gallery.viewModel.GalleryFragmentViewModel
+import com.protone.gallery.viewModel.GalleryViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -127,8 +128,12 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                     is GalleryFragmentViewModel.FragEvent.OnGalleryUpdated -> {
                         viewModel.run {
                             getBucketAdapter().apply {
-                                refreshBucket(it.gallery)
-                                getBucket(ALL_GALLERY)?.let { gallery -> refreshBucket(gallery) }
+                                val itemState =
+                                    GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState.ALL_CHANGED
+                                refreshBucket(it.gallery, itemState)
+                                getBucket(ALL_GALLERY)?.let { gallery ->
+                                    refreshBucket(gallery, itemState)
+                                }
                             }
                         }
                     }

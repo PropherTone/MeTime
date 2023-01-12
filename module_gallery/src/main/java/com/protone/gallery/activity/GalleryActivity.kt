@@ -3,6 +3,7 @@ package com.protone.gallery.activity
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.net.Uri
 import android.view.ViewAnimationUtils
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -42,6 +43,7 @@ import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryListFragment
 import com.protone.gallery.viewModel.GalleryViewModel
+import com.protone.gallery.viewModel.GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
@@ -111,13 +113,19 @@ class GalleryActivity :
                         getBucketAdapter().insertBucket(it.gallery)
                     }
                     is GalleryViewModel.GalleryEvent.OnGalleryRemoved -> {
-                        getBucketAdapter().deleteBucket(it.gallery)
+                        getBucketAdapter().apply {
+                            viewModel.getBucket(ALL_GALLERY)?.let { g -> setSelected(g) }
+                            deleteBucket(it.gallery)
+                        }
                     }
                     is GalleryViewModel.GalleryEvent.OnGalleryUpdated -> {
                         viewModel.run {
                             getBucketAdapter().apply {
-                                refreshBucket(it.gallery)
-                                getBucket(ALL_GALLERY)?.let { gallery -> refreshBucket(gallery) }
+                                refreshSelectGallery(it.gallery, it.itemState, false)
+                                refreshBucket(it.gallery, it.itemState)
+                                getBucket(ALL_GALLERY)?.let { gallery ->
+                                    refreshBucket(gallery, it.itemState)
+                                }
                             }
                         }
                     }
@@ -135,7 +143,7 @@ class GalleryActivity :
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
                 selectBucket { gallery ->
-                    setSelectedGallery(gallery)
+                    setSelectGallery(gallery)
                 }
                 deleteGalleryBucket {
                     viewModel.deleteGalleryBucket(it)
@@ -160,7 +168,7 @@ class GalleryActivity :
                         it.connect(chooseType.isEmpty(), generateMailer(isVideo).onSubscription {
                             getBucket(ALL_GALLERY)?.let { gallery ->
                                 getBucketAdapter().setSelected(gallery)
-                                setSelectedGallery(gallery)
+                                setSelectGallery(gallery)
                             }
                             if (++initializeSize == fs.size) {
                                 isInit = true
@@ -192,11 +200,7 @@ class GalleryActivity :
                 binding.galleryTab.apply {
                     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab?) {
-                            tab?.text?.let {
-                                if (onTabChanged(it)) {
-                                    onGalleryTabSwapped()
-                                }
-                            }
+                            tab?.text?.let { if (onTabChanged(it)) onGalleryTabSwapped() }
                         }
 
                         override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
@@ -214,14 +218,13 @@ class GalleryActivity :
 
     fun showBucket() {
         val progress = binding.motionRoot.progress
+        if (progress != 0f && progress != 1f) return
         ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
             addUpdateListener {
                 binding.motionRoot.progress = (it.animatedValue as Float)
             }
         }.start()
-        launch {
-            viewModel.sendListEvent(GalleryViewModel.GalleryListEvent.OnDrawerEvent(progress != 1f))
-        }
+        viewModel.drawerStateChanged(progress != 1f)
     }
 
     fun showPop() {
@@ -244,25 +247,44 @@ class GalleryActivity :
     }
 
     private fun onGalleryTabSwapped() {
+        viewModel.drawerStateChanged(binding.motionRoot.progress == 1f)
         getBucketAdapter().setData(viewModel.getGalleryData())
-        viewModel.getBucket()?.let { gallery ->
+        viewModel.getSelectedBucket()?.let { gallery ->
             getBucketAdapter().setSelected(gallery)
-            setSelectedGallery(gallery)
+            setSelectGallery(gallery)
         }
     }
 
-    private fun setSelectedGallery(gallery: Gallery) {
+    private fun setSelectGallery(gallery: Gallery) {
+        viewModel.onGallerySelected(gallery, binding.motionRoot.progress == 1f)
+        refreshSelectGallery(gallery)
+    }
+
+    private fun refreshSelectGallery(
+        gallery: Gallery,
+        itemState: ItemState = ItemState.ALL_CHANGED,
+        doAni: Boolean = true
+    ) {
         binding.apply {
-            viewModel.onGallerySelected(gallery)
-            Image.load(gallery.uri)
-                .with(this@GalleryActivity)
-                .error(com.protone.component.R.drawable.ic_baseline_image_24_white)
-                .transition(Transition.CrossFade)
-                .into(galleryAction)
-            galleryName.text = gallery.name
-            galleryItemNumber.text = gallery.size.toString()
-            getReveal()?.start()
+            when (itemState) {
+                ItemState.ALL_CHANGED -> {
+                    loadGalleyUri(gallery.uri)
+                    galleryName.text = gallery.name
+                    galleryItemNumber.text = gallery.size.toString()
+                }
+                ItemState.SIZE_CHANGED -> galleryItemNumber.text = gallery.size.toString()
+                ItemState.URI_CHANGED -> loadGalleyUri(gallery.uri)
+            }
+            if (doAni) getReveal()?.start()
         }
+    }
+
+    private fun loadGalleyUri(uri: Uri?) {
+        Image.load(uri)
+            .with(this@GalleryActivity)
+            .error(com.protone.component.R.drawable.ic_baseline_image_24_white)
+            .transition(Transition.CrossFade)
+            .into(binding.galleryAction)
     }
 
     private fun getReveal(): Animator? {

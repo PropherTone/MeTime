@@ -15,13 +15,24 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import com.protone.gallery.viewModel.GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState
 
 class GalleryViewModel : BaseViewModel() {
 
     sealed class GalleryEvent {
         data class OnNewGallery(val gallery: Gallery) : GalleryEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : GalleryEvent()
-        data class OnGalleryUpdated(val gallery: Gallery) : GalleryEvent()
+        data class OnGalleryUpdated(
+            val gallery: Gallery,
+            val itemState: ItemState = ItemState.ALL_CHANGED
+        ) : GalleryEvent() {
+            enum class ItemState {
+                SIZE_CHANGED,
+                URI_CHANGED,
+                ALL_CHANGED
+            }
+        }
+
         data class OnNewGalleries(val galleries: List<Gallery>) : GalleryEvent()
     }
 
@@ -32,7 +43,8 @@ class GalleryViewModel : BaseViewModel() {
         data class OnGallerySelected(
             val gallery: Gallery,
             val isVideo: Boolean,
-            val combine: Boolean
+            val combine: Boolean,
+            val isDrawerOpen: Boolean
         ) : GalleryListEvent()
 
         sealed class MediaEvent(val galleryMedia: GalleryMedia) : GalleryListEvent()
@@ -147,9 +159,15 @@ class GalleryViewModel : BaseViewModel() {
         }
     }
 
+    fun drawerStateChanged(isOpen: Boolean) {
+        viewModelScope.launchDefault {
+            sendListEvent(GalleryListEvent.OnDrawerEvent(isOpen))
+        }
+    }
+
     fun getBucket(bucket: String) = getGalleryData(isVideoGallery).find { it.name == bucket }
 
-    fun getBucket() = getGalleryData(isVideoGallery).find { it.name == rightGallery }
+    fun getSelectedBucket() = getGalleryData(isVideoGallery).find { it.name == rightGallery }
 
     fun addBucket(name: String) {
         galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideoGallery)) { re, reName ->
@@ -169,10 +187,17 @@ class GalleryViewModel : BaseViewModel() {
         mailers[if (isVideo) 1 else 0] = it
     }.asSharedFlow()
 
-    fun onGallerySelected(gallery: Gallery) {
+    fun onGallerySelected(gallery: Gallery, isDrawerOpen: Boolean) {
         viewModelScope.launch {
             rightGallery = gallery.name
-            sendListEvent(GalleryListEvent.OnGallerySelected(gallery, isVideoGallery, combine))
+            sendListEvent(
+                GalleryListEvent.OnGallerySelected(
+                    gallery,
+                    isVideoGallery,
+                    combine,
+                    isDrawerOpen
+                )
+            )
         }
     }
 
@@ -345,9 +370,10 @@ class GalleryViewModel : BaseViewModel() {
     }
 
     private suspend fun Gallery.updateGallery(isVideo: Boolean) {
+        var itemState = ItemState.ALL_CHANGED
         val newSize = if (name == ALL_GALLERY) getGallerySize(isVideo)
         else getGallerySize(name, isVideo)
-        val sizeChanged = newSize.takeIf { size ->
+        newSize.takeIf { size ->
             if (size <= 0) {
                 sendBucketEvent(GalleryEvent.OnGalleryRemoved(this))
                 return
@@ -355,22 +381,18 @@ class GalleryViewModel : BaseViewModel() {
             size != this.size
         }?.let { size ->
             this.size = size
-            itemState = Gallery.ItemState.SIZE_CHANGED
-            true
-        } ?: false
+            itemState = ItemState.SIZE_CHANGED
+        }
 
         val media = if (name == ALL_GALLERY) getNewestMediaChecked(isVideo)
         else getNewestMedia(name, isVideo)
-        val uriChanged = media.takeIf { uri ->
+        media.takeIf { uri ->
             uri != this.uri
         }?.let { uri ->
             this.uri = uri
-            itemState = Gallery.ItemState.URI_CHANGED
-            true
-        } ?: false
-
-        if (sizeChanged && uriChanged) itemState = Gallery.ItemState.ALL_CHANGED
-        sendBucketEvent(GalleryEvent.OnGalleryUpdated(this))
+            itemState = ItemState.URI_CHANGED
+        }
+        sendBucketEvent(GalleryEvent.OnGalleryUpdated(this, itemState))
     }
 
     private suspend fun sendBucketEvent(fragEvent: GalleryEvent, immediate: Boolean = true) {

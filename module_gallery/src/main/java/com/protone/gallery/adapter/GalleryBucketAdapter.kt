@@ -4,16 +4,14 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import com.protone.common.baseType.getString
-import com.protone.common.context.MApplication
-import com.protone.common.context.newLayoutInflater
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.R
+import com.protone.common.baseType.getString
+import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Gallery
+import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryBucketListLayoutBinding
+import com.protone.gallery.viewModel.GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState
 
 class GalleryBucketAdapter(
     context: Context,
@@ -28,7 +26,9 @@ class GalleryBucketAdapter(
 
     sealed class GalleryBucketEvent {
         data class DeleteBucket(val bucket: Gallery) : GalleryBucketEvent()
-        data class RefreshBucket(val bucket: Gallery) : GalleryBucketEvent()
+        data class RefreshBucket(val bucket: Gallery, val itemState: ItemState) :
+            GalleryBucketEvent()
+
         data class InsertBucket(val bucket: Gallery) : GalleryBucketEvent()
         data class InsertBuckets(val buckets: List<Gallery>) : GalleryBucketEvent()
         data class SetSelected(val gallery: Gallery) : GalleryBucketEvent()
@@ -46,7 +46,7 @@ class GalleryBucketAdapter(
             }
             is GalleryBucketEvent.RefreshBucket -> {
                 mList.indexOfFirst { it.name == data.bucket.name }.let {
-                    if (it != -1) notifyItemChangedCO(it, data.bucket.itemState)
+                    if (it != -1) notifyItemChangedCO(it, data.itemState)
                 }
             }
             is GalleryBucketEvent.InsertBucket -> {
@@ -58,14 +58,17 @@ class GalleryBucketAdapter(
                 notifyItemRangeInsertedCO(mList.size - data.buckets.size, data.buckets.size)
             }
             is GalleryBucketEvent.SetSelected -> {
-                for (i in 0 until mList.size) {
-                    if (mList[i].name == data.gallery.name) {
-                        selectList.add(mList[i])
-                        notifyItemChangedCO(i)
-                        return
-                    }
-                }
-                selectList.add(data.gallery)
+                mList.indexOfFirst {
+                    it.name == data.gallery.name
+                }.takeIf {
+                    it != -1
+                }?.let {
+                    val contains = selectList.contains(mList[it])
+                    selectList.clear()
+                    selectList.add(mList[it])
+                    notifyItemChangedCO(it)
+                    if (contains) selectBucket?.invoke(mList[it])
+                } ?: selectList.add(data.gallery)
             }
         }
     }
@@ -106,16 +109,17 @@ class GalleryBucketAdapter(
         payloads: MutableList<Any>
     ) {
         if (payloads.isNotEmpty()) {
+            val gallery = mList[position]
             when (payloads.first()) {
-                Gallery.ItemState.SIZE_CHANGED -> holder.binding.apply {
-                    changedText(mList[position])
+                ItemState.SIZE_CHANGED -> holder.binding.apply {
+                    changedText(gallery)
                 }
-                Gallery.ItemState.URI_CHANGED -> holder.binding.apply {
-                    changedUri(mList[position])
+                ItemState.URI_CHANGED -> holder.binding.apply {
+                    changedUri(gallery)
                 }
-                Gallery.ItemState.ALL_CHANGED -> holder.binding.apply {
-                    changedText(mList[position])
-                    changedUri(mList[position])
+                ItemState.ALL_CHANGED -> holder.binding.apply {
+                    changedText(gallery)
+                    changedUri(gallery)
                 }
             }
         }
@@ -182,8 +186,8 @@ class GalleryBucketAdapter(
         emit(GalleryBucketEvent.DeleteBucket(bucket))
     }
 
-    fun refreshBucket(item: Gallery) {
-        emit(GalleryBucketEvent.RefreshBucket(item))
+    fun refreshBucket(item: Gallery, itemState: ItemState) {
+        emit(GalleryBucketEvent.RefreshBucket(item, itemState))
     }
 
     fun insertBucket(item: Gallery) {

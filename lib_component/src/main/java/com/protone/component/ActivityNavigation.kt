@@ -3,6 +3,7 @@ package com.protone.component
 import android.view.View
 import androidx.core.app.ActivityOptionsCompat
 import com.alibaba.android.arouter.facade.Postcard
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
@@ -28,7 +29,7 @@ suspend fun BaseFragment<*, *>.toGallery(chooseMode: String) =
 fun BaseActivity<*, *, *>.toGalleryView(
     mediaJson: String,
     isVideo: Boolean,
-    targetGallery: String = "全部",
+    targetGallery: String = ALL_GALLERY,
     elementView: View? = null
 ) {
     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
@@ -49,7 +50,7 @@ fun BaseActivity<*, *, *>.toGalleryView(
 fun BaseFragment<*, *>.toGalleryView(
     mediaJson: String,
     isVideo: Boolean,
-    targetGallery: String = "全部",
+    targetGallery: String = ALL_GALLERY,
     elementView: View? = null
 ) {
     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
