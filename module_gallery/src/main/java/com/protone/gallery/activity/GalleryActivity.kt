@@ -14,10 +14,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.R
-import com.protone.common.baseType.bufferCollect
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.launchDefault
-import com.protone.common.baseType.toast
+import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.entity.Gallery
@@ -61,10 +58,8 @@ class GalleryActivity :
         set(value) {
             if (field == value) return
             binding.finish.setImageResource(
-                if (value)
-                    com.protone.component.R.drawable.ic_round_close_24_white
-                else
-                    com.protone.component.R.drawable.ic_round_arrow_left_white_24
+                if (value) com.protone.component.R.drawable.ic_round_close_24_white
+                else com.protone.component.R.drawable.ic_round_arrow_left_white_24
             )
             field = value
         }
@@ -121,7 +116,9 @@ class GalleryActivity :
                     is GalleryViewModel.GalleryEvent.OnGalleryUpdated -> {
                         viewModel.run {
                             getBucketAdapter().apply {
-                                refreshSelectGallery(it.gallery, it.itemState, false)
+                                if (it.gallery.name == rightGallery) {
+                                    refreshSelectGallery(it.gallery, it.itemState, false)
+                                }
                                 refreshBucket(it.gallery, it.itemState)
                                 getBucket(ALL_GALLERY)?.let { gallery ->
                                     refreshBucket(gallery, it.itemState)
@@ -143,7 +140,9 @@ class GalleryActivity :
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
                 selectBucket { gallery ->
-                    setSelectGallery(gallery)
+                    launch {
+                        setSelectGallery(gallery)
+                    }
                 }
                 deleteGalleryBucket {
                     viewModel.deleteGalleryBucket(it)
@@ -200,7 +199,7 @@ class GalleryActivity :
                 binding.galleryTab.apply {
                     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab?) {
-                            tab?.text?.let { if (onTabChanged(it)) onGalleryTabSwapped() }
+                            tab?.text?.let { if (onTabChanged(it)) launch { onGalleryTabSwapped() } }
                         }
 
                         override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
@@ -246,7 +245,7 @@ class GalleryActivity :
         }
     }
 
-    private fun onGalleryTabSwapped() {
+    private suspend fun onGalleryTabSwapped() {
         viewModel.drawerStateChanged(binding.motionRoot.progress == 1f)
         getBucketAdapter().setData(viewModel.getGalleryData())
         viewModel.getSelectedBucket()?.let { gallery ->
@@ -255,16 +254,16 @@ class GalleryActivity :
         }
     }
 
-    private fun setSelectGallery(gallery: Gallery) {
+    private suspend fun setSelectGallery(gallery: Gallery) {
         viewModel.onGallerySelected(gallery, binding.motionRoot.progress == 1f)
         refreshSelectGallery(gallery)
     }
 
-    private fun refreshSelectGallery(
+    private suspend fun refreshSelectGallery(
         gallery: Gallery,
         itemState: ItemState = ItemState.ALL_CHANGED,
         doAni: Boolean = true
-    ) {
+    ): Unit = withMainContext {
         binding.apply {
             when (itemState) {
                 ItemState.ALL_CHANGED -> {
@@ -356,10 +355,10 @@ class GalleryActivity :
     }
 
     override fun popIntoBox() {
-        if (viewModel.chooseData.isEmpty()) {
-            getGalleryData()?.let { viewModel.chooseData.addAll(it) }
-        }
-        IntentDataHolder.put(viewModel.chooseData)
+        IntentDataHolder.put(
+            if (viewModel.chooseData.isEmpty()) getGalleryData() ?: viewModel.chooseData
+            else viewModel.chooseData
+        )
         startActivity(PictureBoxActivity::class.intent)
     }
 

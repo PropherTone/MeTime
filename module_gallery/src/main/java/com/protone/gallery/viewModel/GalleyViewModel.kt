@@ -273,6 +273,7 @@ class GalleryViewModel : BaseViewModel() {
                     sendBucketEvent(GalleryEvent.OnGalleryUpdated(it), false)
                 }
                 if (media.isVideo != isVideoGallery && media.bucket != rightGallery) return
+                chooseData.remove(media)
                 sendListEvent(GalleryListEvent.OnMediaDeleted(media), true)
             }
 
