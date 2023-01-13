@@ -12,6 +12,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.children
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.protone.common.context.setBlurBitmap
 import com.protone.component.R
 
 class SwitchImageView @JvmOverloads constructor(
@@ -36,7 +37,7 @@ class SwitchImageView @JvmOverloads constructor(
     init {
         addView(switcher)
         switcher.setInAnimation(context, R.anim.image_switch_in)
-        switcher.setOutAnimation(context,R.anim.image_switch_out)
+        switcher.setOutAnimation(context, R.anim.image_switch_out)
         repeat(2) {
             switcher.addView(ShapeableImageView(context).apply {
                 layoutParams = LayoutParams(
@@ -49,26 +50,34 @@ class SwitchImageView @JvmOverloads constructor(
         }
     }
 
+    fun setBlurBitmap(bitmap: Bitmap?, radius: Int, sample: Int) {
+        switcher.switch {
+            it.setBlurBitmap(bitmap, radius, sample)
+        }
+    }
+
     fun setImageBitmap(bitmap: Bitmap?) {
-        switcher.apply {
-            (nextView as ImageView).setImageBitmap(bitmap)
-            showNext()
+        switcher.switch {
+            it.setImageBitmap(bitmap)
         }
     }
 
     fun setImageResource(@DrawableRes res: Int) {
-        switcher.apply {
-            (nextView as ImageView).setImageResource(res)
-            showNext()
+        switcher.switch {
+            it.setImageResource(res)
         }
     }
 
     fun setImageDrawable(drawable: Drawable?) {
-        switcher.apply {
-            (nextView as ImageView).setImageDrawable(drawable)
-            showNext()
-            (nextView as ImageView).setImageBitmap(null)
+        switcher.switch {
+            it.setImageDrawable(drawable)
         }
+        (switcher.nextView as ImageView).setImageBitmap(null)
+    }
+
+    private inline fun ViewSwitcher.switch(block: (ImageView) -> Unit) {
+        block(nextView as ImageView)
+        showNext()
     }
 
 }

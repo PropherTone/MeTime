@@ -38,16 +38,4 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun loadBlurIcon(path: String): Bitmap? = withDefaultContext {
-        return@withDefaultContext try {
-            Blur.blur(
-                path.toBitmap(),
-                radius = 10,
-                sampling = 10
-            )
-        } catch (e: Exception) {
-            null
-        }
-    }
-
 }

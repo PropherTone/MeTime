@@ -1,3 +1,5 @@
 <resources>
     <string name="music_bucket">MusicBucket</string>
+    <string name="unknown_artist">UNKNOWN_ARTIST</string>
+    <string name="unknown_album">UNKNOWN_ALBUM</string>
 </resources>

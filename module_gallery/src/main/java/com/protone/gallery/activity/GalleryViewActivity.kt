@@ -16,7 +16,6 @@ import com.protone.common.baseType.getStorageSize
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.intent
-import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
@@ -135,10 +134,11 @@ class GalleryViewActivity : BaseMediaActivity<
                 it.setItemClick { cate ->
                     launch {
                         val media = viewModel.getMediaByUri(cate.toUri())
-                        startActivity(GalleryViewActivity::class.intent.putExtras {
-                            putString(MEDIA, media?.toJson())
-                            putBoolean(IS_VIDEO, media?.isVideo ?: false)
-                        })
+                        startActivity(
+                            GalleryViewActivity::class.intent
+                                .putExtra(MEDIA, media?.toJson())
+                                .putExtra(IS_VIDEO, media?.isVideo ?: false)
+                        )
                     }
                 }
             }

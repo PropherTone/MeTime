@@ -11,7 +11,7 @@ import kotlin.math.roundToInt
 
 @Suppress("DEPRECATION")
 object Blur {
-    private var defaultBlurRadius: Int = 0
+    var defaultBlurRadius: Int = 0
     private var rs: RenderScript? = null
     private var blur: ScriptIntrinsicBlur? = null
     private var output: Allocation? = null

@@ -17,6 +17,15 @@ data class MusicBucket(
     @ColumnInfo(name = "date")
     var date: String?
 ) {
+
+    companion object {
+        const val ALL = 0x0F
+        const val COVER = 0x01
+        const val SIZE = 0x02
+        const val NAME = 0x04
+        const val DETAIL = 0x08
+    }
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "musicBucketId")
     var musicBucketId: Long = 0

@@ -31,7 +31,7 @@ fun tryWithRecording(func: () -> Unit) {
         func.invoke()
     } catch (e: Exception) {
         if (SCrashHandler.path != null) {
-            SCrashHandler.writeLog(e)
+            SCrashHandler.writeLog(SCrashHandler.path ?: "", e)
         }
     }
 }

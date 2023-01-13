@@ -1,15 +1,19 @@
 package com.protone.common.context
 
+import android.graphics.Bitmap
 import android.graphics.Outline
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver
+import android.widget.ImageView
 import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
+import com.protone.common.utils.displayUtils.Blur
+import com.protone.common.utils.displayUtils.BlurFactor
 
 fun View.paddingTop(padding: Int) {
     setPadding(
@@ -42,6 +46,12 @@ fun View.marginBottom(margin: Int) {
     marginLayoutParams.bottomMargin = margin
     layoutParams = marginLayoutParams
 }
+
+fun ImageView.setBlurBitmap(
+    bitmap: Bitmap?,
+    radius: Int = Blur.defaultBlurRadius,
+    sampling: Int = BlurFactor.DEFAULT_SAMPLING
+) = setImageBitmap(bitmap?.let { Blur.blur(it, radius, sampling) })
 
 inline fun View.onGlobalLayout(crossinline block: View.() -> Unit) {
     val view = this

@@ -20,7 +20,7 @@ import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
 import com.protone.common.context.onGlobalLayout
-import com.protone.common.context.putExtras
+import com.protone.common.entity.Gallery
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.IntentDataHolder
@@ -29,19 +29,22 @@ import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.json.toJson
-import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.customView.StatusImageView
+import com.protone.component.view.dialog.titleDialog
 import com.protone.gallery.activity.GallerySearchActivity
 import com.protone.gallery.activity.GalleryViewActivity
 import com.protone.gallery.activity.PictureBoxActivity
 import com.protone.gallery.adapter.GalleryBucketAdapter
-import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.adapter.GalleryListAdapter
+import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.databinding.GalleryFragmentLayoutBinding
 import com.protone.gallery.viewModel.GalleryFragmentViewModel
 import com.protone.gallery.viewModel.GalleryViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     GalleryListAdapter.OnSelect {
@@ -128,8 +131,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                     is GalleryFragmentViewModel.FragEvent.OnGalleryUpdated -> {
                         viewModel.run {
                             getBucketAdapter().apply {
-                                val itemState =
-                                    GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState.ALL_CHANGED
+                                val itemState = Gallery.ItemState.ALL_CHANGED
                                 refreshBucket(it.gallery, itemState)
                                 getBucket(ALL_GALLERY)?.let { gallery ->
                                     refreshBucket(gallery, itemState)
@@ -195,9 +197,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
                 launchDefault {
                     val gallery = viewModel.getGalleryName()
                     IntentDataHolder.put(viewModel.getGallery(gallery))
-                    startActivity(GallerySearchActivity::class.intent.putExtras {
-                        putString("gallery", gallery)
-                    })
+                    startActivity(GallerySearchActivity::class.intent.putExtra("gallery", gallery))
                 }
             }
             galleryToolButton.setOnClickListener {
@@ -280,11 +280,12 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
     }
 
     override fun openView(galleryMedia: GalleryMedia, elementView: View) {
-        startActivity(GalleryViewActivity::class.intent.putExtras {
-            putString(MEDIA, galleryMedia.toJson())
-            putBoolean(IS_VIDEO, galleryMedia.isVideo)
-            putString(GALLERY, viewModel.getGalleryName())
-        })
+        startActivity(
+            GalleryViewActivity::class.intent
+                .putExtra(MEDIA, galleryMedia.toJson())
+                .putExtra(IS_VIDEO, galleryMedia.isVideo)
+                .putExtra(GALLERY, viewModel.getGalleryName())
+        )
     }
 
     override fun onDestroy() {

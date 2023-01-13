@@ -142,30 +142,15 @@ class WorkService : LifecycleService() {
     }
 
     private suspend fun updateMusic(): Unit = coroutineScope {
-        fun sortMusic(allMusic: MutableList<Music>, music: Music): Boolean {
-            val index = allMusic.indexOf(music)
-            return if (index != -1) {
-                allMusic.removeAt(index)
-                true
-            } else false
-        }
         DatabaseBridge.instance.musicDAOBridge.run {
+            Log.d(TAG, "updateMusic")
             val allMusic = mutableListOf<Music>()
             launchDefault {
                 getAllMusic()?.let { allMusic.addAll(it) }
-                flow {
-                    scanAudio { _, music ->
-                        if (!sortMusic(allMusic, music)) {
-                            emit(music)
-                        }
-                    }
-                }.bufferCollect {
-                    insertMusic(it)
-                }
-                deleteMusicMulti(allMusic)
-                if (allMusic.size != 0) {
-                    makeToast("音乐更新完毕")
-                }
+                val audios = scanAudio { _, _ -> }
+                val filteredAudios = audios.filter { !allMusic.remove(it) }
+                insertMusicMultiAsync(filteredAudios)
+                deleteMusicMultiAsync(allMusic)
             }
         }
     }
@@ -173,8 +158,9 @@ class WorkService : LifecycleService() {
 
     private suspend fun CoroutineContext.updateGallery(): Unit = withContext(this) {
         DatabaseBridge.instance.galleryDAOBridge.run {
-            Log.d(TAG, "updateGallery: ")
-            val allSignedMedia = getAllSignedMedia() as MutableList?
+            Log.d(TAG, "updateGallery")
+            val allSignedMedia = mutableListOf<GalleryMedia>()
+            getAllSignedMedia()?.let { allSignedMedia.addAll(it) }
             val scanPicture = async(Dispatchers.Default) {
                 scanPicture { _, _ -> }
             }
@@ -189,23 +175,19 @@ class WorkService : LifecycleService() {
             val sortMedias = async(Dispatchers.Default) {
                 val uncheckedGalleries = getAllGallery() as MutableList<String>
                 sortGalleries(uncheckedGalleries)
-                uncheckedGalleries.forEach {
-                    deleteSignedMediasByGalleryAsync(it)
-                }
-                allSignedMedia?.filter {
+                uncheckedGalleries.forEach { deleteSignedMediasByGalleryAsync(it) }
+                allSignedMedia.filter {
                     uncheckedGalleries.contains(it.bucket) || medias.find { gm -> gm.uri == it.uri } == null
-                }?.apply {
-                    deleteSignedMediaMultiAsync(this)
-                }
+                }.also { deleteSignedMediaMultiAsync(it) }
             }
 
-            sortMedias.await()?.let { allSignedMedia?.removeAll(it) }
+            sortMedias.await().let { allSignedMedia.removeAll(it) }
 
             val updateList = mutableListOf<GalleryMedia>()
             val insertList = mutableListOf<GalleryMedia>()
 
             medias.forEach { media ->
-                if (allSignedMedia?.isNotEmpty() == true) {
+                if (allSignedMedia.isNotEmpty()) {
                     allSignedMedia.find { it.uri == media.uri }.also {
                         if (it == null) insertList.add(media)
                         else if (it != media) updateList.add(media)

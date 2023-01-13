@@ -18,6 +18,7 @@ import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.entity.Gallery
+import com.protone.common.entity.Gallery.ItemState
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.RouterPath
@@ -40,7 +41,6 @@ import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryListFragment
 import com.protone.gallery.viewModel.GalleryViewModel
-import com.protone.gallery.viewModel.GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch

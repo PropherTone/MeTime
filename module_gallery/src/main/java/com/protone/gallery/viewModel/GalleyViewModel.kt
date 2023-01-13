@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.entity.Gallery
+import com.protone.common.entity.Gallery.ItemState
 import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
@@ -15,25 +16,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import com.protone.gallery.viewModel.GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState
 
 class GalleryViewModel : BaseViewModel() {
 
     sealed class GalleryEvent {
         data class OnNewGallery(val gallery: Gallery) : GalleryEvent()
+        data class OnNewGalleries(val galleries: List<Gallery>) : GalleryEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : GalleryEvent()
         data class OnGalleryUpdated(
             val gallery: Gallery,
             val itemState: ItemState = ItemState.ALL_CHANGED
-        ) : GalleryEvent() {
-            enum class ItemState {
-                SIZE_CHANGED,
-                URI_CHANGED,
-                ALL_CHANGED
-            }
-        }
-
-        data class OnNewGalleries(val galleries: List<Gallery>) : GalleryEvent()
+        ) : GalleryEvent()
     }
 
     sealed class GalleryListEvent : GalleryEvent() {
@@ -88,44 +81,42 @@ class GalleryViewModel : BaseViewModel() {
     private val isVideoGallery: Boolean get() = rightMailer == 1
     private val isLock = userConfig.lockGallery.isNotEmpty()
 
-    private val pool =
-        EventCachePool.get<GalleryEvent>(duration = 500L).apply {
-            handleEvent { data ->
-                if (data.isNotEmpty()) when (data.first()) {
-                    is GalleryListEvent.OnMediaInserted -> data.first().also { event ->
-                        if (event !is GalleryListEvent.MediaEvent) return@also
-                        data.associate {
-                            (it as GalleryListEvent.MediaEvent) to listOf(it.galleryMedia)
-                        }.run {
-                            keys.forEach { event ->
-                                event.galleryMedia.bucket.let { galleryName ->
-                                    galleryData.find { it.name == galleryName }.also { gallery ->
-                                        if (gallery != null)
-                                            gallery.updateGallery(event.galleryMedia.isVideo)
-                                        else Gallery(
-                                            galleryName,
-                                            getGallerySize(galleryName, event.galleryMedia.isVideo),
-                                            getNewestMedia(galleryName, event.galleryMedia.isVideo)
-                                        ).also { target -> target.cacheAndNotice(event.galleryMedia.isVideo) }
-                                    }
-                                }
-                                this[event]?.let {
-                                    sendListEvent(GalleryListEvent.OnMediasInserted(it))
-                                }
+    private val pool = EventCachePool.get<GalleryEvent>(duration = 400L).handleEvent { data ->
+        if (data.isEmpty()) return@handleEvent
+        when (data.first()) {
+            is GalleryListEvent.OnMediaInserted -> data.first().also { event ->
+                if (event !is GalleryListEvent.MediaEvent) return@also
+                data.associate {
+                    (it as GalleryListEvent.MediaEvent) to listOf(it.galleryMedia)
+                }.run {
+                    keys.forEach { event ->
+                        event.galleryMedia.bucket.let { galleryName ->
+                            galleryData.find { it.name == galleryName }.also { gallery ->
+                                if (gallery != null)
+                                    gallery.updateGallery(event.galleryMedia.isVideo)
+                                else Gallery(
+                                    galleryName,
+                                    getGallerySize(galleryName, event.galleryMedia.isVideo),
+                                    getNewestMedia(galleryName, event.galleryMedia.isVideo)
+                                ).also { target -> target.cacheAndNotice(event.galleryMedia.isVideo) }
                             }
                         }
+                        this[event]?.let {
+                            sendListEvent(GalleryListEvent.OnMediasInserted(it))
+                        }
                     }
-                    is GalleryEvent.OnGalleryUpdated -> data.distinct().forEach { event ->
-                        val isVideo = isVideoGallery
-                        (event as GalleryEvent.OnGalleryUpdated).gallery.updateGallery(isVideo)
-                        galleryData.find { gallery ->
-                            gallery.name == ALL_GALLERY
-                        }?.updateGallery(isVideo)
-                    }
-                    else -> Unit
                 }
             }
+            is GalleryEvent.OnGalleryUpdated -> data.distinct().forEach { event ->
+                val isVideo = isVideoGallery
+                (event as GalleryEvent.OnGalleryUpdated).gallery.updateGallery(isVideo)
+                galleryData.find { gallery ->
+                    gallery.name == ALL_GALLERY
+                }?.updateGallery(isVideo)
+            }
+            else -> Unit
         }
+    }
 
     fun sortData() {
         observeGallery()
@@ -401,7 +392,7 @@ class GalleryViewModel : BaseViewModel() {
         else pool.holdEvent(fragEvent)
     }
 
-    suspend fun sendListEvent(fragEvent: GalleryListEvent, immediate: Boolean = true) {
+    private suspend fun sendListEvent(fragEvent: GalleryListEvent, immediate: Boolean = true) {
         if (immediate) getCurrentMailer()?.emit(fragEvent)
         else pool.holdEvent(fragEvent)
     }

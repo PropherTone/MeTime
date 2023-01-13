@@ -91,17 +91,18 @@ sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
 
     suspend fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? =
         withIOContext {
-            sendEvent(
-                MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(
-                    musicWithMusicBucket
+            musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)?.also {
+                sendEvent(
+                    MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(
+                        musicWithMusicBucket
+                    )
                 )
-            )
-            musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
+            }
         }
 
     suspend fun deleteMusicWithMusicBucket(musicID: Long, musicBucketId: Long) =
         withIOContext {
-            sendEvent(MediaAction.MusicDataAction.OnMusicWithMusicBucketDeleted(musicID))
+            sendEvent(MediaAction.MusicDataAction.OnMusicWithMusicBucketDeleted(musicID, musicBucketId))
             musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID, musicBucketId)
         }
 

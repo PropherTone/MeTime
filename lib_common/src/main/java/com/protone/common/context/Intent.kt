@@ -50,10 +50,3 @@ val appIntentFilter: IntentFilter
 
 val KClass<*>.intent
     get() = Intent(MApplication.app, this.java)
-
-inline fun Intent.putExtras(block: Bundle.() -> Unit): Intent {
-    return Bundle().let {
-        it.block()
-        putExtras(it)
-    }
-}

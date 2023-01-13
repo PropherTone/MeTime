@@ -10,7 +10,6 @@ import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
-import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
@@ -109,10 +108,11 @@ class NoteActivity :
             noteList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
                 it.adapter = NoteListListAdapter(this@NoteActivity) {
-                    onNote {
-                        startActivity(NoteViewActivity::class.intent.putExtras {
-                            putString(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, it)
-                        })
+                    onNote { note ->
+                        startActivity(
+                            NoteViewActivity::class.intent
+                                .putExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME, note)
+                        )
                     }
                     onDelete { note ->
                         titleDialog(R.string.delete.getString(), R.string.delete.getString()) {
@@ -125,9 +125,7 @@ class NoteActivity :
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
                 it.adapter = NoteTypeListAdapter(this@NoteActivity) {
                     addNote { note ->
-                        startActivity(NoteEditActivity::class.intent.putExtras {
-                            putString(NOTE_DIR, note)
-                        })
+                        startActivity(NoteEditActivity::class.intent.putExtra(NOTE_DIR, note))
                     }
                     onTypeSelected { dir ->
                         launch {

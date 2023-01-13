@@ -8,10 +8,10 @@ import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Gallery
+import com.protone.common.entity.Gallery.ItemState
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryBucketListLayoutBinding
-import com.protone.gallery.viewModel.GalleryViewModel.GalleryEvent.OnGalleryUpdated.ItemState
 
 class GalleryBucketAdapter(
     context: Context,

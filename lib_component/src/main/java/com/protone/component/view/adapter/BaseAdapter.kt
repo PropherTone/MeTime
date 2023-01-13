@@ -30,22 +30,36 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
     protected var firstPosition: Int = -1
     protected var lastPosition: Int = -1
 
-    open fun setData(collection: Collection<Item>) {
-        mList.clear()
-        mList.addAll(collection)
-    }
-
     interface AdapterDiff<Item : Any> {
         fun areContentsTheSame(oldItem: Item, newItem: Item): Boolean
         fun getChangePayload(oldItem: Item, newItem: Item): Boolean
     }
 
     private var diff: AdapterDiff<Item>? = null
+
     fun setAdapterDiff(adapterDiff: AdapterDiff<Item>) {
         diff = adapterDiff
     }
 
+    open fun setData(collection: Collection<Item>) {
+        mList.clear()
+        mList.addAll(collection)
+    }
+
     open suspend fun handleEventAsynchronous(data: Event) {}
+
+    fun refreshVisiblePosition() {
+        layoutManager?.apply {
+            firstPosition = findFirstVisibleItemPosition()
+            lastPosition = findLastVisibleItemPosition()
+        }
+    }
+
+    protected fun emit(value: Event) {
+        launch {
+            _adapterFlow.emit(value)
+        }
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         layoutManager =
@@ -64,19 +78,6 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
             adapterFlow.bufferCollect {
                 handleEventAsynchronous(it)
             }
-        }
-    }
-
-    fun refreshVisiblePosition() {
-        layoutManager?.apply {
-            firstPosition = findFirstVisibleItemPosition()
-            lastPosition = findLastVisibleItemPosition()
-        }
-    }
-
-    protected fun emit(value: Event) {
-        launch {
-            _adapterFlow.emit(value)
         }
     }
 

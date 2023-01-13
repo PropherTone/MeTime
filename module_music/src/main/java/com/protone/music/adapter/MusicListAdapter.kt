@@ -3,11 +3,11 @@ package com.protone.music.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
-import androidx.core.view.isGone
+import com.protone.common.baseType.getString
 import com.protone.common.baseType.toStringMinuteTime
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Music
-import com.protone.component.R
+import com.protone.music.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.music.databinding.MusicListLayoutBinding
 
@@ -19,7 +19,7 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
 
     sealed class MusicListEvent {
         data class PlayPosition(val music: Music) : MusicListEvent()
-        data class InsertMusics(val musics: Collection<Music>) : MusicListEvent()
+        data class ChangeData(val musics: Collection<Music>) : MusicListEvent()
     }
 
     init {
@@ -42,8 +42,8 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
                     musicListTime,
                     musicListDetail,
                     dispatch = false,
-                    backgroundColor = R.color.foreDark,
-                    textsColor = R.color.white
+                    backgroundColor = com.protone.component.R.color.foreDark,
+                    textsColor = com.protone.component.R.color.white
                 )
             }
         }
@@ -59,13 +59,13 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
                     notifyItemChangedCO(playPosition)
                 }
             }
-            is MusicListEvent.InsertMusics -> {
+            is MusicListEvent.ChangeData -> {
                 if (data.musics.isEmpty()) return
                 val oldSize = mList.size
                 mList.clear()
                 notifyItemRangeRemoved(0, oldSize)
                 mList.addAll(data.musics)
-                notifyItemRangeInsertedCO(0, mList.size)
+                notifyItemRangeInsertedChecked(0, mList.size)
             }
         }
     }
@@ -95,8 +95,8 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
                     clearAllSelected()
                     itemClickChange(
-                        R.color.blue_2,
-                        R.color.white,
+                        com.protone.component.R.color.blue_2,
+                        com.protone.component.R.color.white,
                         musicListContainer,
                         musicListInContainer,
                         arrayOf(
@@ -109,9 +109,8 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
                     clickCallback?.invoke(music)
                 }
                 musicListName.text = music.title
-                if (music.artist != null && music.album != null) {
-                    musicListDetail.text = "${music.artist} · ${music.album}"
-                } else musicListDetail.isGone = true
+                musicListDetail.text =
+                    " ${music.artist ?: R.string.unknown_artist.getString()} · ${music.album ?: R.string.unknown_album.getString()}"
                 musicListTime.text = music.duration.toStringMinuteTime()
             }
         }
@@ -131,8 +130,13 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
         emit(MusicListEvent.PlayPosition(music))
     }
 
-    fun insertMusics(musics: Collection<Music>) {
-        emit(MusicListEvent.InsertMusics(musics))
+    fun changeData(musics: Collection<Music>) {
+        emit(MusicListEvent.ChangeData(musics))
+    }
+
+    fun addMusic(music: Music) {
+        mList.add(0, music)
+        notifyItemInserted(0)
     }
 
 }

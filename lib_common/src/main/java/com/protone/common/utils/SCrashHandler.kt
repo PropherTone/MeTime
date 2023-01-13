@@ -6,12 +6,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.protone.common.baseType.getParentPath
 import com.protone.common.context.MApplication
 import com.protone.common.context.activities
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.*
 import kotlin.system.exitProcess
 
 
@@ -25,16 +23,21 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
         Thread.setDefaultUncaughtExceptionHandler(this)
     }
 
-    fun writeLog(e: Throwable, t: Thread? = null) {
+    fun writeLog(logPath: String, e: Throwable, t: Thread? = null) {
+        if (logPath.isEmpty()) return
         val writer = StringWriter()
         val printWriter = PrintWriter(writer)
+        printWriter.println("Thread:${t?.name}")
         e.printStackTrace(printWriter)
         printWriter.close()
         val cause = writer.toString()
-        val crashFile = File(path ?: "".apply {
-            if (t != null) defaultUncaughtExceptionHandler?.uncaughtException(t, e)
-            return
-        })
+        val dir = File(logPath.getParentPath())
+        if (dir.isDirectory) dir.listFiles()
+            ?.sumOf { it.length() }
+            ?.div(1024 * 1024)
+            ?.takeIf { it > 24L }
+            ?.let { dir.deleteRecursively() }
+        val crashFile = File(logPath)
         if (crashFile.exists()) crashFile.delete()
         crashFile.createNewFile()
         val fileWriter = FileWriter(crashFile)
@@ -44,7 +47,11 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(t: Thread, e: Throwable) {
         if (path != null) {
-            writeLog(e, t)
+            try {
+                writeLog(path ?: "", e, t)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
             MApplication.startActivity(
                 "com.protone.metime.activity.SplashActivity",
                 System.currentTimeMillis() + 1000L

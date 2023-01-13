@@ -7,4 +7,10 @@ data class Gallery(
     var size: Int,
     var uri: Uri?,
     val custom: Boolean = false
-)
+){
+    enum class ItemState {
+        SIZE_CHANGED,
+        URI_CHANGED,
+        ALL_CHANGED
+    }
+}

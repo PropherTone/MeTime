@@ -7,7 +7,6 @@ import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
-import com.protone.common.context.putExtras
 import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.utils.RouterPath
@@ -107,12 +106,10 @@ class NoteViewActivity :
 
     private suspend fun edit() = viewModel.apply {
         val re = startActivityForResult(
-            NoteEditActivity::class.intent.putExtras {
-                putString(
-                    NOTE,
-                    this@NoteViewActivity.intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
-                )
-            }
+            NoteEditActivity::class.intent.putExtra(
+                NOTE,
+                this@NoteViewActivity.intent.getStringExtra(RouterPath.NoteRouterPath.NoteViewWire.NOTE_NAME)
+            )
         )
         if (re == null) {
             R.string.none.getString().toast()

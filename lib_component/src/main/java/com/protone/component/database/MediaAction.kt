@@ -13,10 +13,8 @@ sealed class MediaAction {
         data class OnMusicDeleted(val music: Music) : MusicDataAction()
         data class OnMusicsDeleted(val musics: List<Music>) : MusicDataAction()
         data class OnMusicUpdate(val music: Music) : MusicDataAction()
-        data class OnMusicWithMusicBucketInserted(val musicWithMusicBucket: MusicWithMusicBucket) :
-            MusicDataAction()
-
-        data class OnMusicWithMusicBucketDeleted(val musicID: Long) : MusicDataAction()
+        data class OnMusicWithMusicBucketInserted(val musicWithMusicBucket: MusicWithMusicBucket) : MusicDataAction()
+        data class OnMusicWithMusicBucketDeleted(val musicID: Long, val musicBucketId: Long) : MusicDataAction()
     }
 
     sealed class NoteDataAction : MediaAction() {
@@ -25,8 +23,7 @@ sealed class MediaAction {
         data class OnNoteInserted(val note: Note) : NoteDataAction()
         data class OnNoteDirInserted(val noteDir: NoteDir) : NoteDataAction()
         data class OnNoteDirDeleted(val noteDir: NoteDir) : NoteDataAction()
-        data class OnNoteDirWithNoteInserted(val noteDirWithNotes: NoteDirWithNotes) :
-            NoteDataAction()
+        data class OnNoteDirWithNoteInserted(val noteDirWithNotes: NoteDirWithNotes) : NoteDataAction()
     }
 
     sealed class GalleryDataAction : MediaAction() {
@@ -39,19 +36,13 @@ sealed class MediaAction {
         data class OnGalleryDeleted(val gallery: String) : GalleryDataAction()
         data class OnGalleryBucketInserted(val galleryBucket: GalleryBucket) : GalleryDataAction()
         data class OnGalleryBucketDeleted(val galleryBucket: GalleryBucket) : GalleryDataAction()
-        data class OnGalleriesWithNotesInserted(val galleriesWithNotes: GalleriesWithNotes) :
-            GalleryDataAction()
-
-        data class OnMediaWithGalleryBucketInserted(val bucketId: Long, val media: GalleryMedia) :
-            GalleryDataAction()
-
+        data class OnGalleriesWithNotesInserted(val galleriesWithNotes: GalleriesWithNotes) : GalleryDataAction()
+        data class OnMediaWithGalleryBucketInserted(val bucketId: Long, val media: GalleryMedia) : GalleryDataAction()
         data class OnMediaWithGalleryBucketMultiInserted(
             val mediaWithGalleryBuckets: List<MediaWithGalleryBucket>,
             val medias: List<GalleryMedia>
         ) : GalleryDataAction()
-
-        data class OnMediaWithGalleryBucketDeleted(val mediaWithGalleryBucket: MediaWithGalleryBucket) :
-            GalleryDataAction()
+        data class OnMediaWithGalleryBucketDeleted(val mediaWithGalleryBucket: MediaWithGalleryBucket) : GalleryDataAction()
     }
 
 }

@@ -339,7 +339,7 @@ fun isUriExist(uri: Uri): Boolean {
     return exist
 }
 
-inline fun scanAudio(function: ((Uri, Music) -> Unit)): MutableList<Music> {
+inline fun scanAudio(function: (Uri, Music) -> Unit): MutableList<Music> {
     val externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val bucketOrData =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.BUCKET_DISPLAY_NAME

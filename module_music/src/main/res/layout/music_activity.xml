@@ -9,7 +9,7 @@
             name="activity"
             type="com.protone.music.activity.MusicActivity" />
 
-        <import type="com.protone.music.viewModel.MusicModel.MusicEvent" />
+        <import type="com.protone.music.viewModel.MusicModel.MusicViewEvent" />
     </data>
 
     <FrameLayout
@@ -141,6 +141,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:overScrollMode="never"
+                android:paddingBottom="@dimen/model_icon_dimen"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -153,6 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|bottom"
                 android:layout_margin="@dimen/main_margin"
+                android:layout_marginBottom="@dimen/model_icon_dimen"
                 android:orientation="vertical">
 
                 <ImageView
@@ -162,7 +164,7 @@
                     android:layout_marginBottom="@dimen/small_margin"
                     android:background="@drawable/oval_fore_ripple_dark"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendViewEvent(MusicEvent.Search.INSTANCE)}"
+                    android:onClick="@{()->activity.sendViewEvent(MusicViewEvent.Search.INSTANCE)}"
                     android:padding="@dimen/icon_padding"
                     android:src="@drawable/ic_round_search_24_white" />
 
@@ -172,7 +174,7 @@
                     android:layout_height="@dimen/small_Icon"
                     android:background="@drawable/oval_fore_ripple_dark"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendViewEvent(MusicEvent.Locate.INSTANCE)}"
+                    android:onClick="@{()->activity.sendViewEvent(MusicViewEvent.Locate.INSTANCE)}"
                     android:padding="@dimen/icon_padding"
                     android:src="@drawable/ic_round_my_location_24_white" />
 
@@ -235,7 +237,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_ripple_glass"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->activity.sendViewEvent(MusicEvent.AddMusicBucket.INSTANCE)}"
+                android:onClick="@{()->activity.sendViewEvent(MusicViewEvent.AddMusicBucket.INSTANCE)}"
                 android:padding="@dimen/main_padding"
                 android:src="@drawable/ic_baseline_add_24_white"
                 app:layout_constraintBottom_toBottomOf="parent"

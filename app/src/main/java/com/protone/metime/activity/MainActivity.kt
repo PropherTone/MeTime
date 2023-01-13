@@ -1,13 +1,12 @@
 package com.protone.metime.activity
 
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.common.R
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.launchDefault
-import com.protone.common.baseType.toast
+import com.protone.common.baseType.*
 import com.protone.common.context.MApplication
 import com.protone.common.context.clipOutLine
 import com.protone.common.context.onGlobalLayout
@@ -60,7 +59,7 @@ class MainActivity :
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.userIcon)
                 launch {
-                    binding.userBack.setImageBitmap(viewModel.loadBlurIcon(value))
+                    binding.userBack.setBlurBitmap(withDefaultContext { value.toBitmap() }, 10, 10)
                 }
             }
             field = value

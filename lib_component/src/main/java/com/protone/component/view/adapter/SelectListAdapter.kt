@@ -7,10 +7,9 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.component.R
 import com.protone.common.utils.displayUtils.AnimationHelper
+import com.protone.component.R
 import kotlinx.coroutines.launch
 import java.util.concurrent.LinkedBlockingDeque
 
@@ -39,16 +38,18 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
             this.onBindViewHolder(holder, position)
             return
         }
-        if (payloads.first() !is String) return
-        setSelect(
-            holder.binding,
-            position,
-            when (payloads.first()) {
-                SELECT -> true
-                UNSELECT -> false
-                else -> false
-            }
-        )
+        payloads.first().let {
+            if (it !is String && (it != SELECT || it != UNSELECT)) return
+            setSelect(
+                holder.binding,
+                position,
+                when (it) {
+                    SELECT -> true
+                    UNSELECT -> false
+                    else -> false
+                }
+            )
+        }
     }
 
     open fun checkSelect(position: Int, item: Item) {
