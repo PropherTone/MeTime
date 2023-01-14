@@ -33,9 +33,7 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
         val cause = writer.toString()
         val dir = File(logPath.getParentPath())
         if (dir.isDirectory) dir.listFiles()
-            ?.sumOf { it.length() }
-            ?.div(1024 * 1024)
-            ?.takeIf { it > 24L }
+            ?.takeIf { it.size >= 12 }
             ?.let { dir.deleteRecursively() }
         val crashFile = File(logPath)
         if (crashFile.exists()) crashFile.delete()

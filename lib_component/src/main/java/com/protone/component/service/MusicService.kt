@@ -179,7 +179,9 @@ class MusicService : BaseService(), IMusicService {
             return
         }
         if (playList.isEmpty()) return
-        musicPlayer.play(rightMusic)
+        if (currentMusic.value == null) {
+            musicPlayer.play(null)
+        } else musicPlayer.play(music)
     }
 
     override fun pause() {
@@ -191,7 +193,7 @@ class MusicService : BaseService(), IMusicService {
         launch {
             if (playPosition.incrementAndGet() > playList.size - 1) playPosition.set(0)
             finishMusic()
-            play()
+            play(rightMusic)
         }
     }
 
@@ -200,7 +202,7 @@ class MusicService : BaseService(), IMusicService {
         launch {
             if (playPosition.decrementAndGet() <= 0) playPosition.set(playList.size - 1)
             finishMusic()
-            play()
+            play(rightMusic)
         }
     }
 
