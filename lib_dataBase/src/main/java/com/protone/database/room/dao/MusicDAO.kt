@@ -21,6 +21,9 @@ interface MusicDAO {
     @Query("SELECT * FROM Music ORDER BY year DESC")
     fun getAllMusic(): List<Music>?
 
+    @Query("SELECT uri FROM (SELECT uri,MAX(year) FROM Music)")
+    fun getNewestMusicUri(): Uri?
+
     @Delete
     fun deleteMusic(music: Music): Int
 
@@ -34,5 +37,8 @@ interface MusicDAO {
 
     @Query("SELECT * FROM Music WHERE uri IS :uri")
     fun getMusicByUri(uri: Uri): Music?
+
+    @Query("SELECT * FROM Music WHERE musicBaseId IS :id")
+    fun getMusicById(id: Long): Music?
 
 }

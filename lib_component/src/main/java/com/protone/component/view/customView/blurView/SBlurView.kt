@@ -12,6 +12,8 @@ open class SBlurView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), IBlurConfig {
 
+    private var doBlur = true
+
     private var blurTool: BaseBlurFactory = EmptyIBlurTool()
         set(value) {
             value.setBlurView(this)
@@ -42,8 +44,16 @@ open class SBlurView @JvmOverloads constructor(
         blurTool.setBlurView(this)
     }
 
+    fun disableRender() {
+        doBlur = false
+    }
+
+    fun enableRender() {
+        doBlur = true
+    }
+
     fun renderFrame() {
-        blurTool.blur()
+        if (doBlur) blurTool.blur()
     }
 
     override fun onDetachedFromWindow() {

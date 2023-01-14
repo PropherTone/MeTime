@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isGone
 import com.protone.common.baseType.getDrawable
+import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.toStringMinuteTime
+import com.protone.common.baseType.withMainContext
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Music
 import com.protone.common.utils.displayUtils.AnimationHelper
@@ -16,7 +18,6 @@ import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.music.databinding.MusicListLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 class AddMusicListAdapter(
@@ -88,37 +89,29 @@ class AddMusicListAdapter(
                 musicListContainer.setOnClickListener {
                     if (onBusy) return@setOnClickListener
                     onBusy = true
-                    launch(Dispatchers.Default) {
+                    launchDefault {
                         if (mode == "SEARCH") {
                             adapterDataBaseProxy.play(music)
-                            withContext(Dispatchers.Main) {
-                                checkSelect(position, music)
-                            }
+                            withMainContext { checkSelect(position, music) }
                             onBusy = false
-                            return@launch
+                            return@launchDefault
                         }
                         viewQueue.add(position)
                         if (selectList.contains(music)) {
-                            if (!multiChoose) return@launch
+                            if (!multiChoose) return@launchDefault
                             adapterDataBaseProxy.deleteMusicWithMusicBucket(
                                 music.musicBaseId,
                                 bucket
                             )
-                            withContext(Dispatchers.Main) {
-                                checkSelect(position, music)
-                            }
+                            withMainContext { checkSelect(position, music) }
                             onBusy = false
-                            return@launch
+                            return@launchDefault
                         }
-                        withContext(Dispatchers.Main) {
-                            checkSelect(position, music)
-                        }
+                        withMainContext { checkSelect(position, music) }
                         musicListPlayState.drawable.let { d ->
                             when (d) {
                                 is Animatable -> {
-                                    withContext(Dispatchers.Main) {
-                                        d.start()
-                                    }
+                                    withMainContext { d.start() }
                                     if (multiChoose) {
                                         val re = adapterDataBaseProxy
                                             .insertMusicWithMusicBucket(music.musicBaseId, bucket)
@@ -162,7 +155,7 @@ class AddMusicListAdapter(
     }
 
     private suspend fun changeIconAni(view: ImageView) {
-        withContext(Dispatchers.Main) {
+        withMainContext {
             AnimationHelper.apply {
                 animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
                     view.setImageDrawable(R.drawable.ic_baseline_check_24_white.getDrawable())

@@ -16,11 +16,16 @@ sealed class BaseMusicDAO : MusicDAO()
 sealed class MusicDAO : MusicBucketDAO() {
     private val musicDAO = getMusicDAO()
 
+    suspend fun getNewestMusicUri(): Uri? = withIOContext { musicDAO.getNewestMusicUri() }
+
     suspend fun getAllMusic(): List<Music>? =
         withIOContext { musicDAO.getAllMusic() }
 
     suspend fun getMusicByUri(uri: Uri): Music? =
         withIOContext { musicDAO.getMusicByUri(uri) }
+
+    suspend fun getMusicById(id: Long): Music? =
+        withIOContext { musicDAO.getMusicById(id) }
 
     suspend fun insertMusic(music: Music) = withIOContext {
         musicDAO.insertMusic(music).apply {
@@ -93,16 +98,19 @@ sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
         withIOContext {
             musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)?.also {
                 sendEvent(
-                    MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(
-                        musicWithMusicBucket
-                    )
+                    MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(musicWithMusicBucket)
                 )
             }
         }
 
     suspend fun deleteMusicWithMusicBucket(musicID: Long, musicBucketId: Long) =
         withIOContext {
-            sendEvent(MediaAction.MusicDataAction.OnMusicWithMusicBucketDeleted(musicID, musicBucketId))
+            sendEvent(
+                MediaAction.MusicDataAction.OnMusicWithMusicBucketDeleted(
+                    musicID,
+                    musicBucketId
+                )
+            )
             musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID, musicBucketId)
         }
 

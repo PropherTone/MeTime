@@ -1,6 +1,8 @@
 package com.protone.music.viewModel
 
 import androidx.lifecycle.viewModelScope
+import com.protone.common.baseType.launchIO
+import com.protone.common.baseType.withIOContext
 import com.protone.common.entity.Music
 import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +32,7 @@ class PickMusicViewModel : BaseViewModel() {
     }
 
     suspend fun getMusicWithMusicBucket(bucket: String): Collection<Music> =
-        withContext(Dispatchers.IO) {
+        withIOContext {
             musicDAO.run {
                 val musicBucket = getMusicBucketByName(bucket)
                 if (musicBucket != null) {
@@ -40,7 +42,7 @@ class PickMusicViewModel : BaseViewModel() {
         }
 
     fun deleteMusicWithMusicBucket(musicBaseId: Long, musicBucket: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launchIO {
             musicDAO.run {
                 getMusicBucketByName(musicBucket)?.let { musicBucket ->
                     deleteMusicWithMusicBucketAsync(musicBaseId, musicBucket.musicBucketId)
@@ -50,12 +52,8 @@ class PickMusicViewModel : BaseViewModel() {
     }
 
     suspend fun insertMusicWithMusicBucket(musicBaseId: Long, bucket: String): Long =
-        withContext(Dispatchers.IO) {
+        withIOContext {
             musicDAO.insertMusicWithMusicBucket(musicBaseId, bucket)
         }
-
-    suspend fun updateMusicBucket() {
-
-    }
 
 }

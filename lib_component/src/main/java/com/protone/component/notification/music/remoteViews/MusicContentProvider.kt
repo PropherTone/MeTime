@@ -1,35 +1,94 @@
 package com.protone.component.notification.music.remoteViews
 
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
-import com.protone.common.context.*
-import com.protone.component.R
+import android.widget.RemoteViews
+import com.protone.common.context.FINISH
+import com.protone.common.context.MUSIC_NEXT
+import com.protone.common.context.MUSIC_PLAY
+import com.protone.common.context.MUSIC_PREVIOUS
 
-class MusicContentProvider : BaseMusicContentProvider() {
+internal class MusicContentProvider(mrv: IMusicRemoteViews) : BaseMusicContentProvider(mrv) {
 
-    override fun getSmallLayout(): Int = R.layout.music_notification_layout
-    override fun getSmallRootId(): Int = R.id.notify_music_parent
-    override fun getSmallTitleId(): Int = R.id.notify_music_name
-    override fun getSmallPlayId(): Int = R.id.notify_music_control
-    override fun getSmallPreviousId(): Int = R.id.notify_music_previous
-    override fun getSmallNextId(): Int = R.id.notify_music_next
-    override fun getSmallFinishId(): Int = R.id.notify_music_close
-    override fun getSmallCoverId(): Int = R.id.notify_music_icon
-    override fun getSmallIntent(): Intent = Intent(
-        MApplication.app,
-        Class.forName("com.protone.music.activity.MusicViewActivity")
-    )
+    override fun getContent(context: Context): RemoteViews =
+        RemoteViews(context.packageName, getLayout()).apply {
+            val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
-    override fun getBigLayout(): Int = R.layout.music_notification_layout
-    override fun getBigRootId(): Int = R.id.notify_music_parent
-    override fun getBigTitleId(): Int = R.id.notify_music_name
-    override fun getBigPlayId(): Int = R.id.notify_music_control
-    override fun getBigPreviousId(): Int = R.id.notify_music_previous
-    override fun getBigNextId(): Int = R.id.notify_music_next
-    override fun getBigFinishId(): Int = R.id.notify_music_close
-    override fun getBigCoverId(): Int = R.id.notify_music_icon
-    override fun getBigIntent(): Intent = Intent(
-        MApplication.app,
-        Class.forName("com.protone.music.activity.MusicViewActivity")
-    )
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(MUSIC_PLAY),
+                intentFlags
+            ).let { setOnClickPendingIntent(getPlayId(), it) }
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(MUSIC_PREVIOUS),
+                intentFlags
+            ).let { setOnClickPendingIntent(getPreviousId(), it) }
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(MUSIC_NEXT),
+                intentFlags
+            ).let { setOnClickPendingIntent(getNextId(), it) }
+
+            PendingIntent.getActivity(
+                context,
+                0,
+                getIntent(),
+                intentFlags
+            ).let { setOnClickPendingIntent(getRootId(), it) }
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(FINISH),
+                intentFlags
+            ).let { setOnClickPendingIntent(getFinishId(), it) }
+        }
+
+    override fun getBigContent(context: Context): RemoteViews =
+        RemoteViews(context.packageName, getLayout()).apply {
+            val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(MUSIC_PLAY),
+                intentFlags
+            ).let { setOnClickPendingIntent(getPlayId(), it) }
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(MUSIC_PREVIOUS),
+                intentFlags
+            ).let { setOnClickPendingIntent(getPreviousId(), it) }
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(MUSIC_NEXT),
+                intentFlags
+            ).let { setOnClickPendingIntent(getNextId(), it) }
+
+            PendingIntent.getActivity(
+                context,
+                0,
+                getIntent(),
+                intentFlags
+            ).let { setOnClickPendingIntent(getRootId(), it) }
+
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(FINISH),
+                intentFlags
+            ).let { setOnClickPendingIntent(getFinishId(), it) }
+        }
 
 }

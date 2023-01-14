@@ -69,9 +69,9 @@ class PickMusicActivity :
 
         if (bucket != null) {
             if (!mode.isNullOrEmpty() && mode == SEARCH_MUSIC) {
-                bindMusicService { initSeen(bucket, mode, it) }
+                bindMusicService { initList(bucket, mode, it) }
             } else {
-                initSeen(bucket, mode ?: ADD_BUCKET)
+                initList(bucket, mode ?: ADD_BUCKET)
             }
         } else {
             com.protone.common.R.string.no_data.getString().toast()
@@ -118,7 +118,7 @@ class PickMusicActivity :
         }
     }
 
-    private suspend fun initSeen(
+    private suspend fun initList(
         bucket: String,
         mode: String,
         binder: MusicBinder? = null

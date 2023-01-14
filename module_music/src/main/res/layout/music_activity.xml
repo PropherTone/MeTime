@@ -10,6 +10,7 @@
             type="com.protone.music.activity.MusicActivity" />
 
         <import type="com.protone.music.viewModel.MusicModel.MusicViewEvent" />
+
     </data>
 
     <FrameLayout
@@ -153,7 +154,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|bottom"
-                android:layout_margin="@dimen/main_margin"
                 android:layout_marginBottom="@dimen/model_icon_dimen"
                 android:orientation="vertical">
 
@@ -172,6 +172,7 @@
                     android:id="@+id/locate"
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
+                    android:layout_marginBottom="@dimen/main_margin"
                     android:background="@drawable/oval_fore_ripple_dark"
                     android:contentDescription="@string/action"
                     android:onClick="@{()->activity.sendViewEvent(MusicViewEvent.Locate.INSTANCE)}"

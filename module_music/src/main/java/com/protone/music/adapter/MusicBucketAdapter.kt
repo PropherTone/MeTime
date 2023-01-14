@@ -5,21 +5,20 @@ import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
+import com.protone.common.baseType.getColor
 import com.protone.common.baseType.getDrawable
-import com.protone.common.baseType.withMainContext
+import com.protone.common.context.marginEnd
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
-import com.protone.component.R
+import com.protone.music.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.music.databinding.MusicBucketAdapterLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
+class MusicBucketAdapter(context: Context) :
     SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket, MusicBucketAdapter.MusicBucketAEvent>(
         context, true
     ) {
@@ -28,10 +27,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         data class AddBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
         data class RefreshBucket(val bucket: MusicBucket) : MusicBucketAEvent()
         data class DeleteBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
-    }
-
-    init {
-        selectList.add(musicBucket)
+        data class SelectBucket(val bucketName: String) : MusicBucketAEvent()
     }
 
     var musicBucketEventListener: MusicBucketEvent? = null
@@ -39,59 +35,44 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     override suspend fun handleEventAsynchronous(data: MusicBucketAEvent) {
         when (data) {
             is MusicBucketAEvent.AddBucket -> {
-                withContext(Dispatchers.Main) {
-                    mList.add(data.musicBucket)
-                    notifyItemInsertedChecked(mList.size - 1)
-                }
+                mList.add(data.musicBucket)
+                notifyItemInsertedChecked(mList.size - 1)
             }
             is MusicBucketAEvent.RefreshBucket -> {
-                mList.indexOfFirst {
-                    it.name == data.bucket.name
-                }.takeIf {
-                    it != -1 && it != 0
-                }?.let {
-                    val bucket = mList[it]
-                    var payloads = MusicBucket.ALL xor MusicBucket.DETAIL
-                    if (bucket.name == data.bucket.name) {
-                        payloads = payloads xor MusicBucket.NAME
+                mList.indexOfFirst { it.name == data.bucket.name }
+                    .takeIf { it != -1 }
+                    ?.let {
+                        val bucket = mList[it]
+                        mList[it] = data.bucket
+                        notifyItemChangedChecked(
+                            it,
+                            bucket.getChangeState(data.bucket, MusicBucket.DETAIL)
+                        )
                     }
-                    if (bucket.icon == data.bucket.icon) {
-                        payloads = payloads xor MusicBucket.COVER
-                    }
-                    if (bucket.size == data.bucket.size) {
-                        payloads = payloads xor MusicBucket.SIZE
-                    }
-                    mList[it] = data.bucket
-                    notifyItemChangedChecked(it, payloads)
-                }
             }
             is MusicBucketAEvent.DeleteBucket -> {
                 val index = mList.find {
                     it.name == data.musicBucket.name
                 }.let { mList.indexOf(it) }
                 if (index < 0) return
-                withMainContext {
-                    mList.removeAt(index)
-                    notifyItemRemovedChecked(index)
-                }
+                mList.removeAt(index)
+                notifyItemRemovedChecked(index)
                 selectList.clear()
                 selectList.add(mList[0])
                 musicBucketEventListener?.onBucketClicked(mList[0])
             }
+            is MusicBucketAEvent.SelectBucket -> {
+                mList.find { it.name == data.bucketName }?.let {
+                    musicBucketEventListener?.onBucketClicked(it)
+                }
+            }
         }
     }
 
-    override val select: (
-        MusicBucketAdapterLayoutBinding,
-        Int,
-        isSelect: Boolean
-    ) -> Unit =
+    override val select: (MusicBucketAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
         { binding, _, isSelect ->
-            binding.musicBucketBack.setBackgroundColor(
-                context.resources.getColor(
-                    if (isSelect) R.color.gray_1 else R.color.white,
-                    context.theme
-                )
+            binding.musicBucketBoard.setBackgroundColor(
+                (if (isSelect) R.color.bucket_selected else R.color.bucket_normal).getColor()
             )
         }
 
@@ -153,37 +134,37 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             changeName(bucket.name)
             changeSize(bucket.size)
 
-            musicBucketBack.setOnClickListener {
+            musicBucketBoard.setOnClickListener {
                 if (!selectList.contains(bucket)) checkSelect(position, bucket)
                 musicBucketEventListener?.onBucketClicked(bucket)
             }
 
-            if (bucket.name != ALL_MUSIC) musicBucketAction.setOnClickListener {
-                if (musicBucketBack.isVisible) {
+            if (bucket.name == ALL_MUSIC) {
+                musicBucketBoard.marginEnd(0)
+            } else musicBucketAction.setOnClickListener {
+                if (musicBucketBoard.isVisible) {
                     AnimationHelper.translationX(
-                        musicBucketBack,
+                        musicBucketBoard,
                         0f,
-                        -musicBucketBack.measuredWidth.toFloat(),
+                        -musicBucketBoard.measuredWidth.toFloat(),
                         200,
                         play = true,
-                        doOnEnd = {
-                            musicBucketBack.isVisible = false
-                        }
+                        doOnEnd = { musicBucketBoard.isVisible = false }
                     )
                     return@setOnClickListener
                 }
-                closeMusicBucketBack()
+                closeMusicBucketBoard()
             }
             musicBucketEdit.setOnClickListener {
                 musicBucketEventListener?.edit(bucket.name, position)
-                closeMusicBucketBack()
+                closeMusicBucketBoard()
             }
             musicBucketDelete.setOnClickListener {
                 musicBucketEventListener?.delete(bucket.name, position)
-                closeMusicBucketBack()
+                closeMusicBucketBoard()
             }
             musicBucketAddList.setOnClickListener {
-                closeMusicBucketBack()
+                closeMusicBucketBoard()
                 musicBucketEventListener?.addMusic(bucket.name, position)
             }
         }
@@ -193,15 +174,15 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         return true
     }
 
-    private fun MusicBucketAdapterLayoutBinding.closeMusicBucketBack() {
+    private fun MusicBucketAdapterLayoutBinding.closeMusicBucketBoard() {
         AnimationHelper.translationX(
-            musicBucketBack,
-            -musicBucketBack.measuredWidth.toFloat(),
+            musicBucketBoard,
+            -musicBucketBoard.measuredWidth.toFloat(),
             0f,
             200,
             play = true,
             doOnStart = {
-                musicBucketBack.isVisible = true
+                musicBucketBoard.isVisible = true
             }
         )
     }
@@ -210,10 +191,8 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         musicBucketIcon.also {
             when {
                 musicBucket.icon != null -> loadIcon(it, iconPath = musicBucket.icon)
-                else -> loadIcon(
-                    it,
-                    drawable = R.drawable.ic_baseline_music_note_24.getDrawable()
-                )
+                musicBucket.tempIcon != null -> loadIcon(it, iconPath = musicBucket.tempIcon)
+                else -> loadIcon(it, drawable = R.drawable.ic_album_black.getDrawable())
             }
         }
     }
@@ -235,9 +214,19 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             .with(context)
             .skipMemoryCache()
             .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .placeholder(R.drawable.ic_baseline_music_note_24)
+            .placeholder(R.drawable.ic_album_black)
             .overwrite(imageView.measuredWidth, imageView.measuredHeight)
             .into(imageView)
+    }
+
+    fun setSelect(bucketName: String) {
+        emit(MusicBucketAEvent.SelectBucket(bucketName))
+    }
+
+    fun getSelectedBucket() = try {
+        selectList.first
+    } catch (e: NoSuchElementException) {
+        null
     }
 
     fun deleteBucket(musicBucket: MusicBucket): Boolean {

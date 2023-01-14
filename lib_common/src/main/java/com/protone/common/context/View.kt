@@ -47,6 +47,20 @@ fun View.marginBottom(margin: Int) {
     layoutParams = marginLayoutParams
 }
 
+fun View.marginStart(margin: Int) {
+    if (this !is ViewGroup) return
+    val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
+    marginLayoutParams.leftMargin = margin
+    layoutParams = marginLayoutParams
+}
+
+fun View.marginEnd(margin: Int) {
+    if (this !is ViewGroup) return
+    val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
+    marginLayoutParams.rightMargin = margin
+    layoutParams = marginLayoutParams
+}
+
 fun ImageView.setBlurBitmap(
     bitmap: Bitmap?,
     radius: Int = Blur.defaultBlurRadius,

@@ -123,11 +123,12 @@ class DatabaseBridge : DatabaseHelper() {
 
         suspend fun insertMusicWithMusicBucket(musicID: Long, bucket: String): Long {
             val musicBucket = musicDAOBridge.getMusicBucketByName(bucket) ?: return -1L
-            val entity = MusicWithMusicBucket(
-                musicBucket.musicBucketId,
-                musicID
-            )
-            return (insertMusicWithMusicBucket(entity) ?: -1)
+            return (insertMusicWithMusicBucket(
+                MusicWithMusicBucket(
+                    musicBucket.musicBucketId,
+                    musicID
+                )
+            ) ?: -1)
         }
 
     }

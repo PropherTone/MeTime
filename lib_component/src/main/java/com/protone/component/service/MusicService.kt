@@ -1,7 +1,6 @@
 package com.protone.component.service
 
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
@@ -12,6 +11,7 @@ import com.protone.common.context.*
 import com.protone.common.entity.Music
 import com.protone.common.entity.NO_MUSIC
 import com.protone.common.entity.getEmptyMusic
+import com.protone.common.media.musicPlayer.MusicPlay
 import com.protone.common.media.musicPlayer.MusicPlayer
 import com.protone.common.utils.json.toJson
 import com.protone.component.MusicControllerIMP.Companion.LOOP_LIST
@@ -23,7 +23,8 @@ import com.protone.component.broadcast.ApplicationBroadCast
 import com.protone.component.broadcast.MusicReceiver
 import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.database.userConfig
-import com.protone.component.notification.music.remoteViews.MusicNotification
+import com.protone.component.notification.music.IMusicNotification
+import com.protone.component.notification.music.MusicNotification
 import com.protone.component.view.customView.musicPlayer.getBitmap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -35,44 +36,46 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class MusicService : BaseService(), IMusicService {
 
-    private val musicNotification by lazy {
-        MusicNotification(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+    private val musicNotification: IMusicNotification by lazy {
+        MusicNotification(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
     }
 
-    private var musicPlayer = MusicPlayer().apply {
-        init(this@MusicService)
-        onPlayState {
-            onStart {
-                currentMusic.postValue(rightMusic)
-                playState.postValue(true)
-            }
-            onPause {
-                playState.postValue(false)
-            }
-            onCompletion {
-                playState.postValue(false)
-                when (loopModeLive.value) {
-                    LOOP_LIST -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
-                    LOOP_SINGLE -> {
-                        playPosition.decrementAndGet()
-                        musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
-                    }
-                    NO_LOOP -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
-                    RANDOM -> {
-                        playPosition.set((0 until playList.size - 1).random())
-                        repeat(2) {
-                            musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+    private val musicPlayer: MusicPlay by lazy {
+        MusicPlayer().apply {
+            init(this@MusicService)
+            onPlayState {
+                onStart {
+                    currentMusic.postValue(rightMusic)
+                    playState.postValue(true)
+                }
+                onPause {
+                    playState.postValue(false)
+                }
+                onCompletion {
+                    playState.postValue(false)
+                    when (loopModeLive.value) {
+                        LOOP_LIST -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
+                        LOOP_SINGLE -> {
+                            playPosition.decrementAndGet()
+                            musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
+                        }
+                        NO_LOOP -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
+                        RANDOM -> {
+                            playPosition.set((0 until playList.size - 1).random())
+                            repeat(2) {
+                                musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+                            }
+                        }
+                        PLAY_LIST -> {
+                            if (playPosition.get() <= playList.size - 1)
+                                musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
+                            else musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
                         }
                     }
-                    PLAY_LIST -> {
-                        if (playPosition.get() <= playList.size - 1)
-                            musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
-                        else musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
-                    }
                 }
-            }
-            onProgress {
-                this@MusicService.progress.postValue(it)
+                onProgress {
+                    this@MusicService.progress.postValue(it)
+                }
             }
         }
     }

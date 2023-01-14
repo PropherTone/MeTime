@@ -29,32 +29,6 @@ class SplashViewModel : BaseViewModel() {
 
     suspend fun firstBootWork() {
         if (userConfig.isFirstBoot) {
-            musicDAO.insertMusicMulti(scanAudio { _, _ -> })
-            val allMusicRs = musicDAO.getAllMusic() ?: return
-
-            var launch: Job? = null
-            launch = viewModelScope.launch(Dispatchers.Default) {
-                observeMusicData {
-                    if (it is MediaAction.MusicDataAction.OnNewMusicBucket) {
-                        musicDAO.insertMusicMultiAsyncWithBucket(
-                            ALL_MUSIC,
-                            allMusicRs
-                        )
-                        launch?.cancel()
-                    }
-                }
-            }
-            musicDAO.addMusicBucketAsync(
-                MusicBucket(
-                    ALL_MUSIC,
-                    if (allMusicRs.isNotEmpty())
-                        allMusicRs[0].uri.imageSaveToFile(ALL_MUSIC, MUSIC_BUCKET)
-                    else null,
-                    allMusicRs.size,
-                    null,
-                    todayDate("yyyy/MM/dd")
-                )
-            )
             withContext(Dispatchers.IO) {
                 val dir = File("${MApplication.app.filesDir.absolutePath}/SharedMedia")
                 if (!dir.exists()) {
@@ -65,7 +39,8 @@ class SplashViewModel : BaseViewModel() {
                 isFirstBoot = false
                 lastMusicBucket = ALL_MUSIC
                 playedMusicPosition = -1
-                lastMusicBucketCover = allMusicRs[0].uri.toString()
+                lastMusicBucketCover = musicDAO.getAllMusic()
+                    .takeIf { it?.isNotEmpty() == true }?.first()?.uri.toString()
             }
         }
     }

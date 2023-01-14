@@ -60,7 +60,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/musicBucket_back"
+            android:id="@+id/musicBucketBoard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/small_Icon"
@@ -75,6 +75,7 @@
                 android:layout_width="@dimen/list_item_height"
                 android:layout_height="@dimen/list_item_height"
                 android:contentDescription="@string/icon"
+                android:padding="@dimen/main_padding"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -85,8 +86,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/texts_margin"
-                android:textColor="@color/black"
                 android:letterSpacing="0.05"
+                android:textColor="@color/black"
                 android:textSize="@dimen/title_text"
                 app:layout_constraintBottom_toBottomOf="@+id/musicBucket_time"
                 app:layout_constraintStart_toEndOf="@+id/musicBucket_icon"

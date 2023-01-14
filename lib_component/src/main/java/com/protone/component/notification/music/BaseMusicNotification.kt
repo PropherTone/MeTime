@@ -7,27 +7,31 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
 import android.widget.RemoteViews
+import com.protone.component.notification.music.remoteViews.IMusicRemoteViews
 import com.protone.component.notification.music.remoteViews.MusicContentProvider
 
-abstract class BaseMusicNotification(private val notificationManager: NotificationManager) :
-    IMusicNotification, IMusicNotificationProvider {
+abstract class BaseMusicNotification(
+    private val notificationManager: NotificationManager,
+    private val provider: IMusicNotificationProvider,
+    mrv: IMusicRemoteViews
+) : IMusicNotification {
 
-    private val remoteViews = MusicContentProvider()
+    private val remoteViews = MusicContentProvider(mrv)
     private var content: RemoteViews? = null
     private var notification: Notification? = null
 
     private fun Context.sdkONotification(content: RemoteViews, bigContent: RemoteViews? = null) =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                getNotificationIdName(),
-                getNotificationName(),
+                provider.getNotificationIdName(),
+                provider.getNotificationName(),
                 NotificationManager.IMPORTANCE_LOW
             )
             notificationManager.createNotificationChannel(channel)
-            Notification.Builder(this, getNotificationIdName()).apply {
+            Notification.Builder(this, provider.getNotificationIdName()).apply {
                 setCustomContentView(content)
                 if (bigContent != null) setCustomBigContentView(bigContent)
-                setSmallIcon(getNotificationIcon())
+                setSmallIcon(provider.getNotificationIcon())
             }.build()
         } else null
 
@@ -36,7 +40,7 @@ abstract class BaseMusicNotification(private val notificationManager: Notificati
         Notification().apply {
             contentView = content
             if (bigContent != null) bigContentView = bigContent
-            icon = getNotificationIcon()
+            icon = provider.getNotificationIcon()
         }
 
     override fun initNotification(context: Context): Notification {
@@ -50,7 +54,7 @@ abstract class BaseMusicNotification(private val notificationManager: Notificati
     }
 
     override fun doNotify() {
-        notificationManager.notify(getNotificationId(), notification)
+        notificationManager.notify(provider.getNotificationId(), notification)
     }
 
     override fun setTitle(title: CharSequence) {
@@ -64,7 +68,7 @@ abstract class BaseMusicNotification(private val notificationManager: Notificati
     override fun setPlayState(isPlaying: Boolean) {
         content?.setImageViewResource(
             remoteViews.getPlayId(),
-            if (isPlaying) getPlayIcon() else getPauseIcon()
+            if (isPlaying) provider.getPlayIcon() else provider.getPauseIcon()
         )
     }
 
@@ -77,23 +81,4 @@ abstract class BaseMusicNotification(private val notificationManager: Notificati
         content = null
         notification = null
     }
-}
-
-interface IMusicNotification {
-    fun initNotification(context: Context): Notification
-    fun doNotify()
-    fun setTitle(title: CharSequence)
-    fun setMusicCover(cover: Bitmap)
-    fun setPlayState(isPlaying: Boolean)
-    fun cancelAll()
-    fun release()
-}
-
-interface IMusicNotificationProvider {
-    fun getNotificationIcon(): Int
-    fun getNotificationIdName(): String
-    fun getNotificationName(): String
-    fun getNotificationId(): Int
-    fun getPlayIcon(): Int
-    fun getPauseIcon(): Int
 }

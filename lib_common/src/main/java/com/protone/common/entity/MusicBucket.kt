@@ -1,6 +1,7 @@
 package com.protone.common.entity
 
 import androidx.room.*
+import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.converters.UriTypeConverter
 
 @Entity
@@ -31,7 +32,27 @@ data class MusicBucket(
     var musicBucketId: Long = 0
 
     @Ignore
+    var tempIcon: String? = null
+
+    @Ignore
     constructor() : this("", null, 0, null, null)
+
+    fun getChangeState(bucket: MusicBucket, ignored: Int?): Int {
+        var payloads = ALL
+        if (ignored != null || ignored == NAME || ignored == COVER || ignored == SIZE || ignored == DETAIL) {
+            payloads = payloads xor ignored
+        }
+        if (bucket.name == bucket.name) {
+            payloads = payloads xor NAME
+        }
+        if (bucket.icon == bucket.icon) {
+            payloads = payloads xor COVER
+        }
+        if (bucket.size == bucket.size) {
+            payloads = payloads xor SIZE
+        }
+        return payloads
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -58,6 +79,5 @@ data class MusicBucket(
     override fun toString(): String {
         return "MusicBucket(name='$name', icon=$icon, size=$size, detail=$detail, date=$date, id=$musicBucketId)"
     }
-
 
 }

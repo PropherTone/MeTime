@@ -11,7 +11,7 @@ import com.protone.music.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.music.databinding.MusicListLayoutBinding
 
-class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
+class MusicListAdapter(context: Context, musicList: Collection<Music>) :
     SelectListAdapter<MusicListLayoutBinding, Music, MusicListAdapter.MusicListEvent>(
         context,
         true
@@ -121,7 +121,11 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
         return mList.indexOf(selectList.first ?: mList[0])
     }
 
-    fun getPlayingMusic(): Music? = selectList.first
+    fun getPlayingMusic(): Music? = try {
+        selectList.first
+    } catch (e: NoSuchElementException) {
+        null
+    }
 
     fun getPlayList() = mList.toMutableList()
 
@@ -137,6 +141,21 @@ class MusicListAdapter(context: Context, musicList: MutableList<Music>) :
     fun addMusic(music: Music) {
         mList.add(0, music)
         notifyItemInserted(0)
+    }
+
+    fun addMusics(musics: Collection<Music>) {
+        if (musics.isEmpty()) return
+        mList.addAll(0, musics)
+        notifyItemRangeInserted(0, musics.size)
+    }
+
+    fun removeMusic(music: Music) {
+        mList.indexOf(music).takeIf {
+            it != -1
+        }?.let {
+            mList.removeAt(it)
+            notifyItemRemoved(it)
+        }
     }
 
 }

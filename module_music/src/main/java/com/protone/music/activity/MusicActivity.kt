@@ -8,11 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.R
-import com.protone.common.baseType.getDrawable
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.toast
-import com.protone.common.baseType.withDefaultContext
+import com.protone.common.baseType.*
 import com.protone.common.context.*
+import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
@@ -31,18 +29,13 @@ import com.protone.music.viewModel.MusicModel
 import com.protone.music.viewModel.MusicModel.MusicEvent
 import com.protone.music.viewModel.MusicModel.MusicViewEvent
 import com.protone.music.viewModel.PickMusicViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.Main)
 class MusicActivity :
     BaseMusicActivity<MusicActivityBinding, MusicModel, MusicViewEvent>(true),
     StatusImageView.StateListener {
-
-    private var doBlur = true
-    private var playerFitTopH = 0
 
     override val viewModel: MusicModel by viewModels()
 
@@ -58,8 +51,8 @@ class MusicActivity :
             activity = this@MusicActivity
             musicBucketContainer.fitStatuesBar()
             mySmallMusicPlayer.interceptAlbumCover = true
-            playerFitTopH = toolbar.minHeight + statuesBarHeight
-            translatePlayerCover(true)
+            viewModel.playerFitTopH = toolbar.minHeight + statuesBarHeight
+            translatePlayerCoverToFit(true)
             musicBucketContainer.initBlurTool(
                 DefaultBlurController(
                     root as ViewGroup,
@@ -69,7 +62,7 @@ class MusicActivity :
             )
             musicBucketContainer.setForeColor(getColor(com.protone.component.R.color.foreDark))
             root.viewTreeObserver.addOnPreDrawListener {
-                if (doBlur) musicBucketContainer.renderFrame()
+                musicBucketContainer.renderFrame()
                 true
             }
             root.onGlobalLayout {
@@ -93,8 +86,9 @@ class MusicActivity :
         observeEvent(controller)
         observeMusicEvent()
 
-        initMusicList()
         initMusicBucketList()
+        initMusicList()
+        isInit = true
         bindMusicService {
             controller.getPlayingMusic()?.let { music ->
                 getMusicListAdapter()?.playPosition(music)
@@ -102,10 +96,8 @@ class MusicActivity :
             controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
                 getMusicListAdapter()?.playPosition(music)
             })
-            controller.onClick {
-                binding.musicShowBucket.performClick()
-            }
             binding.apply {
+                controller.onClick { musicShowBucket.performClick() }
                 mySmallMusicPlayer.coverSwitcher.setOnClickListener {
                     startActivity(MusicViewActivity::class.intent)
                 }
@@ -132,57 +124,29 @@ class MusicActivity :
                     }
                     controller.play(it.music)
                 }
-                is MusicViewEvent.SetBucketCover -> getBucket(it.name)?.let { mb ->
-                    userConfig.lastMusicBucketCover = mb.icon ?: ""
-                    binding.apply {
-                        if (mb.icon != null) {
-                            mb.icon?.getBitmap()?.let { bm ->
-                                musicBucketIcon.setImageBitmap(bm)
-                                binding.blurredBucketCover.setBlurBitmap(bm, 24, 10)
-                            }
-                        } else {
-                            blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
-                            musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
-                        }
-                        musicBucketName.text = mb.name
-                        musicBucketNamePhanton.text = mb.name
-                        musicBucketMsg.text =
-                            if (mb.date != null && mb.detail != null) "${mb.date} ${mb.detail}" else R.string.none.getString()
-                    }
-                }
                 is MusicViewEvent.AddMusic -> {
                     if (it.bucket == ALL_MUSIC) {
                         R.string.bruh.getString().toast()
                         return@onViewEvent
                     }
-                    startActivityForResult(
+                    startActivity(
                         PickMusicActivity::class.intent.putExtra(
                             PickMusicViewModel.BUCKET_NAME,
                             it.bucket
                         )
-                    ).run {
-                        getBucketRefreshed(it.bucket)?.let { mb ->
-                            refreshListAndBucket(mb)
-                        }
-                    }
+                    )
                 }
                 is MusicViewEvent.Edit -> withDefaultContext {
                     if (it.bucket == ALL_MUSIC) {
                         R.string.bruh.getString().toast()
                         return@withDefaultContext
                     }
-                    val ar = startActivityForResult(
+                    startActivity(
                         AddBucketActivity::class.intent.putExtra(
                             AddBucketViewModel.BUCKET_NAME,
                             it.bucket
                         )
                     )
-                    ar?.also { re ->
-                        if (re.resultCode != RESULT_OK) return@also
-                        re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)?.let { name ->
-                            sendViewEvent(MusicViewEvent.RefreshBucket(name))
-                        }
-                    }
                 }
                 is MusicViewEvent.Delete -> {
                     if (it.bucket == ALL_MUSIC) {
@@ -191,11 +155,6 @@ class MusicActivity :
                     }
                     val musicBucket = tryDeleteMusicBucket(it.bucket)
                     if (musicBucket == null) R.string.failed_msg.getString().toast()
-                }
-                is MusicViewEvent.RefreshBucket -> {
-                    getBucket(it.newName)?.let { bucket ->
-                        getMusicBucketAdapter()?.refreshBucket(bucket)
-                    }
                 }
                 is MusicViewEvent.AddMusicBucket -> {
                     val re = startActivityForResult(AddBucketActivity::class.intent)
@@ -224,10 +183,31 @@ class MusicActivity :
     }
 
     private fun MusicModel.observeMusicEvent() {
-//        getMusicBucketAdapter()?.addBucket(musicBucket)
-//        refreshListAndBucket(musicBucket)
-//        getMusicBucketAdapter()?.deleteBucket(musicBucket)
-        observeMusicEvent {
+
+        fun onDefaultBucket() = getMusicBucketAdapter()?.getSelectedBucket()
+            .takeIf { selected ->
+                selected != null && selected.name == ALL_MUSIC
+            } != null
+
+        fun updateBucket(music: Music, isInsert: Boolean) {
+            getMusicBucketAdapter()?.getSelectedBucket()?.takeIf { mb ->
+                mb.name == binding.musicBucketName.text
+            }?.let { mb ->
+                val corm = if (isInsert) 1 else -1
+                if (mb.name != ALL_MUSIC) getDefaultBucket().also { default ->
+                    default.size = default.size + corm
+                    getMusicBucketAdapter()?.refreshBucket(default)
+                }
+                mb.size = mb.size + corm
+                getMusicBucketAdapter()?.refreshBucket(mb)
+                getMusicListAdapter()?.apply {
+                    if (isInsert) addMusic(music)
+                    else removeMusic(music)
+                }
+            }
+        }
+
+        observeMusicEvent observeFun@{
             when (it) {
                 is MusicEvent.OnMusicBucketInsert -> {
                     getMusicBucketAdapter()?.addBucket(it.musicBucket)
@@ -241,44 +221,51 @@ class MusicActivity :
                 is MusicEvent.OnMusicInsert -> {
                     getMusicListAdapter()?.addMusic(it.music)
                 }
-                is MusicEvent.OnMusicsInsert -> {}
-                is MusicEvent.OnMusicDeleted -> {}
-                is MusicEvent.OnMusicUpdated -> {}
+                is MusicEvent.OnMusicsInsert -> {
+                    if (onDefaultBucket()) {
+                        getBucket(ALL_MUSIC)?.let { mb ->
+                            mb.size += it.musics.size
+                            getMusicBucketAdapter()?.refreshBucket(mb)
+                            getMusicListAdapter()?.addMusics(it.musics)
+                        }
+                    }
+                }
+                is MusicEvent.OnMusicDeleted -> {
+                    if (onDefaultBucket()) {
+                        getBucket(ALL_MUSIC)?.let { mb ->
+                            mb.size -= 1
+                            getMusicBucketAdapter()?.refreshBucket(mb)
+                            getMusicListAdapter()?.removeMusic(it.music)
+                        }
+                    }
+                }
+                is MusicEvent.OnMusicUpdated -> {
+                    TODO("Update on musics will not happen")
+                }
+                is MusicEvent.OnMusicInsertToBucket -> {
+                    val music = getMusicById(it.musicID) ?: return@observeFun
+                    updateBucket(music, true)
+                }
+                is MusicEvent.OnMusicRemoveFromBucket -> {
+                    val music = getMusicById(it.musicID) ?: return@observeFun
+                    updateBucket(music, false)
+                }
                 else -> Unit
-            }
-        }
-    }
-
-    private fun initMusicList() {
-        binding.musicMusicList.apply {
-            layoutManager = LinearLayoutManager(this@MusicActivity)
-            adapter = MusicListAdapter(this@MusicActivity, mutableListOf()).apply {
-                clickCallback = { sendViewEvent(MusicViewEvent.PlayMusic(it)) }
             }
         }
     }
 
     private suspend fun MusicModel.initMusicBucketList() {
         binding.musicBucket.apply {
-            val allMusicBucket = getMusicBuckets()
             layoutManager = LinearLayoutManager(this@MusicActivity)
-            adapter = MusicBucketAdapter(
-                this@MusicActivity,
-                getLastMusicBucket(allMusicBucket)
-            ).apply {
-                setData(allMusicBucket)
-                getBucket(lastBucket)?.let {
-                    if (binding.musicBucketName.text != it.name) {
-                        sendViewEvent(MusicViewEvent.SetBucketCover(it.name))
-                        getMusicListAdapter()?.changeData(getCurrentMusicList(it))
-                    }
-                }
+            adapter = MusicBucketAdapter(this@MusicActivity).apply {
+                setData(getMusicBuckets())
                 musicBucketEventListener = object : MusicBucketAdapter.MusicBucketEvent {
                     override fun onBucketClicked(musicBucket: MusicBucket) {
                         launch {
-                            hideBucket()
+                            binding.musicShowBucket.negative()
                             if (binding.musicBucketName.text == musicBucket.name) return@launch
-                            sendViewEvent(MusicViewEvent.SetBucketCover(musicBucket.name))
+                            onMusicBucketSelected(musicBucket)
                             switchMusicBucket(musicBucket)
                         }
                     }
@@ -296,10 +283,12 @@ class MusicActivity :
         }
     }
 
-    private suspend fun MusicModel.refreshListAndBucket(musicBucket: MusicBucket) {
-        getMusicBucketAdapter()?.refreshBucket(musicBucket)
-        if (binding.musicBucketName.text == musicBucket.name) {
-            getMusicListAdapter()?.changeData(getCurrentMusicList(musicBucket))
+    private fun initMusicList() {
+        binding.musicMusicList.apply {
+            layoutManager = LinearLayoutManager(this@MusicActivity)
+            adapter = MusicListAdapter(this@MusicActivity, mutableListOf()).apply {
+                clickCallback = { sendViewEvent(MusicViewEvent.PlayMusic(it)) }
+            }
         }
     }
 
@@ -311,16 +300,41 @@ class MusicActivity :
             ).apply {
                 getMusicListAdapter()?.getPlayingMusic()?.let { selectList.add(it) }
                 clickCallback = getMusicListAdapter()?.clickCallback
-            }, true
+            }, false
         )
+    }
+
+    private suspend fun onMusicBucketSelected(bucket: MusicBucket) {
+        viewModel.getBucket(bucket.name)?.let { mb ->
+            userConfig.lastMusicBucketCover = mb.icon ?: ""
+            binding.apply {
+                if (mb.icon != null) {
+                    mb.icon?.getBitmap()?.let { bm ->
+                        musicBucketIcon.setImageBitmap(bm)
+                        binding.blurredBucketCover.setBlurBitmap(bm, 24, 10)
+                    }
+                } else {
+                    blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
+                    musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
+                }
+                musicBucketName.text = mb.name
+                musicBucketNamePhanton.text = mb.name
+                musicBucketMsg.text =
+                    if (mb.date != null && mb.detail != null) "${mb.date} ${mb.detail}" else R.string.none.getString()
+            }
+        }
     }
 
     private fun getMusicBucketAdapter() = (binding.musicBucket.adapter as MusicBucketAdapter?)
 
     private fun getMusicListAdapter() = (binding.musicMusicList.adapter as MusicListAdapter?)
 
-    private suspend fun hideBucket() = withContext(Dispatchers.Main) {
-        binding.musicShowBucket.negative()
+    private fun MusicActivityBinding.translatePlayerCoverToFit(fitTop: Boolean) {
+        TransitionManager.beginDelayedTransition(musicBucketContainer)
+        musicPlayerCover.updateLayoutParams {
+            if (fitTop) height += viewModel.playerFitTopH
+            else height -= viewModel.playerFitTopH
+        }
     }
 
     fun sendEdit() {
@@ -338,7 +352,7 @@ class MusicActivity :
     override fun onActive() {
         binding.apply {
             appToolbar.setExpanded(false, false)
-            doBlur = true
+            musicBucketContainer.enableRender()
             var isDone = false
             musicBucketContainer.show(onStart = {
                 musicBucketContainer.setWillMove(true)
@@ -348,7 +362,7 @@ class MusicActivity :
                 if ((it?.animatedValue as Float) > 0.8f) {
                     if (isDone) return@show
                     isDone = true
-                    translatePlayerCover(true)
+                    translatePlayerCoverToFit(true)
                 }
             }, onEnd = {
                 musicBucketContainer.setWillMove(false)
@@ -358,14 +372,18 @@ class MusicActivity :
 
     override fun onNegative() {
         binding.apply {
+            if (musicBucketName.text == null || musicBucketName.text.isEmpty()) {
+                launch { getMusicBucketAdapter()?.setSelect(viewModel.lastBucket) }
+                return
+            }
             musicBucketNamePhanton.isGone = true
             musicFinishPhanton.isGone = true
             musicBucketContainer.hide(onStart = {
                 musicBucketContainer.setWillMove(true)
-                translatePlayerCover(false)
+                translatePlayerCoverToFit(false)
             }, onEnd = {
                 musicBucketContainer.setWillMove(false)
-                doBlur = false
+                musicBucketContainer.disableRender()
             })
         }
     }
@@ -375,14 +393,6 @@ class MusicActivity :
             com.protone.component.R.anim.card_bot_in,
             com.protone.component.R.anim.card_bot_out
         )
-    }
-
-    private fun MusicActivityBinding.translatePlayerCover(fitTop: Boolean) {
-        TransitionManager.beginDelayedTransition(musicBucketContainer)
-        musicPlayerCover.updateLayoutParams {
-            if (fitTop) height += playerFitTopH
-            else height -= playerFitTopH
-        }
     }
 
 }
