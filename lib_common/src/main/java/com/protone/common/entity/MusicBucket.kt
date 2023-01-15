@@ -42,14 +42,17 @@ data class MusicBucket(
         if (ignored != null || ignored == NAME || ignored == COVER || ignored == SIZE || ignored == DETAIL) {
             payloads = payloads xor ignored
         }
-        if (bucket.name == bucket.name) {
+        if (this.name == bucket.name && ignored != NAME) {
             payloads = payloads xor NAME
         }
-        if (bucket.icon == bucket.icon) {
+        if (this.icon == bucket.icon && ignored != COVER) {
             payloads = payloads xor COVER
         }
-        if (bucket.size == bucket.size) {
+        if (this.size == bucket.size && ignored != SIZE) {
             payloads = payloads xor SIZE
+        }
+        if (this.detail == bucket.detail && ignored != DETAIL) {
+            payloads = payloads xor DETAIL
         }
         return payloads
     }

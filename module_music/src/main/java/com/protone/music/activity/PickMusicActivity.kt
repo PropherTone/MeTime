@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import com.protone.common.R
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -74,7 +75,7 @@ class PickMusicActivity :
                 initList(bucket, mode ?: ADD_BUCKET)
             }
         } else {
-            com.protone.common.R.string.no_data.getString().toast()
+            R.string.no_data.getString().toast()
             finish()
         }
 
@@ -82,8 +83,10 @@ class PickMusicActivity :
             query(getInput())
         }
 
-        onFinish = {
-            searchModel.destroy()
+        onLifecycleEvent {
+            onFinish {
+                searchModel.destroy()
+            }
         }
     }
 
@@ -93,7 +96,7 @@ class PickMusicActivity :
             setResult(RESULT_OK, Intent().apply {
                 data = selectList.first.uri
             })
-        } else com.protone.common.R.string.cancel.getString().toast()
+        } else R.string.cancel.getString().toast()
         finish()
     }
 
@@ -110,7 +113,7 @@ class PickMusicActivity :
                     newAdapter(
                         it.bucket,
                         it.mode,
-                        it.adapterDataBaseProxy,
+                        it.proxy,
                         list
                     ), true
                 )
@@ -162,8 +165,7 @@ class PickMusicActivity :
                 ) {
                     super.getItemOffsets(outRect, view, parent, state)
                     if (parent.getChildLayoutPosition(view) >= state.itemCount - 1) {
-                        outRect.bottom =
-                            resources.getDimensionPixelSize(com.protone.common.R.dimen.action_icon_p)
+                        outRect.bottom = resources.getDimensionPixelSize(R.dimen.action_icon_p)
                     }
                 }
             })

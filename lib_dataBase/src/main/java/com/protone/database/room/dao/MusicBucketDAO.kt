@@ -12,11 +12,14 @@ interface MusicBucketDAO {
     @Query("SELECT * FROM MusicBucket WHERE name IS :name")
     fun getMusicBucketByName(name: String): MusicBucket?
 
+    @Query("SELECT * FROM MusicBucket WHERE musicBucketId IS :id")
+    fun getMusicBucketById(id: Long): MusicBucket?
+
     @Insert
     fun addMusicBucket(musicBucket: MusicBucket)
 
     @Update
-    fun updateMusicBucket(bucket: MusicBucket) : Int
+    fun updateMusicBucket(bucket: MusicBucket): Int
 
     @Delete
     fun deleteMusicBucket(bucket: MusicBucket)

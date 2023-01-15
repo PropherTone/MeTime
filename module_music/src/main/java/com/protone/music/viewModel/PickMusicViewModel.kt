@@ -6,7 +6,6 @@ import com.protone.common.baseType.withIOContext
 import com.protone.common.entity.Music
 import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PickMusicViewModel : BaseViewModel() {
@@ -36,7 +35,7 @@ class PickMusicViewModel : BaseViewModel() {
             musicDAO.run {
                 val musicBucket = getMusicBucketByName(bucket)
                 if (musicBucket != null) {
-                    getMusicWithMusicBucket(musicBucket.musicBucketId)
+                    getMusicWithMusicBucket(musicBucket.musicBucketId) ?: mutableListOf()
                 } else listOf()
             }
         }

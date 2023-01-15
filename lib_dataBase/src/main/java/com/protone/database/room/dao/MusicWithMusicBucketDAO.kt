@@ -13,11 +13,15 @@ interface MusicWithMusicBucketDAO {
 
     @RewriteQueriesToDropUnusedColumns
     @Query("DELETE FROM MusicWithMusicBucket WHERE musicBaseId IS :musicID AND musicBucketId IS:musicBucketId")
-    fun deleteMusicWithMusicBucket(musicID: Long,musicBucketId: Long)
+    fun deleteMusicWithMusicBucket(musicID: Long,musicBucketId: Long) : Int?
 
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId IS:musicBucketId")
     fun getMusicWithMusicBucket(musicBucketId: Long): List<Music>?
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT count(*) FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId IS:musicBucketId")
+    fun getMusicWithBucketSize(musicBucketId: Long): Int
 
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM MusicBucket INNER JOIN MusicWithMusicBucket ON MusicBucket.musicBucketId = MusicWithMusicBucket.musicBucketId WHERE MusicWithMusicBucket.musicBaseId IS:musicID")

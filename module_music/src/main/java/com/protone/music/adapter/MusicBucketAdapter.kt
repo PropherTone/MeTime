@@ -135,8 +135,9 @@ class MusicBucketAdapter(context: Context) :
             changeSize(bucket.size)
 
             musicBucketBoard.setOnClickListener {
-                if (!selectList.contains(bucket)) checkSelect(position, bucket)
-                musicBucketEventListener?.onBucketClicked(bucket)
+                val newData = mList[holder.layoutPosition]
+                if (!selectList.contains(newData)) checkSelect(position, newData)
+                musicBucketEventListener?.onBucketClicked(newData)
             }
 
             if (bucket.name == ALL_MUSIC) {
@@ -156,16 +157,19 @@ class MusicBucketAdapter(context: Context) :
                 closeMusicBucketBoard()
             }
             musicBucketEdit.setOnClickListener {
-                musicBucketEventListener?.edit(bucket.name, position)
+                val layoutPosition = holder.layoutPosition
+                musicBucketEventListener?.edit(mList[layoutPosition].name, layoutPosition)
                 closeMusicBucketBoard()
             }
             musicBucketDelete.setOnClickListener {
-                musicBucketEventListener?.delete(bucket.name, position)
+                val layoutPosition = holder.layoutPosition
+                musicBucketEventListener?.delete(mList[layoutPosition].name, layoutPosition)
                 closeMusicBucketBoard()
             }
             musicBucketAddList.setOnClickListener {
                 closeMusicBucketBoard()
-                musicBucketEventListener?.addMusic(bucket.name, position)
+                val layoutPosition = holder.layoutPosition
+                musicBucketEventListener?.addMusic(mList[layoutPosition].name, layoutPosition)
             }
         }
     }

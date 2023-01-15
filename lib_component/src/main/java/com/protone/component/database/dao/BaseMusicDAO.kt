@@ -28,7 +28,8 @@ sealed class MusicDAO : MusicBucketDAO() {
         withIOContext { musicDAO.getMusicById(id) }
 
     suspend fun insertMusic(music: Music) = withIOContext {
-        musicDAO.insertMusic(music).apply {
+        musicDAO.insertMusic(music).also {
+            if (it == -1L) return@withIOContext null
             sendEvent(MediaAction.MusicDataAction.OnMusicInserted(music))
         }
     }
@@ -75,6 +76,10 @@ sealed class MusicBucketDAO : MusicWithMusicBucketDAO() {
         musicBucketDAO.getMusicBucketByName(name)
     }
 
+    suspend fun getMusicBucketById(id: Long): MusicBucket? = withIOContext {
+        musicBucketDAO.getMusicBucketById(id)
+    }
+
     suspend fun addMusicBucket(musicBucket: MusicBucket) = withIOContext {
         sendEvent(MediaAction.MusicDataAction.OnNewMusicBucket(musicBucket))
         musicBucketDAO.addMusicBucket(musicBucket)
@@ -97,6 +102,7 @@ sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
     suspend fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? =
         withIOContext {
             musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)?.also {
+                if (it == -1L) return@withIOContext null
                 sendEvent(
                     MediaAction.MusicDataAction.OnMusicWithMusicBucketInserted(musicWithMusicBucket)
                 )
@@ -105,23 +111,30 @@ sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
 
     suspend fun deleteMusicWithMusicBucket(musicID: Long, musicBucketId: Long) =
         withIOContext {
-            sendEvent(
-                MediaAction.MusicDataAction.OnMusicWithMusicBucketDeleted(
-                    musicID,
-                    musicBucketId
+            musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID, musicBucketId)?.also {
+                if (it == -1) return@withIOContext null
+                sendEvent(
+                    MediaAction.MusicDataAction.OnMusicWithMusicBucketDeleted(
+                        musicID,
+                        musicBucketId
+                    )
                 )
-            )
-            musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID, musicBucketId)
+            }
         }
 
-    suspend fun getMusicWithMusicBucket(musicBucketId: Long): List<Music> =
+    suspend fun getMusicWithMusicBucket(musicBucketId: Long): List<Music>? =
         withIOContext {
-            musicWithMusicBucketDAO.getMusicWithMusicBucket(musicBucketId) ?: mutableListOf()
+            musicWithMusicBucketDAO.getMusicWithMusicBucket(musicBucketId)
         }
 
-    suspend fun getMusicBucketWithMusic(musicID: Long): List<MusicBucket> =
+    suspend fun getMusicBucketWithMusic(musicID: Long): List<MusicBucket>? =
         withIOContext {
-            musicWithMusicBucketDAO.getMusicBucketWithMusic(musicID) ?: mutableListOf()
+            musicWithMusicBucketDAO.getMusicBucketWithMusic(musicID)
         }
+
+    suspend fun getMusicWithBucketSize(musicBucketId: Long): Int = withIOContext {
+        musicWithMusicBucketDAO.getMusicWithBucketSize(musicBucketId)
+    }
+
 }
 

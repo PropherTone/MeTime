@@ -1,8 +1,8 @@
 package com.protone.music.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.launchDefault
+import com.protone.common.baseType.mutableBufferCollect
 import com.protone.common.baseType.withIOContext
 import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MusicModel : BaseViewModel() {
 
@@ -37,27 +38,51 @@ class MusicModel : BaseViewModel() {
         data class OnMusicBucketUpdated(val musicBucket: MusicBucket) : MusicEvent()
 
         data class OnMusicInsert(val music: Music) : MusicEvent()
-        data class OnMusicsInsert(val musics: Collection<Music>) : MusicEvent()
         data class OnMusicDeleted(val music: Music) : MusicEvent()
-        data class OnMusicsDeleted(val musics: Collection<Music>) : MusicEvent()
         data class OnMusicUpdated(val music: Music) : MusicEvent()
 
-        data class OnMusicInsertToBucket(val musicID: Long, val musicBucketId: Long) : MusicEvent()
-        data class OnMusicRemoveFromBucket(
-            val musicID: Long,
-            val musicBucketId: Long
+        data class OnMusicsInsert(
+            val musics: Collection<Music>,
+            val bucketName: String = ALL_MUSIC
         ) : MusicEvent()
+
+        data class OnMusicsDeleted(
+            val musics: Collection<Music>,
+            val bucketName: String = ALL_MUSIC
+        ) : MusicEvent()
+
+        sealed class MusicWithBucketEvent(
+            val musicID: Long,
+            val musicBucketID: Long
+        ) : MusicEvent()
+
+        data class OnMusicInsertToBucket(
+            val musicId: Long,
+            val musicBucketId: Long
+        ) : MusicWithBucketEvent(musicId, musicBucketId)
+
+        data class OnMusicRemoveFromBucket(
+            val musicId: Long,
+            val musicBucketId: Long
+        ) : MusicWithBucketEvent(musicId, musicBucketId)
     }
 
-    var isInit = false
+    private var isViewEventInit: AtomicBoolean? = null
+    private var isEventInit: AtomicBoolean? = null
+    var isInit
+        set(value) {
+            isViewEventInit?.set(value)
+            isEventInit?.set(value)
+        }
+        get() = isViewEventInit != null && isEventInit != null
 
+    var currentBucket = ""
     var playerFitTopH = 0
 
     private val _musicObserver by lazy { MutableSharedFlow<MusicEvent>() }
     fun CoroutineScope.observeMusicEvent(block: suspend (MusicEvent) -> Unit) {
         launchDefault {
-            _musicObserver.asSharedFlow().bufferCollect {
-                while (!isInit) delay(24L)
+            isViewEventInit = _musicObserver.asSharedFlow().mutableBufferCollect(this) {
                 block(it)
             }
         }
@@ -86,20 +111,44 @@ class MusicModel : BaseViewModel() {
                     }
                 }
                 is MusicEvent.OnMusicInsertToBucket -> {
-                    TODO("NOT YET IMP")
+                    checkMusicWithBucket(it.map { event ->
+                        event as MusicEvent.MusicWithBucketEvent
+                    }) { musics, name ->
+                        sendMusicEvent(MusicEvent.OnMusicsInsert(musics, name))
+                    }
                 }
                 is MusicEvent.OnMusicRemoveFromBucket -> {
-                    TODO("NOT YET IMP")
+                    checkMusicWithBucket(it.map { event ->
+                        event as MusicEvent.MusicWithBucketEvent
+                    }) { musics, name ->
+                        sendMusicEvent(MusicEvent.OnMusicsDeleted(musics, name))
+                    }
                 }
                 else -> Unit
             }
         }
     }
 
+    private suspend inline fun checkMusicWithBucket(
+        events: List<MusicEvent.MusicWithBucketEvent>,
+        callBack: (List<Music>, String) -> Unit
+    ) {
+        events.associate { event ->
+            val id = event.musicBucketID
+            id to listOf(musicDAO.getMusicById(event.musicID))
+        }.also { map ->
+            map.keys.forEach { bucketId ->
+                map[bucketId]?.filterNotNull()?.let { musics ->
+                    val bucket = musicDAO.getMusicBucketById(bucketId) ?: getDefaultBucket()
+                    callBack(musics, bucket.name)
+                }
+            }
+        }
+    }
+
     init {
         viewModelScope.launchDefault {
-            observeMusicData {
-                while (!isInit) delay(24L)
+            isEventInit = observeMusicDataMutable(viewModelScope) {
                 when (it) {
                     is MediaAction.MusicDataAction.OnNewMusicBucket -> {
                         sendMusicEvent(MusicEvent.OnMusicBucketInsert(it.musicBucket))
@@ -149,6 +198,7 @@ class MusicModel : BaseViewModel() {
                 null,
                 null
             ).also { it.tempIcon = musicDAO.getNewestMusicUri().toString() }
+            delay(1000L)
         }
     }
 
@@ -166,15 +216,6 @@ class MusicModel : BaseViewModel() {
         musicDAO.run {
             ((getAllMusicBucket() as MutableList<MusicBucket>?)
                 ?: mutableListOf()).let { list ->
-                viewModelScope.launchDefault {
-//                    list.forEach {
-//                        val newSize = getMusicWithMusicBucket(it.musicBucketId).size
-//                        if (it.size != newSize) {
-//                            it.size = newSize
-//                            updateMusicBucket(it)
-//                        }
-//                    }
-                }
                 list.add(0, defaultBucket)
                 list
             }

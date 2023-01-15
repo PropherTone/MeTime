@@ -1,6 +1,5 @@
 package com.protone.metime.activity
 
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams

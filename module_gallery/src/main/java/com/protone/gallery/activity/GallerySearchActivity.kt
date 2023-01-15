@@ -57,8 +57,10 @@ class GallerySearchActivity : BaseMediaActivity<
             initList()
         }
 
-        onFinish = {
-            searchModel.destroy()
+        onLifecycleEvent {
+            onFinish {
+                searchModel.destroy()
+            }
         }
     }
 

@@ -57,7 +57,6 @@ class DatabaseBridge : DatabaseHelper() {
             deleteMusic(music)
         }
 
-
         fun updateMusicBucketAsync(bucket: MusicBucket) {
             execute {
                 updateMusicBucket(bucket)
@@ -106,29 +105,36 @@ class DatabaseBridge : DatabaseHelper() {
 
         fun deleteMusicWithMusicBucketAsync(musicID: Long, musicBucketId: Long) {
             execute {
-                deleteMusicWithMusicBucket(musicID, musicBucketId)
+                deleteMusicWithMusicBucket(musicID, musicBucketId)?.let {
+                    execute {
+                        musicDAOBridge.getMusicBucketById(musicBucketId)?.let { bucket ->
+                            bucket.size = getMusicWithBucketSize(musicBucketId)
+                            updateMusicBucket(bucket)
+                        }
+                    }
+                }
             }
         }
 
-        fun insertMusicMultiAsyncWithBucket(musicBucket: String, music: List<Music>) {
+        fun insertMusicMultiWithBucketAsync(musicBucket: String, musics: List<Music>) {
             execute {
-                val bucket = musicDAOBridge.getMusicBucketByName(musicBucket) ?: return@execute
-                music.forEach {
-                    insertMusicWithMusicBucket(
-                        MusicWithMusicBucket(bucket.musicBucketId, it.musicBaseId)
-                    )
+                musics.forEach {
+                    insertMusicWithMusicBucket(it.musicBaseId, musicBucket)
                 }
             }
         }
 
         suspend fun insertMusicWithMusicBucket(musicID: Long, bucket: String): Long {
             val musicBucket = musicDAOBridge.getMusicBucketByName(bucket) ?: return -1L
-            return (insertMusicWithMusicBucket(
-                MusicWithMusicBucket(
-                    musicBucket.musicBucketId,
-                    musicID
-                )
-            ) ?: -1)
+            return insertMusicWithMusicBucket(
+                MusicWithMusicBucket(musicBucket.musicBucketId, musicID)
+            )?.let {
+                execute {
+                    musicBucket.size = getMusicWithBucketSize(musicBucket.musicBucketId)
+                    updateMusicBucket(musicBucket)
+                }
+                it
+            } ?: -1
         }
 
     }

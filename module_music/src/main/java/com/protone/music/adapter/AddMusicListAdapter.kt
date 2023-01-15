@@ -24,13 +24,13 @@ class AddMusicListAdapter(
     context: Context,
     val bucket: String,
     val mode: String,
-    val adapterDataBaseProxy: AddMusicListAdapterDataProxy
+    val proxy: AddMusicListAdapterDataProxy
 ) : SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     init {
         multiChoose = mode == "ADD"
         if (multiChoose) launch(Dispatchers.Default) {
-            selectList.addAll(adapterDataBaseProxy.getMusicWithMusicBucket(bucket))
+            selectList.addAll(proxy.getMusicWithMusicBucket(bucket))
             selectList.forEach {
                 mList.indexOf(it).let { index ->
                     if (index != -1) notifyItemChangedCO(index)
@@ -91,7 +91,7 @@ class AddMusicListAdapter(
                     onBusy = true
                     launchDefault {
                         if (mode == "SEARCH") {
-                            adapterDataBaseProxy.play(music)
+                            proxy.play(music)
                             withMainContext { checkSelect(position, music) }
                             onBusy = false
                             return@launchDefault
@@ -99,10 +99,7 @@ class AddMusicListAdapter(
                         viewQueue.add(position)
                         if (selectList.contains(music)) {
                             if (!multiChoose) return@launchDefault
-                            adapterDataBaseProxy.deleteMusicWithMusicBucket(
-                                music.musicBaseId,
-                                bucket
-                            )
+                            proxy.deleteMusicWithMusicBucket(music.musicBaseId, bucket)
                             withMainContext { checkSelect(position, music) }
                             onBusy = false
                             return@launchDefault
@@ -113,14 +110,13 @@ class AddMusicListAdapter(
                                 is Animatable -> {
                                     withMainContext { d.start() }
                                     if (multiChoose) {
-                                        val re = adapterDataBaseProxy
-                                            .insertMusicWithMusicBucket(music.musicBaseId, bucket)
-                                        if (re != -1L) {
-                                            changeIconAni(musicListPlayState)
-                                        } else {
-                                            selectList.remove(music)
-                                            notifyItemChanged()
-                                        }
+                                        proxy.insertMusicWithMusicBucket(music.musicBaseId, bucket)
+                                            .takeIf { re -> re != -1L }
+                                            ?.run { changeIconAni(musicListPlayState) }
+                                            ?: run {
+                                                selectList.remove(music)
+                                                notifyItemChanged()
+                                            }
                                     } else {
                                         changeIconAni(musicListPlayState)
                                     }

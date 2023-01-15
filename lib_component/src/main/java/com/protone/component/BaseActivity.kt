@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.system.exitProcess
 
 abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>(
     handleEvent: Boolean
@@ -62,10 +61,10 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
                 }
             }
         }
-    protected var onRestart: (suspend () -> Unit)? = null
-    protected var onPause: (suspend () -> Unit)? = null
-    protected var onStop: (suspend () -> Unit)? = null
-    protected var onFinish: (suspend () -> Unit)? = null
+    private var onRestart: (suspend () -> Unit)? = null
+    private var onPause: (suspend () -> Unit)? = null
+    private var onStop: (suspend () -> Unit)? = null
+    private var onFinish: (suspend () -> Unit)? = null
 
     init {
         if (handleEvent) {

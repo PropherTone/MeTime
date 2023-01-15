@@ -13,7 +13,8 @@ class StatusImageView @JvmOverloads constructor(
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0
 ) : androidx.appcompat.widget.AppCompatImageView(context, attrs, defStyleAttr) {
-    private var positive = false
+    var positive = false
+        private set
     private var stateListener: StateListener? = null
 
     private var activeDrawable = R.drawable.ic_baseline_arrow_drop_down_24.getDrawable()
