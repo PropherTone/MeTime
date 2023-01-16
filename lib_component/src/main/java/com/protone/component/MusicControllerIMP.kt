@@ -53,14 +53,14 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
             }
             this@MusicControllerIMP.binder?.run {
                 refresh()
-                if (progress != null) {
-                    progress?.progressListener = object : ColorfulProgressBar.Progress {
+                progress?.let {
+                    it.progressListener = object : ColorfulProgressBar.Progress {
                         override fun getProgress(position: Long) {
                             setProgress(position)
                         }
                     }
-                    onProgress().observe(lifecycle) {
-                        progress?.barSeekTo(it)
+                    onProgress().observe(lifecycle) { progress ->
+                        it.barSeekTo(progress)
                     }
                 }
                 onPlayState().observe(lifecycle) {

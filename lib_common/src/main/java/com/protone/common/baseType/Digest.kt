@@ -54,7 +54,7 @@ fun File.getSHA(): String? {
 
 fun String.toBase64(): String? {
     return try {
-        Base64.decode(this,Base64.DEFAULT).decodeToString()
+        Base64.decode(this, Base64.DEFAULT).decodeToString()
     } catch (e: Exception) {
         null
     }
@@ -81,7 +81,7 @@ fun File.getMD5(): String? {
     }
 }
 
-fun ByteArray.toHexString(): String {
+fun ByteArray.toHexString(maxLen: Int = Int.MAX_VALUE): String {
     val stringBuilder = StringBuilder()
     if (this.isEmpty()) return ""
     this.forEach {
@@ -90,12 +90,13 @@ fun ByteArray.toHexString(): String {
             stringBuilder.append(0)
         }
         stringBuilder.append(hexString)
+        if (stringBuilder.length > maxLen) return@forEach
     }
     return stringBuilder.toString()
 }
 
 fun ByteArray.getMediaMimeType(): String {
-    val hexString = this.toHexString()
+    val hexString = this.toHexString(20)
     return mutableMapOf<String, String>().apply {
         put("FFD8FF", "jpg") // JPEG (jpg)
         put("89504E47", "png") // PNG (png)

@@ -51,7 +51,7 @@ class AddBucketViewModel : BaseViewModel() {
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
             mb.icon?.deleteFile()
-            val toFile = uri?.imageSaveToDisk(name, R.string.music_bucket.getString())
+            val toFile = uri?.imageSaveToDisk(name, MUSIC_BUCKET)
             if (mb.icon?.equals(toFile) == false) mb.icon = toFile
             if (mb.detail != detail) mb.detail = detail
             todayDate("yyyy/MM/dd")

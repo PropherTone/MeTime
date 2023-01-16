@@ -40,6 +40,7 @@
             android:id="@+id/music_bucketMsg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/texts_margin"
             android:alpha="1"
             android:textColor="@color/white"
             android:textSize="@dimen/subContent_text"
@@ -54,12 +55,11 @@
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/icon_margin"
             android:alpha="1"
-            android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_baseline_edit_24_white"
             app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
+            app:layout_constraintTop_toTopOf="@id/music_bucketDelete"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/music_bucketDelete"
@@ -68,12 +68,11 @@
             android:layout_marginTop="@dimen/main_margin"
             android:layout_marginBottom="@dimen/small_margin"
             android:alpha="1"
-            android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_baseline_delete_24_white"
             app:layout_constraintEnd_toStartOf="@id/music_bucketAddList"
             app:layout_constraintStart_toEndOf="@id/music_bucketEdit"
-            app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+            app:layout_constraintTop_toBottomOf="@id/music_bucketMsg"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/music_bucketAddList"
@@ -81,12 +80,11 @@
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/icon_margin"
             android:alpha="1"
-            android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_baseline_more_24_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/music_bucketDelete"
-            app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
+            app:layout_constraintTop_toTopOf="@id/music_bucketDelete"
+            app:visibilityMode="ignore" />
 
     </ConstraintSet>
 
@@ -128,6 +126,7 @@
             android:id="@+id/music_bucketMsg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/texts_margin"
             android:alpha="0"
             android:textColor="@color/white"
             android:textSize="@dimen/subContent_text"
@@ -142,24 +141,22 @@
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/icon_margin"
             android:alpha="0"
-            android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_baseline_edit_24_white"
             app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
+            app:layout_constraintTop_toTopOf="@id/music_bucketDelete"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/music_bucketDelete"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:alpha="0"
-            android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_baseline_delete_24_white"
             app:layout_constraintEnd_toStartOf="@id/music_bucketAddList"
             app:layout_constraintStart_toEndOf="@id/music_bucketEdit"
-            app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+            app:layout_constraintTop_toBottomOf="@id/music_bucketMsg"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/music_bucketAddList"
@@ -167,12 +164,11 @@
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/icon_margin"
             android:alpha="0"
-            android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_baseline_more_24_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/music_bucketDelete"
-            app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
+            app:layout_constraintTop_toTopOf="@id/music_bucketDelete"
+            app:visibilityMode="ignore" />
 
     </ConstraintSet>
 

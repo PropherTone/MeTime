@@ -41,8 +41,9 @@ suspend fun Uri.imageSaveToDisk(
     var exists = false
     var mimeType: String
     return onResult {
-        val bytes = MApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
-            ?.use { inputStream -> inputStream.readBytes() } ?: toBitmapByteArray()
+        val bytes = toBitmapByteArray()
+            ?: MApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
+                ?.use { inputStream -> inputStream.readBytes() }
         it.resumeWith(Result.success(if (bytes == null) {
             null
         } else MApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(

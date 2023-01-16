@@ -136,5 +136,9 @@ sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
         musicWithMusicBucketDAO.getMusicWithBucketSize(musicBucketId)
     }
 
+    suspend fun getNewestMusicInBucket(musicBucketId: Long): Uri? = withIOContext {
+        musicWithMusicBucketDAO.getNewestMusicInBucket(musicBucketId)
+    }
+
 }
 

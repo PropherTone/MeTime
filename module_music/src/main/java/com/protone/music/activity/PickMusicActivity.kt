@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
+import com.protone.common.baseType.withMainContext
 import com.protone.common.context.MUSIC_PLAY_CUR
 import com.protone.common.context.linkInput
 import com.protone.common.context.root
@@ -106,7 +107,7 @@ class PickMusicActivity :
         }
     }
 
-    private suspend fun refreshList(list: MutableList<Music>) = withContext(Dispatchers.Main) {
+    private suspend fun refreshList(list: MutableList<Music>) = withMainContext {
         binding.addMBList.adapter.let {
             if (it is AddMusicListAdapter) {
                 binding.addMBList.swapAdapter(

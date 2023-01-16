@@ -3,51 +3,39 @@ package com.protone.metime.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
+import android.os.Bundle
 import androidx.activity.viewModels
 import com.protone.common.context.*
-import com.protone.common.utils.SCrashHandler
 import com.protone.metime.databinding.SplashActivityBinding
 import com.protone.metime.viewModel.SplashViewModel
 import com.protone.component.BaseActivity
 import com.protone.component.broadcast.workLocalBroadCast
-import com.protone.component.service.MusicService
-import com.protone.component.service.WorkService
+import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity :
-    BaseActivity<SplashActivityBinding, SplashViewModel, SplashViewModel.SplashEvent>(true) {
+    BaseActivity<SplashActivityBinding, SplashViewModel, Nothing>(false) {
 
     override val viewModel: SplashViewModel by viewModels()
 
     override fun createView(): SplashActivityBinding {
         return SplashActivityBinding.inflate(layoutInflater, root, false).apply {
-            root.onGlobalLayout {
+            root.post {
                 MApplication.apply {
-                    screenHeight = measuredHeight
-                    screenWidth = measuredWidth
+                    screenHeight = root.measuredHeight
+                    screenWidth = root.measuredWidth
                 }
             }
         }
     }
 
-    override suspend fun SplashViewModel.init() {
-        onViewEvent {
-            when (it) {
-                SplashViewModel.SplashEvent.InitConfig -> {
-                    viewModel.firstBootWork()
-                    startActivity(MainActivity::class.intent)
-                    finish()
-                }
-                SplashViewModel.SplashEvent.UpdateMedia -> updateMedia()
-            }
-        }
-    }
+    override suspend fun SplashViewModel.init() = Unit
 
-    override suspend fun doStart() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         checkNeededPermission {
             onSucceed {
-                sendViewEvent(SplashViewModel.SplashEvent.UpdateMedia)
+                this@SplashActivity.init()
             }
             onFailed {
                 requestContentPermission()
@@ -63,17 +51,17 @@ class SplashActivity :
         if (requestCode == 0
             && grantResults[0] == PackageManager.PERMISSION_GRANTED
             && grantResults[1] == PackageManager.PERMISSION_GRANTED
-        ) {
-            sendViewEvent(SplashViewModel.SplashEvent.UpdateMedia)
-        } else {
-            finish()
-        }
+        ) init() else finish()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    private fun updateMedia() {
+    private fun init() {
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLERY))
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
-        sendViewEvent(SplashViewModel.SplashEvent.InitConfig)
+        launch {
+            viewModel.firstBootWork()
+            startActivity(MainActivity::class.intent)
+            finish()
+        }
     }
 }

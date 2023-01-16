@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.alibaba.android.arouter.facade.Postcard
 import com.alibaba.android.arouter.launcher.ARouter
 import com.protone.common.baseType.getString
+import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchMain
 import com.protone.common.baseType.toast
 import com.protone.common.context.*
@@ -99,11 +100,13 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
     override fun onCreate(savedInstanceState: Bundle?) {
         setTransparentClipStatusBar()
         super.onCreate(savedInstanceState)
-        ARouter.getInstance().inject(this)
-        activityOperationBroadcast.registerReceiver(
-            activityOperationReceiver,
-            IntentFilter(ACTIVITY_FINISH)
-        )
+        launchDefault {
+            ARouter.getInstance().inject(this)
+            activityOperationBroadcast.registerReceiver(
+                activityOperationReceiver,
+                IntentFilter(ACTIVITY_FINISH)
+            )
+        }
         binding = createView().apply {
             setContentView(root)
             root.onGlobalLayout {

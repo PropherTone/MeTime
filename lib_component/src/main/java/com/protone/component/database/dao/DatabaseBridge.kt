@@ -1,6 +1,9 @@
 package com.protone.component.database.dao
 
+import com.protone.common.baseType.getString
+import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.entity.*
+import com.protone.common.utils.MUSIC_BUCKET
 import com.protone.component.database.MediaAction
 
 class DatabaseBridge : DatabaseHelper() {
@@ -130,6 +133,10 @@ class DatabaseBridge : DatabaseHelper() {
                 MusicWithMusicBucket(musicBucket.musicBucketId, musicID)
             )?.let {
                 execute {
+                    if (musicBucket.icon == null) {
+                        musicBucket.icon = getNewestMusicInBucket(musicBucket.musicBucketId)
+                            ?.imageSaveToDisk(musicBucket.name, MUSIC_BUCKET)
+                    }
                     musicBucket.size = getMusicWithBucketSize(musicBucket.musicBucketId)
                     updateMusicBucket(musicBucket)
                 }
