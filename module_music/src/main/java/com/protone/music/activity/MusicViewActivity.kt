@@ -28,7 +28,7 @@ import com.protone.music.viewModel.MusicViewModel
 
 @Route(path = RouterPath.MusicRouterPath.MusicPlayer)
 class MusicViewActivity :
-    BaseMusicActivity<MusicViewActivityBinding, MusicViewModel, BaseViewModel.ViewEvent>(false) {
+    BaseMusicActivity<MusicViewActivityBinding, MusicViewModel, BaseViewModel.ViewEvent>() {
     override val viewModel: MusicViewModel by viewModels()
 
     override fun createView(): MusicViewActivityBinding {

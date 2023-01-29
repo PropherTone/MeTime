@@ -17,16 +17,16 @@ import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.URI
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toUri
-import com.protone.component.BaseActivity
+import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.toGallery
 import com.protone.music.databinding.AddBucketActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 
 @Route(path = RouterPath.MusicRouterPath.AddBucket)
-class AddBucketActivity : BaseActivity<
+class AddBucketActivity : BaseMsgActivity<
         AddBucketActivityBinding,
         AddBucketViewModel,
-        AddBucketViewModel.AddBucketEvent>(true) {
+        AddBucketViewModel.AddBucketEvent>() {
     override val viewModel: AddBucketViewModel by viewModels()
 
     private var name: String

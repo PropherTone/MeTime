@@ -44,7 +44,7 @@ import java.io.File
 class GalleryViewActivity : BaseMediaActivity<
         GalleryViewActivityBinding,
         GalleryViewViewModel,
-        GalleryViewViewModel.GalleryViewEvent>(true) {
+        GalleryViewViewModel.GalleryViewEvent>() {
     override val viewModel: GalleryViewViewModel by viewModels()
 
     override fun createView(): GalleryViewActivityBinding {

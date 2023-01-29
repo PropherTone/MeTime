@@ -10,23 +10,22 @@ import com.example.config.databinding.LogActivityBinding
 import com.protone.common.R
 import com.protone.common.baseType.getFileName
 import com.protone.common.baseType.getString
+import com.protone.common.baseType.launchIO
 import com.protone.common.baseType.toast
 import com.protone.common.context.root
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.noteEditPostcard
 import com.protone.common.utils.TAG
-import com.protone.component.BaseActivity
 import com.protone.component.BaseViewModel
+import com.protone.component.activity.BaseActivity
 import com.protone.component.database.dao.DatabaseBridge
 import com.protone.component.view.adapter.LogListAdapter
 import com.protone.component.view.dialog.titleDialog
 import com.protone.config.viewModel.LogViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 @Route(path = RouterPath.ConfigRouterPath.Log)
-class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel.ViewEvent>(false) {
+class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel.ViewEvent>() {
     override val viewModel: LogViewModel by viewModels()
 
     override fun createView(): LogActivityBinding {
@@ -53,7 +52,7 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel
             }
 
             override fun viewLog(path: String) {
-                launch(Dispatchers.IO) {
+                launchIO {
                     try {
                         startActivityWithGainData(
                             getLogContent(path),

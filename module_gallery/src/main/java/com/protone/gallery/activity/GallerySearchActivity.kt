@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 class GallerySearchActivity : BaseMediaActivity<
         GallerySearchActivityBinding,
         GallerySearchViewModel,
-        BaseViewModel.ViewEvent>(false),
+        BaseViewModel.ViewEvent>(),
     GalleryListAdapter.OnSelect, GallerySearchViewModel.OnQuery {
     override val viewModel: GallerySearchViewModel by viewModels()
 
@@ -108,16 +108,16 @@ class GallerySearchActivity : BaseMediaActivity<
         showPop(binding.actionMenu, false)
     }
 
-    override fun select(galleryMedia: GalleryMedia) {
+    override fun select(media: GalleryMedia) {
         binding.apply {
-            (resultGalleries.adapter as GalleryListAdapter).noticeSelectChange(galleryMedia)
-            (resultCato.adapter as GalleryListAdapter).noticeSelectChange(galleryMedia)
-            (resultNotes.adapter as GalleryListAdapter).noticeSelectChange(galleryMedia)
+            (resultGalleries.adapter as GalleryListAdapter).noticeSelectChange(media)
+            (resultCato.adapter as GalleryListAdapter).noticeSelectChange(media)
+            (resultNotes.adapter as GalleryListAdapter).noticeSelectChange(media)
         }
     }
 
-    override fun select(galleryMedia: List<GalleryMedia>) {
-        if (galleryMedia.isEmpty()) {
+    override fun select(medias: List<GalleryMedia>) {
+        if (medias.isEmpty()) {
             binding.apply {
                 (resultGalleries.adapter as GalleryListAdapter).quitSelectMod()
                 (resultCato.adapter as GalleryListAdapter).quitSelectMod()

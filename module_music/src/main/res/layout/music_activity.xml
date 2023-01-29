@@ -94,44 +94,44 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/music_bucketName" />
 
-                    <ImageView
-                        android:id="@+id/music_bucketEdit"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="@dimen/icon_margin"
-                        android:contentDescription="@string/action"
-                        android:onClick="@{()->activity.sendEdit()}"
-                        android:padding="@dimen/icon_padding_mid"
-                        android:src="@drawable/ic_baseline_edit_24_white"
-                        app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
+<!--                    <ImageView-->
+<!--                        android:id="@+id/music_bucketEdit"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginStart="@dimen/icon_margin"-->
+<!--                        android:contentDescription="@string/action"-->
+<!--                        android:onClick="@{()->activity.sendEdit()}"-->
+<!--                        android:padding="@dimen/icon_padding_mid"-->
+<!--                        android:src="@drawable/ic_baseline_edit_24_white"-->
+<!--                        app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />-->
 
-                    <ImageView
-                        android:id="@+id/music_bucketDelete"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/main_margin"
-                        android:contentDescription="@string/action"
-                        android:onClick="@{()->activity.sendDelete()}"
-                        android:padding="@dimen/icon_padding_mid"
-                        android:src="@drawable/ic_baseline_delete_24_white"
-                        app:layout_constraintEnd_toStartOf="@id/music_bucketAddList"
-                        app:layout_constraintStart_toEndOf="@id/music_bucketEdit"
-                        app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+<!--                    <ImageView-->
+<!--                        android:id="@+id/music_bucketDelete"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginTop="@dimen/main_margin"-->
+<!--                        android:contentDescription="@string/action"-->
+<!--                        android:onClick="@{()->activity.sendDelete()}"-->
+<!--                        android:padding="@dimen/icon_padding_mid"-->
+<!--                        android:src="@drawable/ic_baseline_delete_24_white"-->
+<!--                        app:layout_constraintEnd_toStartOf="@id/music_bucketAddList"-->
+<!--                        app:layout_constraintStart_toEndOf="@id/music_bucketEdit"-->
+<!--                        app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />-->
 
-                    <ImageView
-                        android:id="@+id/music_bucketAddList"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="@dimen/icon_margin"
-                        android:contentDescription="@string/action"
-                        android:onClick="@{()->activity.sendAddMusic()}"
-                        android:padding="@dimen/icon_padding_mid"
-                        android:src="@drawable/ic_baseline_more_24_white"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/music_bucketDelete"
-                        app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
+<!--                    <ImageView-->
+<!--                        android:id="@+id/music_bucketAddList"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginEnd="@dimen/icon_margin"-->
+<!--                        android:contentDescription="@string/action"-->
+<!--                        android:onClick="@{()->activity.sendAddMusic()}"-->
+<!--                        android:padding="@dimen/icon_padding_mid"-->
+<!--                        android:src="@drawable/ic_baseline_more_24_white"-->
+<!--                        app:layout_constraintEnd_toEndOf="parent"-->
+<!--                        app:layout_constraintStart_toEndOf="@id/music_bucketDelete"-->
+<!--                        app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />-->
 
                 </androidx.constraintlayout.motion.widget.MotionLayout>
 
@@ -209,8 +209,8 @@
                 android:clickable="true"
                 android:elevation="1dp"
                 android:focusable="true"
-                app:ActiveDrawable="@drawable/ic_baseline_arrow_drop_up_24"
-                app:NegativeDrawable="@drawable/ic_baseline_arrow_drop_down_24"
+                app:ActiveDrawable="@drawable/ic_round_arrow_drop_up_24_blue"
+                app:NegativeDrawable="@drawable/ic_round_arrow_drop_down_24_blue"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

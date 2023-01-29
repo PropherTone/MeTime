@@ -6,15 +6,14 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.protone.common.context.*
+import com.protone.component.activity.BaseActivity
+import com.protone.component.broadcast.workLocalBroadCast
 import com.protone.metime.databinding.SplashActivityBinding
 import com.protone.metime.viewModel.SplashViewModel
-import com.protone.component.BaseActivity
-import com.protone.component.broadcast.workLocalBroadCast
 import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen")
-class SplashActivity :
-    BaseActivity<SplashActivityBinding, SplashViewModel, Nothing>(false) {
+class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel, Nothing>() {
 
     override val viewModel: SplashViewModel by viewModels()
 

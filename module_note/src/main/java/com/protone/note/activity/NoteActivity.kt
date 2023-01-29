@@ -15,7 +15,7 @@ import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE_DIR
-import com.protone.component.BaseActivity
+import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.database.MediaAction
 import com.protone.component.view.dialog.titleDialog
 import com.protone.note.adapter.NoteListListAdapter
@@ -27,7 +27,8 @@ import kotlin.math.abs
 
 @Route(path = RouterPath.NoteRouterPath.Main)
 class NoteActivity :
-    BaseActivity<NoteActivityBinding, NoteViewModel, NoteViewModel.NoteViewEvent>(true) {
+    BaseMsgActivity<NoteActivityBinding, NoteViewModel, NoteViewModel.NoteViewEvent>() {
+
     override val viewModel: NoteViewModel by viewModels()
 
     override fun createView(): NoteActivityBinding {

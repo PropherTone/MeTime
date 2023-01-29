@@ -31,7 +31,7 @@ import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.spans.ISpanForUse
 import com.protone.common.utils.spans.SpanStates
-import com.protone.component.BaseActivity
+import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.toGallery
 import com.protone.component.view.customView.richText.RichNoteImageLoader
 import com.protone.component.view.customView.richText.RichNoteView
@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.NoteRouterPath.Edit)
 class NoteEditActivity :
-    BaseActivity<NoteEditActivityBinding, NoteEditViewModel, NoteEditViewModel.NoteEvent>(true),
+    BaseMsgActivity<NoteEditActivityBinding, NoteEditViewModel, NoteEditViewModel.NoteEvent>(),
     ISpanForUse {
     override val viewModel: NoteEditViewModel by viewModels()
 

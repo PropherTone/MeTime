@@ -10,8 +10,8 @@ import com.protone.common.baseType.toast
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
-import com.protone.component.BaseActivity
 import com.protone.component.BaseViewModel
+import com.protone.component.activity.BaseActivity
 import com.protone.component.view.customView.ScalableRegionLoadingImageView
 import com.protone.component.view.customView.bitmapCache
 import com.protone.gallery.adapter.PictureBoxAdapter
@@ -20,7 +20,7 @@ import com.protone.gallery.viewModel.PictureBoxViewModel
 
 @Route(path = RouterPath.GalleryRouterPath.Box)
 class PictureBoxActivity :
-    BaseActivity<PictureBoxActivityBinding, PictureBoxViewModel, BaseViewModel.ViewEvent>(false) {
+    BaseActivity<PictureBoxActivityBinding, PictureBoxViewModel, BaseViewModel.ViewEvent>() {
     override val viewModel: PictureBoxViewModel by viewModels()
 
     override fun createView(): PictureBoxActivityBinding {

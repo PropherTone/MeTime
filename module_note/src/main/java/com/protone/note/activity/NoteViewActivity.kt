@@ -25,9 +25,7 @@ import kotlinx.coroutines.launch
 
 @Route(path = RouterPath.NoteRouterPath.NoteView)
 class NoteViewActivity :
-    BaseMusicActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(
-        true
-    ) {
+    BaseMusicActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>() {
     override val viewModel: NoteViewViewModel by viewModels()
 
     private var binder: MusicBinder? = null

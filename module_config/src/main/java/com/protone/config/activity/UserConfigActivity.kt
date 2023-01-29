@@ -19,7 +19,7 @@ import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
 import com.protone.common.utils.json.toEntity
-import com.protone.component.BaseActivity
+import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.database.userConfig
 import com.protone.component.databinding.UserConfigItemLayoutBinding
 import com.protone.component.toGallery
@@ -34,10 +34,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Route(path = RouterPath.ConfigRouterPath.UserConfig)
-class UserConfigActivity : BaseActivity<
+class UserConfigActivity : BaseMsgActivity<
         UserConfigActivityBinding,
         UserConfigViewModel,
-        UserConfigViewModel.UserConfigEvent>(true) {
+        UserConfigViewModel.UserConfigEvent>() {
     override val viewModel: UserConfigViewModel by viewModels()
 
     override fun createView(): UserConfigActivityBinding {

@@ -39,7 +39,6 @@ import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.databinding.GalleryFragmentLayoutBinding
 import com.protone.gallery.viewModel.GalleryFragmentViewModel
-import com.protone.gallery.viewModel.GalleryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -271,11 +270,11 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
 
     private fun getListAdapter() = binding.galleryList.adapter as GalleryListAdapter
 
-    override fun select(galleryMedia: GalleryMedia) = Unit
+    override fun select(media: GalleryMedia) = Unit
 
-    override fun select(galleryMedia: List<GalleryMedia>) {
+    override fun select(medias: List<GalleryMedia>) {
         launch {
-            viewModel.sendEvent(GalleryFragmentViewModel.FragEvent.OnSelect(galleryMedia), true)
+            viewModel.sendEvent(GalleryFragmentViewModel.FragEvent.OnSelect(medias), true)
         }
     }
 

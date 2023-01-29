@@ -4,22 +4,17 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.databinding.ViewDataBinding
-import com.protone.common.baseType.launchDefault
 import com.protone.common.context.intent
 import com.protone.common.context.isServiceRunning
-import com.protone.common.context.musicIntentFilter
-import com.protone.component.broadcast.MusicReceiver
+import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.service.MusicBinder
 import com.protone.component.service.MusicService
 import com.protone.component.service.observeServiceStatues
-import com.protone.component.service.serviceObserver
 import com.protone.component.view.customView.musicPlayer.bitmapCachePool
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>(
-    handleEvent: Boolean
-) : BaseActivity<VB, VM, VE>(handleEvent) {
+abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>
+    : BaseMsgActivity<VB, VM, VE>() {
 
     private var serviceConnection: ServiceConnection? = null
 

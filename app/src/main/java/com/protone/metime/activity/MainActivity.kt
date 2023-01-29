@@ -35,7 +35,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class MainActivity :
-    BaseMusicActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>(true) {
+    BaseMusicActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>() {
     override val viewModel: MainViewModel by viewModels()
 
     private var userName: String? = null

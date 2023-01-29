@@ -10,6 +10,7 @@ import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
+import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.databinding.GalleryOptionPopBinding
 import com.protone.component.view.dialog.cateDialog
 import com.protone.component.view.dialog.checkListDialog
@@ -21,9 +22,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
-    handleEvent: Boolean
-) : BaseActivity<VB, VM, T>(handleEvent),
+abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>
+    : BaseMsgActivity<VB, VM, T>(),
     View.OnClickListener {
 
     val popLayout: GalleryOptionPopBinding by lazy {

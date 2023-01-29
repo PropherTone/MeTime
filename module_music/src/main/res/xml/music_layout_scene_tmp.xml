@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+
+        <Constraint
+            android:id="@+id/music_finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="@dimen/small_elevation"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_showBucketDetail"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="@dimen/small_elevation"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_bucketIcon"
+            android:layout_width="@dimen/huge_icon"
+            android:layout_height="@dimen/huge_icon"
+            android:alpha="0"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_bucketName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/music_finish"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/music_finish" />
+
+        <Constraint
+            android:id="@+id/music_bucketTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/texts_margin"
+            android:alpha="0"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_bucketMsg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/icon_margin"
+            android:layout_marginTop="@dimen/texts_margin"
+            android:layout_marginEnd="@dimen/icon_margin"
+            android:layout_marginBottom="@dimen/icon_margin"
+            android:padding="@dimen/texts_padding"
+            app:layout_constraintBottom_toTopOf="@+id/music_add"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/music_bucketTime" />
+
+        <Constraint
+            android:id="@+id/music_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toBottomOf="@id/music_add"
+            app:layout_constraintEnd_toStartOf="@id/music_add"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_add"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/music_edit"
+            app:layout_constraintStart_toEndOf="@id/music_delete"
+            app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+
+        <Constraint
+            android:id="@+id/music_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toBottomOf="@id/music_add"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/music_add" />
+
+        <Constraint
+            android:id="@+id/music_musicList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingBottom="@dimen/model_icon_dimen"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/music_add" />
+
+        <Constraint
+            android:id="@+id/search"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintBottom_toTopOf="@id/locate"
+            app:layout_constraintEnd_toEndOf="@id/locate" />
+
+        <Constraint
+            android:id="@+id/locate"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_marginTop="@dimen/small_margin"
+            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+            android:id="@+id/music_finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="@dimen/small_elevation"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_showBucketDetail"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="@dimen/small_elevation"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_bucketIcon"
+            android:layout_width="@dimen/huge_icon"
+            android:layout_height="@dimen/huge_icon"
+            android:layout_marginTop="28dp"
+            android:alpha="1"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/music_finish" />
+
+        <Constraint
+            android:id="@+id/music_bucketName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/icon_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/music_bucketIcon" />
+
+        <Constraint
+            android:id="@+id/music_bucketTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/texts_margin"
+            android:alpha="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/music_bucketName" />
+
+        <Constraint
+            android:id="@+id/music_bucketMsg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/icon_margin"
+            android:layout_marginTop="@dimen/texts_margin"
+            android:layout_marginEnd="@dimen/icon_margin"
+            android:layout_marginBottom="@dimen/icon_margin"
+            android:padding="@dimen/texts_padding"
+            app:layout_constraintBottom_toTopOf="@+id/music_add"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/music_bucketTime" />
+
+        <Constraint
+            android:id="@+id/music_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toBottomOf="@id/music_add"
+            app:layout_constraintEnd_toStartOf="@id/music_add"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Constraint
+            android:id="@+id/music_add"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/music_edit"
+            app:layout_constraintStart_toEndOf="@id/music_delete"
+            app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+
+        <Constraint
+            android:id="@+id/music_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toBottomOf="@id/music_add"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/music_add" />
+
+        <Constraint
+            android:id="@+id/music_musicList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingBottom="@dimen/model_icon_dimen"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/music_finish" />
+
+        <Constraint
+            android:id="@+id/search"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintBottom_toTopOf="@id/locate"
+            app:layout_constraintEnd_toEndOf="@id/locate" />
+
+        <Constraint
+            android:id="@+id/locate"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/small_Icon"
+            android:layout_marginTop="@dimen/small_margin"
+            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/main_margin"
+            android:padding="@dimen/icon_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </ConstraintSet>
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start"
+        app:motionInterpolator="linear" />
+
+</MotionScene>

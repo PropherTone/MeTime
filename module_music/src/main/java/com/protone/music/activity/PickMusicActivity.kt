@@ -37,7 +37,7 @@ import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.Pick)
 class PickMusicActivity :
-    BaseMusicActivity<PickMusicActivityBinding, PickMusicViewModel, BaseViewModel.ViewEvent>(true) {
+    BaseMusicActivity<PickMusicActivityBinding, PickMusicViewModel, BaseViewModel.ViewEvent>() {
     override val viewModel: PickMusicViewModel by viewModels()
 
     override fun createView(): PickMusicActivityBinding {

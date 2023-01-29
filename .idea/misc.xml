@@ -59,16 +59,19 @@
         <entry key="..\:/MeTime/lib_base/src/main/res/layout/reg_pop_layout.xml" value="0.1" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/background_ripple_blue.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_album_24_white.xml" value="0.1605" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.1275" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_arrow_drop_up_24.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_data_usage_24_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_load_animation.xml" value="0.1" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_round_arrow_drop_down_24_blue.xml" value="0.1275" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_round_close_24_white.xml" value="0.1705" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/load_animation.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/main_background.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/oval_back_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/oval_background.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/round_background_tans_white_lite.xml" value="0.1225" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/select_up_down_icon.xml" value="0.1115" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/trans_ripple.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/auto_music_player_layout_full.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/auto_music_player_layout_lite.xml" value="0.24114583333333334" />
@@ -133,11 +136,14 @@
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_video_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_music/src/main/res/drawable/ic_album_black.xml" value="0.1605" />
+        <entry key="..\:/MeTime/module_music/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.1115" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_activity.xml" value="0.1" />
+        <entry key="..\:/MeTime/module_music/src/main/res/layout/music_activity_layout.xml" value="0.1" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_bucket_adapter_layout.xml" value="0.1" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_list_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/pick_music_activity.xml" value="0.24114583333333334" />
+        <entry key="..\:/MeTime/module_music/src/main/res/xml/music_layout_scene_tmp.xml" value="0.24010416666666667" />
         <entry key="..\:/MeTime/module_note/src/main/res/layout/note_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_note/src/main/res/layout/note_edit_activity.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_note/src/main/res/layout/note_list_adapter_layout.xml" value="0.24114583333333334" />

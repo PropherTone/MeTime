@@ -49,7 +49,7 @@ import kotlin.math.hypot
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
-    BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>(false) {
+    BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>() {
     override val viewModel: GalleryViewModel by viewModels()
 
     private var isInit = false

@@ -40,8 +40,8 @@
                     android:layout_height="@dimen/small_Icon"
                     android:clickable="true"
                     android:focusable="true"
-                    app:ActiveDrawable="@drawable/ic_baseline_arrow_drop_up_24"
-                    app:NegativeDrawable="@drawable/ic_baseline_arrow_drop_down_24"
+                    app:ActiveDrawable="@drawable/ic_round_arrow_drop_up_24_blue"
+                    app:NegativeDrawable="@drawable/ic_round_arrow_drop_down_24_blue"
                     tools:ignore="ContentDescription" />
 
                 <ImageView

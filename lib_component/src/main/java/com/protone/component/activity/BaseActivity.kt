@@ -1,9 +1,6 @@
-package com.protone.component
+package com.protone.component.activity
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,24 +12,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.android.arouter.facade.Postcard
 import com.alibaba.android.arouter.launcher.ARouter
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchMain
-import com.protone.common.baseType.toast
 import com.protone.common.context.*
 import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.TAG
 import com.protone.common.utils.onResult
+import com.protone.component.BaseViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>(
-    handleEvent: Boolean
-) : AppCompatActivity(), CoroutineScope by MainScope() {
+abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>
+    : AppCompatActivity(), CoroutineScope by MainScope() {
 
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
@@ -40,18 +32,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
 
     abstract fun createView(): VB
     abstract suspend fun VM.init()
-    private var onViewEvent: (suspend (VE) -> Unit)? = null
-        set(value) {
-            field = value
-            viewEventTask?.start()
-        }
-
-    fun onViewEvent(block: suspend (VE) -> Unit) {
-        onViewEvent = block
-    }
-
-    private var viewEvent: Channel<VE>? = null
-    private var viewEventTask: Job? = null
 
     protected var onResume: (suspend () -> Unit)? = null
         set(value) {
@@ -67,46 +47,11 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
     private var onStop: (suspend () -> Unit)? = null
     private var onFinish: (suspend () -> Unit)? = null
 
-    init {
-        if (handleEvent) {
-            viewEvent = Channel(1)
-            viewEventTask = launchMain {
-                viewEvent?.receiveAsFlow()?.collect {
-                    try {
-                        onViewEvent?.invoke(it)
-                    } catch (e: Exception) {
-                        if (e is CancellationException) throw e
-                        e.printStackTrace()
-                        com.protone.common.R.string.unknown_error.getString().toast()
-                    }
-                }
-            }
-        }
-    }
-
     val code = AtomicInteger(0)
-
-    private val activityOperationReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                ACTIVITY_FINISH -> {
-                    finishAll()
-                }
-                ACTIVITY_RESTART -> {}
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTransparentClipStatusBar()
         super.onCreate(savedInstanceState)
-        launchDefault {
-            ARouter.getInstance().inject(this)
-            activityOperationBroadcast.registerReceiver(
-                activityOperationReceiver,
-                IntentFilter(ACTIVITY_FINISH)
-            )
-        }
         binding = createView().apply {
             setContentView(root)
             root.onGlobalLayout {
@@ -205,17 +150,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         if (requestCode == code.get()) {
             launch { _activityResultMessenger.emit(data) }
         }
-    }
-
-    fun sendViewEvent(event: VE) {
-        viewEvent?.trySend(event)
-    }
-
-    fun closeEvent() {
-        viewEventTask?.cancel()
-        viewEventTask = null
-        viewEvent?.close()
-        viewEvent = null
     }
 
     protected fun View.fitStatuesBar() {
@@ -319,7 +253,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
         try {
             Log.d(TAG, "onDestroy: ${this@BaseActivity::class.simpleName}")
             binding.unbind()
-            activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
         } finally {
             cancel()
             super.onDestroy()

@@ -7,6 +7,7 @@ import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
+import com.protone.component.activity.BaseActivity
 
 fun BaseActivity<*, *, *>.toGallery(postcard: (Postcard.() -> Postcard)? = null) =
     postcard?.let { startActivity(RouterPath.GalleryRouterPath.Main, it) }

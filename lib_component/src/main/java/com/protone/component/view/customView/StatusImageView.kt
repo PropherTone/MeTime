@@ -17,8 +17,8 @@ class StatusImageView @JvmOverloads constructor(
         private set
     private var stateListener: StateListener? = null
 
-    private var activeDrawable = R.drawable.ic_baseline_arrow_drop_down_24.getDrawable()
-    private var negativeDrawable = R.drawable.ic_baseline_arrow_drop_up_24.getDrawable()
+    private var activeDrawable = R.drawable.ic_round_arrow_drop_down_24_blue.getDrawable()
+    private var negativeDrawable = R.drawable.ic_round_arrow_drop_up_24_blue.getDrawable()
 
     init {
         setImageDrawable(activeDrawable)
