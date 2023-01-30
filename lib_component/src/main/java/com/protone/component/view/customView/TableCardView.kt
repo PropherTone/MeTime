@@ -26,8 +26,8 @@ class BlurTableCardView @JvmOverloads constructor(
         }
         get() = tableTool.botBlock
 
-    var showDuration : Long = 300L
-    var hideDuration : Long = 300L
+    var showDuration: Long = 300L
+    var hideDuration: Long = 300L
 
     private val tableTool by lazy {
         TableAnimationTool(this)
@@ -38,7 +38,7 @@ class BlurTableCardView @JvmOverloads constructor(
         onEnd: Runnable? = null,
         update: ValueAnimator.AnimatorUpdateListener? = null
     ) {
-        tableTool.show(showDuration,onStart, onEnd, update)
+        tableTool.show(showDuration, onStart, onEnd, update)
     }
 
     fun hide(
@@ -46,7 +46,7 @@ class BlurTableCardView @JvmOverloads constructor(
         onEnd: Runnable? = null,
         update: ValueAnimator.AnimatorUpdateListener? = null
     ) {
-        tableTool.hide(hideDuration,onStart, onEnd, update)
+        tableTool.hide(hideDuration, onStart, onEnd, update)
     }
 
 }
@@ -67,19 +67,11 @@ class TableCardView @JvmOverloads constructor(
         }
         get() = tableTool.botBlock
 
-    var showDuration : Long = 300L
-    var hideDuration : Long = 300L
+    var showDuration: Long = 300L
+    var hideDuration: Long = 300L
 
     private val tableTool by lazy {
         TableAnimationTool(this)
-    }
-
-    fun doAfterShow(block: () -> Unit) {
-        tableTool.doAfterShow = block
-    }
-
-    fun doAfterHide(block: () -> Unit) {
-        tableTool.doAfterHide = block
     }
 
     fun show(
@@ -87,7 +79,7 @@ class TableCardView @JvmOverloads constructor(
         onEnd: Runnable? = null,
         update: ValueAnimator.AnimatorUpdateListener? = null
     ) {
-        tableTool.show(showDuration,onStart, onEnd, update)
+        tableTool.show(showDuration, onStart, onEnd, update)
     }
 
     fun hide(
@@ -95,7 +87,7 @@ class TableCardView @JvmOverloads constructor(
         onEnd: Runnable? = null,
         update: ValueAnimator.AnimatorUpdateListener? = null
     ) {
-        tableTool.hide(hideDuration,onStart, onEnd, update)
+        tableTool.hide(hideDuration, onStart, onEnd, update)
     }
 
 }
@@ -106,9 +98,6 @@ class TableAnimationTool(private val view: View) {
 
     var interpolator = DecelerateInterpolator()
 
-    var doAfterShow: () -> Unit = {}
-    var doAfterHide: () -> Unit = {}
-
     fun show(
         duration: Long,
         onStart: Runnable? = null,
@@ -118,12 +107,8 @@ class TableAnimationTool(private val view: View) {
         view.animate().setInterpolator(interpolator)
             .setDuration(duration)
             .translationY(0f + topBlock)
-            .withEndAction {
-                onEnd?.run()
-            }
-            .withStartAction {
-                onStart?.run()
-            }
+            .withEndAction(onEnd)
+            .withStartAction(onStart)
             .setUpdateListener(update)
             .start()
     }

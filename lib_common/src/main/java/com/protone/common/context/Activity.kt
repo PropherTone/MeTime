@@ -10,7 +10,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
-import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.common.R
@@ -134,7 +134,7 @@ fun Activity.showFailedToast() = runOnUiThread {
 }
 
 fun Activity.hideSoftInput() {
-    ViewCompat.getWindowInsetsController(window.decorView)?.hide(WindowInsetsCompat.Type.ime())
+    WindowCompat.getInsetsController(window,window.decorView).hide(WindowInsetsCompat.Type.ime())
 }
 
 @Suppress("unused")

@@ -69,6 +69,7 @@
             android:id="@+id/music_delete"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0"
             android:padding="@dimen/main_padding"
             app:layout_constraintBottom_toBottomOf="@id/music_add"
             app:layout_constraintEnd_toStartOf="@id/music_add"
@@ -78,6 +79,7 @@
             android:id="@+id/music_add"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0"
             android:padding="@dimen/main_padding"
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/music_edit"
@@ -88,6 +90,7 @@
             android:id="@+id/music_edit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0"
             android:padding="@dimen/main_padding"
             app:layout_constraintBottom_toBottomOf="@id/music_add"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,7 +104,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/music_add" />
+            app:layout_constraintTop_toBottomOf="@+id/music_finish" />
 
         <Constraint
             android:id="@+id/search"
@@ -120,8 +123,10 @@
             android:layout_marginEnd="@dimen/main_margin"
             android:layout_marginBottom="@dimen/main_margin"
             android:padding="@dimen/icon_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:visibility="visible"
+            app:constraint_referenced_ids="search"
+            app:layout_constraintBottom_toBottomOf="@id/music_musicList"
+            app:layout_constraintEnd_toEndOf="@id/music_musicList" />
 
     </ConstraintSet>
 
@@ -193,6 +198,7 @@
             android:id="@+id/music_delete"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1"
             android:padding="@dimen/main_padding"
             app:layout_constraintBottom_toBottomOf="@id/music_add"
             app:layout_constraintEnd_toStartOf="@id/music_add"
@@ -202,6 +208,8 @@
             android:id="@+id/music_add"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/model_icon_dimen"
+            android:alpha="1"
             android:padding="@dimen/main_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/music_edit"
@@ -212,6 +220,7 @@
             android:id="@+id/music_edit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1"
             android:padding="@dimen/main_padding"
             app:layout_constraintBottom_toBottomOf="@id/music_add"
             app:layout_constraintEnd_toEndOf="parent"
@@ -225,7 +234,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/music_finish" />
+            app:layout_constraintTop_toBottomOf="@+id/music_add" />
 
         <Constraint
             android:id="@+id/search"
@@ -244,8 +253,10 @@
             android:layout_marginEnd="@dimen/main_margin"
             android:layout_marginBottom="@dimen/main_margin"
             android:padding="@dimen/icon_padding"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:visibility="gone"
+            app:constraint_referenced_ids="search"
+            app:layout_constraintBottom_toBottomOf="@id/music_musicList"
+            app:layout_constraintEnd_toEndOf="@id/music_musicList" />
 
     </ConstraintSet>
 

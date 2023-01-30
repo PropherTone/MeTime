@@ -215,7 +215,7 @@ class MusicService : BaseService(), IMusicService {
         playList.addAll(list)
     }
 
-    override fun getPlayState(): Boolean = playState.value == true
+    override fun isPlaying(): Boolean = playState.value == true
 
     override fun onProgress(): LiveData<Long> = progress
 
@@ -261,7 +261,7 @@ class MusicBinder(private val iMusic: IMusicService) : Binder(), IMusicService {
     override fun finishMusic() = iMusic.finishMusic()
     override fun getPlayList(): List<Music> = iMusic.getPlayList()
     override fun setPlayList(list: List<Music>) = iMusic.setPlayList(list)
-    override fun getPlayState(): Boolean = iMusic.getPlayState()
+    override fun isPlaying(): Boolean = iMusic.isPlaying()
     override fun onProgress(): LiveData<Long> = iMusic.onProgress()
     override fun onPlayState(): LiveData<Boolean> = iMusic.onPlayState()
     override fun onLoopMode(): LiveData<Int> = iMusic.onLoopMode()
@@ -273,7 +273,7 @@ class MusicBinder(private val iMusic: IMusicService) : Binder(), IMusicService {
 internal abstract class MusicServiceReceiver(private val iMusic: IMusicService) : MusicReceiver() {
 
     override fun play() {
-        iMusic.getPlayState().let {
+        iMusic.isPlaying().let {
             if (!it) {
                 iMusic.play()
             } else {
@@ -298,7 +298,7 @@ interface IMusicService {
     fun finishMusic()
     fun getPlayList(): List<Music>
     fun setPlayList(list: List<Music>)
-    fun getPlayState(): Boolean
+    fun isPlaying(): Boolean
     fun onProgress(): LiveData<Long>
     fun onPlayState(): LiveData<Boolean>
     fun onLoopMode(): LiveData<Int>

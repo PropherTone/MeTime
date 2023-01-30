@@ -13,7 +13,6 @@
     <string name="icon">icon</string>
     <string name="model_music">音乐</string>
     <string name="bruh">bruh</string>
-    <string name="behavior_userCard">com.protone.seen.behavior.UserCardBehavior</string>
     <string name="rename">改名</string>
     <string name="moveTo">移动</string>
     <string name="delete">删除</string>

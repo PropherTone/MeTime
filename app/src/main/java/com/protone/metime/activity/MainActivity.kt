@@ -121,12 +121,15 @@ class MainActivity :
             setLoopMode(userConfig.musicLoopMode)
             launchDefault {
                 viewModel.getMusics(userConfig.lastMusicBucket)?.let { list ->
-                    list as MutableList<Music>
                     setMusicList(list)
+                    if (isPlaying() == true) {
+                        refreshPlayer()
+                        return@let
+                    }
                     refresh(
-                        if (userConfig.lastMusic.isNotEmpty())
+                        if (userConfig.lastMusic.isNotEmpty()) {
                             userConfig.lastMusic.toEntity(Music::class.java)
-                        else if (list.isNotEmpty()) list[0] else getEmptyMusic(),
+                        } else if (list.isNotEmpty()) list[0] else getEmptyMusic(),
                         userConfig.lastMusicProgress
                     )
                 }

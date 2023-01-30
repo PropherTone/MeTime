@@ -1,7 +1,9 @@
 package com.protone.music.activity
 
+import android.text.method.ScrollingMovementMethod
 import androidx.activity.viewModels
 import androidx.core.view.isGone
+import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,10 +14,7 @@ import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.baseType.withDefaultContext
-import com.protone.common.context.intent
-import com.protone.common.context.onGlobalLayout
-import com.protone.common.context.root
-import com.protone.common.context.statuesBarHeight
+import com.protone.common.context.*
 import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
@@ -45,7 +44,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
     internal class BindingViewModel {
         lateinit var binding: MusicActivityLayoutBinding
         lateinit var activity: MusicActivity
-        val isBucketOpen: ObservableField<Boolean> = ObservableField()
 
         fun search() {
             activity.sendViewEvent(MusicViewEvent.Search)
@@ -91,14 +89,25 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 it.binding = this
             }
 
+            musicModelContainer.fitStatuesBar()
             musicBucketContainer.fitStatuesBar()
             mySmallMusicPlayer.interceptAlbumCover = true
-            viewModel.playerFitTopH = musicFinish.minimumHeight + statuesBarHeight
+            viewModel.playerFitTopH = musicModelContainer.minHeight + statuesBarHeight
             translatePlayerCoverToFit(true)
+            musicBucketTime.movementMethod = ScrollingMovementMethod()
 
             root.onGlobalLayout {
-                musicBucketContainer.botBlock = resources
-                    .getDimensionPixelSize(R.dimen.model_icon_dimen).toFloat()
+                musicBucketContainer.botBlock =
+                    resources.getDimensionPixelSize(R.dimen.model_icon_dimen).toFloat()
+
+                val location = intArrayOf(0, 0)
+                musicBucketName.getLocationOnScreen(location)
+                musicBucketNamePhanton.y = location[1].toFloat()
+                musicFinish.getLocationOnScreen(location)
+                musicFinishPhanton.y = location[1].toFloat()
+                musicBucketNamePhanton.isGone = false
+                musicFinishPhanton.isGone = false
+
                 musicShowBucket.setOnStateListener(this@MusicActivity)
             }
         }
@@ -134,13 +143,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 mySmallMusicPlayer.coverSwitcher.setOnClickListener {
                     startActivity(MusicViewActivity::class.intent)
                 }
-                val location = intArrayOf(0, 0)
-                musicBucketName.getLocationOnScreen(location)
-                musicBucketNamePhanton.y = location[1].toFloat()
-                musicFinish.getLocationOnScreen(location)
-                musicFinishPhanton.y = location[1].toFloat()
-                musicBucketNamePhanton.isGone = false
-                musicFinishPhanton.isGone = false
             }
         }
     }
@@ -351,8 +353,9 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
             }
             musicBucketName.text = mb.name
             musicBucketNamePhanton.text = mb.name
+            musicBucketTime.text = mb.date
             musicBucketMsg.text =
-                if (mb.date != null && mb.detail != null) "${mb.date} ${mb.detail}" else R.string.none.getString()
+                if (mb.detail != null) "${mb.detail}" else R.string.none.getString()
         }
     }
 
@@ -360,7 +363,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
 
     private fun getMusicListAdapter() = (binding.musicMusicList.adapter as MusicListAdapter?)
 
-    fun MusicActivityLayoutBinding.translatePlayerCoverToFit(fitTop: Boolean) {
+    private fun MusicActivityLayoutBinding.translatePlayerCoverToFit(fitTop: Boolean) {
         TransitionManager.beginDelayedTransition(musicBucketContainer)
         musicPlayerCover.updateLayoutParams {
             if (fitTop) height += viewModel.playerFitTopH
@@ -369,7 +372,23 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
     }
 
     override fun onActive() {
-        binding.model?.isBucketOpen?.set(true)
+        binding.apply {
+            musicBucketContainer.enableRender()
+            var isDone = false
+            musicBucketContainer.show(onStart = {
+                musicBucketContainer.setWillMove(true)
+                musicBucketNamePhanton.isGone = false
+                musicFinishPhanton.isGone = false
+            }, update = {
+                if ((it?.animatedValue as Float) > 0.8f) {
+                    if (isDone) return@show
+                    isDone = true
+                    translatePlayerCoverToFit(true)
+                }
+            }, onEnd = {
+                musicBucketContainer.setWillMove(false)
+            })
+        }
     }
 
     override fun onNegative() {
@@ -378,7 +397,15 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 launch { getMusicBucketAdapter()?.setSelect(viewModel.lastBucket) }
                 return
             }
-            model?.isBucketOpen?.set(false)
+            musicBucketNamePhanton.isGone = true
+            musicFinishPhanton.isGone = true
+            musicBucketContainer.hide(onStart = {
+                musicBucketContainer.setWillMove(true)
+                translatePlayerCoverToFit(false)
+            }, onEnd = {
+                musicBucketContainer.setWillMove(false)
+                musicBucketContainer.disableRender()
+            })
         }
     }
 

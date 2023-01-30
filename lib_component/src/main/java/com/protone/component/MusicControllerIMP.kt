@@ -130,19 +130,25 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         musicBroadCastManager.sendBroadcast(Intent(MUSIC_REFRESH))
     }
 
+    fun refreshPlayer() {
+        getPlayingMusic()?.let { setDetail(it) }
+    }
+
     fun play(music: Music?) {
         binder?.play(music)
         musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY_CUR))
     }
 
-    fun setMusicList(mutableList: MutableList<Music>) {
-        binder?.setPlayList(mutableList)
+    fun setMusicList(list: List<Music>) {
+        binder?.setPlayList(list)
         musicBroadCastManager.sendBroadcast(Intent(MUSIC_REFRESH))
     }
 
     fun getPlayingMusic() = binder?.onMusicPlaying()?.value
 
     fun getProgress() = controller.progress?.barDuration
+
+    fun isPlaying() = binder?.isPlaying()
 
     fun setInterceptAlbumCover(intercept: Boolean) {
         controller.interceptAlbumCover = intercept

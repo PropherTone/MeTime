@@ -55,11 +55,11 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
     open fun checkSelect(position: Int, item: Item) {
         if (selectList.contains(item)) {
             selectList.remove(item)
-            notifyItemChangedChecked(position, UNSELECT)
+            notifyItemChanged(position, UNSELECT)
         } else {
             if (!multiChoose) clearSelected()
             selectList.add(item)
-            notifyItemChangedChecked(position, SELECT)
+            notifyItemChanged(position, SELECT)
         }
     }
 
@@ -74,7 +74,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
             selectList.clear()
             if (itemIndex != -1) {
                 launch {
-                    notifyItemChangedChecked(itemIndex, UNSELECT)
+                    notifyItemChanged(itemIndex, UNSELECT)
                 }
             }
         }
@@ -87,7 +87,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
         selectList.clear()
         list.forEach {
             if (it != -1) launch {
-                notifyItemChangedChecked(it, UNSELECT)
+                notifyItemChanged(it, UNSELECT)
             }
         }
     }
