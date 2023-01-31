@@ -7,7 +7,9 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.core.view.marginStart
 import androidx.databinding.BindingAdapter
+import androidx.transition.TransitionManager
 import com.protone.common.context.marginStart
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.component.view.customView.BlurTableCardView
@@ -17,16 +19,21 @@ import com.protone.component.view.customView.musicPlayer.MusicPlayerViewLite
 import com.protone.music.databinding.MusicActivityLayoutBinding
 
 @BindingAdapter(value = ["State", "Binding"], requireAll = true)
-internal fun MusicPlayerViewLite.onStateChange(isOpen: Boolean, binding: MusicActivityLayoutBinding) {
+internal fun MusicPlayerViewLite.onStateChange(
+    isOpen: Boolean,
+    binding: MusicActivityLayoutBinding
+) {
+    if (binding.musicFinish.measuredWidth <= 0) return
+    TransitionManager.beginDelayedTransition(binding.musicBucketContainer)
     if (isOpen) {
-        marginStart(binding.musicFinish.measuredWidth)
+        marginStart(binding.musicFinish.measuredWidth - binding.musicFinish.paddingStart)
     } else {
         marginStart(0)
     }
 }
 
 @BindingAdapter(value = ["ShowDetail"], requireAll = true)
-fun ImageView.showDetail(binding: MusicActivityLayoutBinding) {
+internal fun ImageView.showDetail(binding: MusicActivityLayoutBinding) {
     binding.apply {
         val updateListener = ValueAnimator.AnimatorUpdateListener {
             musicModelContainer.progress = it.animatedValue as Float
@@ -60,7 +67,7 @@ fun ImageView.showDetail(binding: MusicActivityLayoutBinding) {
 }
 
 @BindingAdapter(value = ["BlurInit"], requireAll = true)
-fun BlurTableCardView.initRenderBlur(binding: MusicActivityLayoutBinding) {
+internal fun BlurTableCardView.initRenderBlur(binding: MusicActivityLayoutBinding) {
     binding.apply {
         initBlurTool(
             DefaultBlurController(

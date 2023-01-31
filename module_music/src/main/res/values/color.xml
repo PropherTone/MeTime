@@ -2,4 +2,5 @@
 <resources>
     <color name="bucket_normal">#1A000000</color>
     <color name="bucket_selected">#26000000</color>
+    <color name="bucket_clicked">#0D000000</color>
 </resources>

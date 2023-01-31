@@ -91,12 +91,12 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 it.activity = this@MusicActivity
                 it.binding = this
             }
-
-            musicFinish.fitStatuesBar()
+            val barHeight = statuesBarHeight
+            musicFinish.y += barHeight
             musicModelContainer.fitStatuesBar()
             musicBucketContainer.fitStatuesBar()
             mySmallMusicPlayer.interceptAlbumCover = true
-            viewModel.playerFitTopH = statuesBarHeight
+            viewModel.playerFitTopH = barHeight
             translatePlayerCoverToFit(true)
             musicBucketTime.movementMethod = ScrollingMovementMethod()
 
@@ -370,16 +370,18 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
             musicBucketContainer.enableRender()
             var isDone = false
             musicBucketContainer.show(onStart = {
+                binding.model?.isContainerOpen?.set(true)
                 musicBucketContainer.setWillMove(true)
             }, update = {
                 if ((it?.animatedValue as Float) > 0.8f) {
                     if (isDone) return@show
                     isDone = true
+
                     translatePlayerCoverToFit(true)
                 }
             }, onEnd = {
                 musicBucketContainer.setWillMove(false)
-                binding.model?.isContainerOpen?.set(true)
+
             })
         }
     }

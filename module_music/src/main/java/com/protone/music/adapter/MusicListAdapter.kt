@@ -42,8 +42,9 @@ class MusicListAdapter(context: Context, musicList: Collection<Music>) :
                     musicListTime,
                     musicListDetail,
                     dispatch = false,
-                    backgroundColor = com.protone.component.R.color.foreDark,
-                    textsColor = com.protone.component.R.color.white
+                    backgroundColor = R.color.bucket_normal,
+                    textsColor = com.protone.component.R.color.white,
+                    backgroundColorPressed = R.color.bucket_selected
                 )
             }
         }
@@ -95,7 +96,7 @@ class MusicListAdapter(context: Context, musicList: Collection<Music>) :
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
                     clearAllSelected()
                     itemClickChange(
-                        com.protone.component.R.color.blue_2,
+                        R.color.bucket_clicked,
                         com.protone.component.R.color.white,
                         musicListContainer,
                         musicListInContainer,

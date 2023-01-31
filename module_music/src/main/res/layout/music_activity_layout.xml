@@ -26,8 +26,8 @@
             android:id="@+id/music_finish"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:contentDescription="@string/action"
             android:layout_gravity="top|start"
+            android:contentDescription="@string/action"
             android:elevation="@dimen/small_elevation"
             android:onClick="@{()->model.finish()}"
             android:padding="@dimen/main_padding"
@@ -220,10 +220,11 @@
 
             <com.protone.component.view.customView.musicPlayer.MusicPlayerViewLite
                 android:id="@+id/mySmallMusicPlayer"
+                Binding="@{model.binding}"
+                State="@{model.isContainerOpen()}"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/small_music_player"
-                State="@{model.isContainerOpen()}"
-                Binding="@{model.binding}"
+                android:layout_marginStart="?attr/actionBarSize"
                 app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
