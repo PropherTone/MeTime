@@ -2,121 +2,112 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/musicBucket_card"
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/musicBucket_board"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/list_item_height"
-        app:cardBackgroundColor="@color/transparent"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="1dp">
+        android:layout_height="wrap_content"
+        app:layoutDescription="@xml/music_bucket_adapter_layout_scene">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <View
+            android:id="@+id/back"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/main_background">
+            android:layout_height="@dimen/list_item_height"
+            android:background="@color/bucket_normal"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/musicBucket_edit"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/icon_margin"
-                android:contentDescription="@string/action"
-                android:padding="@dimen/icon_padding_mid"
-                android:src="@drawable/ic_baseline_edit_24_white"
-                app:layout_constraintEnd_toStartOf="@id/musicBucket_delete"
-                app:layout_constraintStart_toStartOf="parent" />
+        <ImageView
+            android:id="@+id/musicBucket_icon"
+            android:layout_width="@dimen/list_item_height"
+            android:layout_height="@dimen/list_item_height"
+            android:contentDescription="@string/icon"
+            android:padding="@dimen/main_padding"
+            android:scaleType="centerCrop"
+            android:src="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/back"
+            app:layout_constraintStart_toStartOf="@id/back"
+            app:layout_constraintTop_toTopOf="@id/back" />
 
-            <ImageView
-                android:id="@+id/musicBucket_delete"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/action"
-                android:padding="@dimen/icon_padding_mid"
-                android:src="@drawable/ic_baseline_delete_24_white"
-                app:layout_constraintEnd_toStartOf="@id/musicBucket_addList"
-                app:layout_constraintStart_toEndOf="@id/musicBucket_edit" />
+        <TextView
+            android:id="@+id/musicBucket_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/texts_margin"
+            android:letterSpacing="0.05"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_text"
+            app:layout_constraintBottom_toTopOf="@id/musicBucket_time"
+            app:layout_constraintStart_toEndOf="@+id/musicBucket_icon"
+            app:layout_constraintTop_toTopOf="@id/back"
+            app:layout_constraintVertical_chainStyle="packed" />
 
-            <ImageView
-                android:id="@+id/musicBucket_addList"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/icon_margin"
-                android:contentDescription="@string/action"
-                android:padding="@dimen/icon_padding_mid"
-                android:src="@drawable/ic_baseline_more_24_white"
-                app:layout_constraintEnd_toStartOf="@id/musicBucket_action"
-                app:layout_constraintStart_toEndOf="@id/musicBucket_delete" />
+        <TextView
+            android:id="@+id/musicBucket_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toBottomOf="@id/back"
+            app:layout_constraintStart_toStartOf="@+id/musicBucket_name"
+            app:layout_constraintTop_toBottomOf="@+id/musicBucket_name" />
 
-            <ImageView
-                android:id="@+id/musicBucket_action"
-                android:layout_width="@dimen/small_Icon"
-                android:layout_height="@dimen/list_item_height"
-                android:contentDescription="@string/action"
-                android:src="@drawable/ic_baseline_more_vert_24_white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/musicBucket_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/texts_margin"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toBottomOf="@id/back"
+            app:layout_constraintEnd_toStartOf="@id/musicBucket_action"
+            app:layout_constraintTop_toTopOf="@id/back" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/musicBucket_action"
+            android:layout_width="@dimen/small_Icon"
+            android:layout_height="@dimen/list_item_height"
+            android:contentDescription="@string/action"
+            android:paddingTop="@dimen/bucket_btn_padding"
+            android:paddingBottom="@dimen/bucket_btn_padding"
+            android:src="@drawable/ic_baseline_more_vert_24_white"
+            app:layout_constraintBottom_toBottomOf="@id/back"
+            app:layout_constraintEnd_toEndOf="@id/back"
+            app:layout_constraintTop_toTopOf="@id/back" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/musicBucketBoard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/small_Icon"
-            android:background="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/musicBucket_edit"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/action"
+            android:padding="@dimen/bucket_btn_padding"
+            android:src="@drawable/ic_baseline_edit_24_white"
+            app:layout_constraintBottom_toBottomOf="@id/musicBucket_addList"
+            app:layout_constraintEnd_toStartOf="@id/musicBucket_addList"
+            app:layout_constraintStart_toStartOf="@id/back"
+            app:layout_constraintTop_toTopOf="@id/musicBucket_addList" />
 
-            <ImageView
-                android:id="@+id/musicBucket_icon"
-                android:layout_width="@dimen/list_item_height"
-                android:layout_height="@dimen/list_item_height"
-                android:contentDescription="@string/icon"
-                android:padding="@dimen/main_padding"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/musicBucket_addList"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/list_icon"
+            android:contentDescription="@string/action"
+            android:padding="@dimen/bucket_btn_padding"
+            android:src="@drawable/ic_baseline_add_24_white"
+            app:layout_constraintEnd_toStartOf="@id/musicBucket_delete"
+            app:layout_constraintStart_toEndOf="@id/musicBucket_edit"
+            app:layout_constraintTop_toBottomOf="@id/back" />
 
-            <TextView
-                android:id="@+id/musicBucket_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/texts_margin"
-                android:letterSpacing="0.05"
-                android:textColor="@color/black"
-                android:textSize="@dimen/title_text"
-                app:layout_constraintBottom_toBottomOf="@+id/musicBucket_time"
-                app:layout_constraintStart_toEndOf="@+id/musicBucket_icon"
-                app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/musicBucket_delete"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/action"
+            android:padding="@dimen/bucket_btn_padding"
+            android:src="@drawable/ic_baseline_delete_24_white"
+            app:layout_constraintBottom_toBottomOf="@id/musicBucket_addList"
+            app:layout_constraintEnd_toEndOf="@id/back"
+            app:layout_constraintStart_toEndOf="@id/musicBucket_addList"
+            app:layout_constraintTop_toTopOf="@id/musicBucket_addList" />
 
-            <TextView
-                android:id="@+id/musicBucket_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/texts_margin"
-                android:text=""
-                android:textSize="@dimen/sub_text"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/musicBucket_name"
-                app:layout_constraintTop_toBottomOf="@+id/musicBucket_name" />
-
-            <TextView
-                android:id="@+id/musicBucket_num"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/texts_margin"
-                android:text=""
-                android:textSize="@dimen/sub_text"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 
 </layout>

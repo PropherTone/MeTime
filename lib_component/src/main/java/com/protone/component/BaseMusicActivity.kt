@@ -9,7 +9,7 @@ import com.protone.common.context.isServiceRunning
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.service.MusicBinder
 import com.protone.component.service.MusicService
-import com.protone.component.service.observeServiceStatues
+import com.protone.component.service.observeServiceState
 import com.protone.component.view.customView.musicPlayer.bitmapCachePool
 import kotlinx.coroutines.launch
 
@@ -20,7 +20,7 @@ abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : 
 
     fun bindMusicService(block: suspend (MusicBinder) -> Unit) {
         if (!isServiceRunning(MusicService::class.java)) {
-            observeServiceStatues(this, MusicService::class.java) {
+            observeServiceState(this, MusicService::class.java) {
                 connectService(block)
             }
             startService(MusicService::class.intent)

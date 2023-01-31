@@ -22,25 +22,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <ImageView
+            android:id="@+id/music_finish"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:contentDescription="@string/action"
+            android:layout_gravity="top|start"
+            android:elevation="@dimen/small_elevation"
+            android:onClick="@{()->model.finish()}"
+            android:padding="@dimen/main_padding"
+            android:src="@drawable/ic_round_arrow_left_white_24" />
+
         <androidx.constraintlayout.motion.widget.MotionLayout
             android:id="@+id/music_model_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
             android:minHeight="?attr/actionBarSize"
             app:layoutDescription="@xml/music_layout_scene_tmp">
-
-            <ImageView
-                android:id="@+id/music_finish"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:contentDescription="@string/action"
-                android:elevation="@dimen/small_elevation"
-                android:minHeight="?attr/actionBarSize"
-                android:onClick="@{()->model.finish()}"
-                android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_round_arrow_left_white_24"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/music_showBucketDetail"
@@ -48,7 +47,6 @@
                 android:layout_width="?attr/actionBarSize"
                 android:layout_height="?attr/actionBarSize"
                 android:contentDescription="@string/action"
-                android:elevation="@dimen/small_elevation"
                 android:padding="@dimen/main_padding"
                 android:src="@drawable/ic_baseline_arrow_drop_down_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -153,7 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:overScrollMode="never"
-                android:paddingBottom="@dimen/model_icon_dimen"
+                android:paddingBottom="@dimen/small_music_player"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -178,13 +176,13 @@
                 android:layout_height="@dimen/small_Icon"
                 android:layout_marginTop="@dimen/small_margin"
                 android:layout_marginEnd="@dimen/main_margin"
-                android:layout_marginBottom="@dimen/main_margin"
-                app:constraint_referenced_ids="search"
+                android:layout_marginBottom="@dimen/fab_margin_bot"
                 android:background="@drawable/oval_fore_ripple_dark"
                 android:contentDescription="@string/action"
                 android:onClick="@{()->model.locateMusic()}"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_round_my_location_24_white"
+                app:constraint_referenced_ids="search"
                 app:layout_constraintBottom_toBottomOf="@id/music_musicList"
                 app:layout_constraintEnd_toEndOf="@id/music_musicList" />
 
@@ -195,16 +193,14 @@
             BlurInit="@{model.binding}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
             android:clickable="true"
-            android:elevation="2dp"
             android:focusable="true"
             android:orientation="vertical">
 
             <com.protone.component.view.customView.SwitchImageView
                 android:id="@+id/musicPlayerCover"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/model_icon_dimen"
+                android:layout_height="@dimen/small_music_player"
                 android:elevation="0dp"
                 app:layout_constraintBottom_toBottomOf="@id/mySmallMusicPlayer" />
 
@@ -225,7 +221,9 @@
             <com.protone.component.view.customView.musicPlayer.MusicPlayerViewLite
                 android:id="@+id/mySmallMusicPlayer"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/model_icon_dimen"
+                android:layout_height="@dimen/small_music_player"
+                State="@{model.isContainerOpen()}"
+                Binding="@{model.binding}"
                 app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -255,27 +253,6 @@
                 app:layout_constraintTop_toBottomOf="@id/music_bucket" />
 
         </com.protone.component.view.customView.BlurTableCardView>
-
-        <ImageView
-            android:id="@+id/music_finishPhanton"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:contentDescription="@string/action"
-            android:elevation="@dimen/small_elevation"
-            android:onClick="@{()->model.finish()}"
-            android:padding="@dimen/icon_padding_mid"
-            android:src="@drawable/ic_round_arrow_left_white_24"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/music_bucketNamePhanton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:elevation="@dimen/small_elevation"
-            android:textColor="@color/white"
-            android:textSize="@dimen/title_text"
-            android:visibility="gone" />
 
     </FrameLayout>
 

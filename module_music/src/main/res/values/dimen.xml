@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="small_music_player">60dp</dimen>
+    <dimen name="fab_margin_bot">70dp</dimen>
+    <dimen name="bucket_btn_padding">16dp</dimen>
+</resources>

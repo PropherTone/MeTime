@@ -182,6 +182,7 @@ class MusicService : BaseService(), IMusicService {
         if (currentMusic.value == null) {
             musicPlayer.play(null)
         } else musicPlayer.play(music)
+        currentMusic.postValue(music)
     }
 
     override fun pause() {

@@ -8,13 +8,13 @@ import com.protone.common.context.isKeyBroadShow
 import com.protone.common.context.navigationBarHeight
 import java.lang.ref.WeakReference
 
-class SoftInputStatues(context: Context) {
+class SoftInputState(context: Context) {
 
     private val weakContext: WeakReference<Context> = WeakReference(context)
 
     private var listener: View.OnLayoutChangeListener? = null
 
-    fun setSoftInputStatuesListener(onSoftInput: (Int, Boolean) -> Unit = { _, _ -> }) {
+    fun setSoftInputStateListener(onSoftInput: (Int, Boolean) -> Unit = { _, _ -> }) {
         weakContext.get()?.let {
             if (it !is Activity) return@let
             isKeyBroadShow = false

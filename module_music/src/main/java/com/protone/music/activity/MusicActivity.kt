@@ -3,7 +3,6 @@ package com.protone.music.activity
 import android.text.method.ScrollingMovementMethod
 import androidx.activity.viewModels
 import androidx.core.view.isGone
-import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +13,10 @@ import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.baseType.withDefaultContext
-import com.protone.common.context.*
+import com.protone.common.context.intent
+import com.protone.common.context.onGlobalLayout
+import com.protone.common.context.root
+import com.protone.common.context.statuesBarHeight
 import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
@@ -44,6 +46,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
     internal class BindingViewModel {
         lateinit var binding: MusicActivityLayoutBinding
         lateinit var activity: MusicActivity
+        val isContainerOpen = ObservableField(true)
 
         fun search() {
             activity.sendViewEvent(MusicViewEvent.Search)
@@ -89,25 +92,17 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 it.binding = this
             }
 
+            musicFinish.fitStatuesBar()
             musicModelContainer.fitStatuesBar()
             musicBucketContainer.fitStatuesBar()
             mySmallMusicPlayer.interceptAlbumCover = true
-            viewModel.playerFitTopH = musicModelContainer.minHeight + statuesBarHeight
+            viewModel.playerFitTopH = statuesBarHeight
             translatePlayerCoverToFit(true)
             musicBucketTime.movementMethod = ScrollingMovementMethod()
 
             root.onGlobalLayout {
                 musicBucketContainer.botBlock =
                     resources.getDimensionPixelSize(R.dimen.model_icon_dimen).toFloat()
-
-                val location = intArrayOf(0, 0)
-                musicBucketName.getLocationOnScreen(location)
-                musicBucketNamePhanton.y = location[1].toFloat()
-                musicFinish.getLocationOnScreen(location)
-                musicFinishPhanton.y = location[1].toFloat()
-                musicBucketNamePhanton.isGone = false
-                musicFinishPhanton.isGone = false
-
                 musicShowBucket.setOnStateListener(this@MusicActivity)
             }
         }
@@ -352,7 +347,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
             }
             musicBucketName.text = mb.name
-            musicBucketNamePhanton.text = mb.name
             musicBucketTime.text = mb.date
             musicBucketMsg.text =
                 if (mb.detail != null) "${mb.detail}" else R.string.none.getString()
@@ -377,8 +371,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
             var isDone = false
             musicBucketContainer.show(onStart = {
                 musicBucketContainer.setWillMove(true)
-                musicBucketNamePhanton.isGone = false
-                musicFinishPhanton.isGone = false
             }, update = {
                 if ((it?.animatedValue as Float) > 0.8f) {
                     if (isDone) return@show
@@ -387,6 +379,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 }
             }, onEnd = {
                 musicBucketContainer.setWillMove(false)
+                binding.model?.isContainerOpen?.set(true)
             })
         }
     }
@@ -397,11 +390,10 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 launch { getMusicBucketAdapter()?.setSelect(viewModel.lastBucket) }
                 return
             }
-            musicBucketNamePhanton.isGone = true
-            musicFinishPhanton.isGone = true
             musicBucketContainer.hide(onStart = {
                 musicBucketContainer.setWillMove(true)
                 translatePlayerCoverToFit(false)
+                binding.model?.isContainerOpen?.set(false)
             }, onEnd = {
                 musicBucketContainer.setWillMove(false)
                 musicBucketContainer.disableRender()

@@ -1,9 +1,11 @@
 package com.protone.music.adapter
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.protone.common.baseType.getColor
 import com.protone.common.baseType.getDrawable
@@ -11,7 +13,6 @@ import com.protone.common.context.marginEnd
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
-import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.music.R
@@ -71,7 +72,7 @@ class MusicBucketAdapter(context: Context) :
 
     override val select: (MusicBucketAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
         { binding, _, isSelect ->
-            binding.musicBucketBoard.setBackgroundColor(
+            binding.back.setBackgroundColor(
                 (if (isSelect) R.color.bucket_selected else R.color.bucket_normal).getColor()
             )
         }
@@ -132,28 +133,18 @@ class MusicBucketAdapter(context: Context) :
         holder.binding.apply {
             changeIcon(bucket)
             changeName(bucket.name)
+            changeTime(bucket.date)
             changeSize(bucket.size)
 
-            musicBucketBoard.setOnClickListener {
+            root.setOnClickListener {
                 val newData = mList[holder.layoutPosition]
                 if (!selectList.contains(newData)) checkSelect(position, newData)
                 musicBucketEventListener?.onBucketClicked(newData)
             }
 
             if (bucket.name == ALL_MUSIC) {
-                musicBucketBoard.marginEnd(0)
+                musicBucketAction.isGone = true
             } else musicBucketAction.setOnClickListener {
-                if (musicBucketBoard.isVisible) {
-                    AnimationHelper.translationX(
-                        musicBucketBoard,
-                        0f,
-                        -musicBucketBoard.measuredWidth.toFloat(),
-                        200,
-                        play = true,
-                        doOnEnd = { musicBucketBoard.isVisible = false }
-                    )
-                    return@setOnClickListener
-                }
                 closeMusicBucketBoard()
             }
             musicBucketEdit.setOnClickListener {
@@ -179,16 +170,14 @@ class MusicBucketAdapter(context: Context) :
     }
 
     private fun MusicBucketAdapterLayoutBinding.closeMusicBucketBoard() {
-        AnimationHelper.translationX(
-            musicBucketBoard,
-            -musicBucketBoard.measuredWidth.toFloat(),
-            0f,
-            200,
-            play = true,
-            doOnStart = {
-                musicBucketBoard.isVisible = true
+        if (!root.isVisible) return
+        if (musicBucketBoard.progress != 0f && musicBucketBoard.progress != 1f) return
+        val isOpen = musicBucketBoard.progress == 1f
+        ValueAnimator.ofFloat(if (isOpen) 1f else 0f, if (isOpen) 0f else 1f).apply {
+            addUpdateListener {
+                musicBucketBoard.progress = it.animatedValue as Float
             }
-        )
+        }.start()
     }
 
     private fun MusicBucketAdapterLayoutBinding.changeIcon(musicBucket: MusicBucket) {
@@ -196,13 +185,18 @@ class MusicBucketAdapter(context: Context) :
             when {
                 musicBucket.icon != null -> loadIcon(it, iconPath = musicBucket.icon)
                 musicBucket.tempIcon != null -> loadIcon(it, iconPath = musicBucket.tempIcon)
-                else -> loadIcon(it, drawable = R.drawable.ic_album_black.getDrawable())
+                else -> loadIcon(it, drawable = R.drawable.ic_album.getDrawable())
             }
         }
     }
 
     private fun MusicBucketAdapterLayoutBinding.changeName(name: String) {
         musicBucketName.text = name
+    }
+
+    private fun MusicBucketAdapterLayoutBinding.changeTime(time: String?) {
+        if (time == null) return
+        musicBucketTime.text = time
     }
 
     private fun MusicBucketAdapterLayoutBinding.changeSize(size: Int) {
@@ -218,7 +212,7 @@ class MusicBucketAdapter(context: Context) :
             .with(context)
             .skipMemoryCache()
             .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .placeholder(R.drawable.ic_album_black)
+            .placeholder(R.drawable.ic_album)
             .overwrite(imageView.measuredWidth, imageView.measuredHeight)
             .into(imageView)
     }

@@ -3,15 +3,27 @@ package com.protone.music.bindingAdapter
 import android.animation.ValueAnimator
 import android.text.method.ScrollingMovementMethod
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
+import com.protone.common.context.marginStart
 import com.protone.common.utils.displayUtils.AnimationHelper
 import com.protone.component.view.customView.BlurTableCardView
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
+import com.protone.component.view.customView.musicPlayer.MusicPlayerViewLite
 import com.protone.music.databinding.MusicActivityLayoutBinding
+
+@BindingAdapter(value = ["State", "Binding"], requireAll = true)
+internal fun MusicPlayerViewLite.onStateChange(isOpen: Boolean, binding: MusicActivityLayoutBinding) {
+    if (isOpen) {
+        marginStart(binding.musicFinish.measuredWidth)
+    } else {
+        marginStart(0)
+    }
+}
 
 @BindingAdapter(value = ["ShowDetail"], requireAll = true)
 fun ImageView.showDetail(binding: MusicActivityLayoutBinding) {
@@ -30,15 +42,17 @@ fun ImageView.showDetail(binding: MusicActivityLayoutBinding) {
         end.addUpdateListener(updateListener)
         val endAnimator = AnimationHelper.animatorSet(end, animatorEndSet)
 
+        DecelerateInterpolator().also {
+            startAnimator.interpolator = it
+            endAnimator.interpolator = it
+        }
+
         setOnClickListener {
             if (startAnimator.isRunning || endAnimator.isRunning) {
                 return@setOnClickListener
             }
             when (musicModelContainer.progress) {
-                0f -> {
-                    locate.isVisible = false
-                    startAnimator.start()
-                }
+                0f -> startAnimator.start()
                 1f -> endAnimator.start()
             }
         }
@@ -55,7 +69,6 @@ fun BlurTableCardView.initRenderBlur(binding: MusicActivityLayoutBinding) {
                     it.scaleFactor = 16f
                 })
         )
-        setForeColor(root.context.getColor(com.protone.component.R.color.foreDark))
         root.viewTreeObserver.addOnPreDrawListener {
             renderFrame()
             true

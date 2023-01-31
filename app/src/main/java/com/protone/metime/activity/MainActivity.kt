@@ -109,7 +109,12 @@ class MainActivity :
         initTimeList()
 
         musicController.bindMusicService()
-
+        startActivity(RouterPath.MusicRouterPath.Main) {
+            withTransition(
+                com.protone.component.R.anim.card_top_in,
+                com.protone.component.R.anim.card_top_out
+            )
+        }
         observeViewEvent()
     }
 

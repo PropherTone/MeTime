@@ -8,6 +8,7 @@ import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.EventCachePool
+import com.protone.common.utils.todayDate
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
@@ -194,11 +195,10 @@ class MusicModel : BaseViewModel() {
             defaultBucket = MusicBucket(
                 ALL_MUSIC,
                 null,
-                0,
+                musicDAO.getAllMusicSize(),
                 null,
-                null
+                "最后更新：${todayDate("yyyy/MM/dd hh:mm:ss")}"
             ).also { it.tempIcon = musicDAO.getNewestMusicUri().toString() }
-            delay(1000L)
         }
     }
 

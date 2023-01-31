@@ -21,6 +21,9 @@ sealed class MusicDAO : MusicBucketDAO() {
     suspend fun getAllMusic(): List<Music>? =
         withIOContext { musicDAO.getAllMusic() }
 
+    suspend fun getAllMusicSize(): Int =
+        withIOContext { musicDAO.getAllMusicSize() }
+
     suspend fun getMusicByUri(uri: Uri): Music? =
         withIOContext { musicDAO.getMusicByUri(uri) }
 

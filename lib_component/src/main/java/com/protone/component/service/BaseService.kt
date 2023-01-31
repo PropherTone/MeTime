@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 val serviceObserver = MutableSharedFlow<String>()
 
-inline fun observeServiceStatues(
+inline fun observeServiceState(
     scope: CoroutineScope,
     serviceClazz: Class<out Service>,
     crossinline block: () -> Unit

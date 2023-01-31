@@ -21,6 +21,9 @@ interface MusicDAO {
     @Query("SELECT * FROM Music ORDER BY year DESC")
     fun getAllMusic(): List<Music>?
 
+    @Query("SELECT count(musicBaseId) FROM Music")
+    fun getAllMusicSize(): Int
+
     @Query("SELECT uri FROM (SELECT uri,MAX(year) FROM Music)")
     fun getNewestMusicUri(): Uri?
 

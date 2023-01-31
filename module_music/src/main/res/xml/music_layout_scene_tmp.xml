@@ -5,19 +5,9 @@
     <ConstraintSet android:id="@+id/start">
 
         <Constraint
-            android:id="@+id/music_finish"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:elevation="@dimen/small_elevation"
-            android:padding="@dimen/main_padding"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Constraint
             android:id="@+id/music_showBucketDetail"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:elevation="@dimen/small_elevation"
             android:padding="@dimen/main_padding"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -36,10 +26,10 @@
             android:id="@+id/music_bucketName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/music_finish"
+            app:layout_constraintBottom_toBottomOf="@id/music_showBucketDetail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/music_finish" />
+            app:layout_constraintTop_toTopOf="@id/music_showBucketDetail" />
 
         <Constraint
             android:id="@+id/music_bucketTime"
@@ -100,11 +90,11 @@
             android:id="@+id/music_musicList"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:paddingBottom="@dimen/model_icon_dimen"
+            android:paddingBottom="@dimen/small_music_player"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/music_finish" />
+            app:layout_constraintTop_toBottomOf="@+id/music_showBucketDetail" />
 
         <Constraint
             android:id="@+id/search"
@@ -121,7 +111,7 @@
             android:layout_height="@dimen/small_Icon"
             android:layout_marginTop="@dimen/small_margin"
             android:layout_marginEnd="@dimen/main_margin"
-            android:layout_marginBottom="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/fab_margin_bot"
             android:padding="@dimen/icon_padding"
             android:visibility="visible"
             app:constraint_referenced_ids="search"
@@ -133,19 +123,9 @@
     <ConstraintSet android:id="@+id/end">
 
         <Constraint
-            android:id="@+id/music_finish"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:elevation="@dimen/small_elevation"
-            android:padding="@dimen/main_padding"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Constraint
             android:id="@+id/music_showBucketDetail"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:elevation="@dimen/small_elevation"
             android:padding="@dimen/main_padding"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -159,7 +139,7 @@
             android:padding="@dimen/icon_padding"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/music_finish" />
+            app:layout_constraintTop_toBottomOf="@id/music_showBucketDetail" />
 
         <Constraint
             android:id="@+id/music_bucketName"
@@ -251,7 +231,7 @@
             android:layout_height="@dimen/small_Icon"
             android:layout_marginTop="@dimen/small_margin"
             android:layout_marginEnd="@dimen/main_margin"
-            android:layout_marginBottom="@dimen/main_margin"
+            android:layout_marginBottom="@dimen/fab_margin_bot"
             android:padding="@dimen/icon_padding"
             android:visibility="gone"
             app:constraint_referenced_ids="search"
