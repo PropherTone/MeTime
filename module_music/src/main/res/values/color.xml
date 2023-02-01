@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="bucket_normal">#1A000000</color>
-    <color name="bucket_selected">#26000000</color>
+    <color name="bucket_selected">#803B84FF</color>
     <color name="bucket_clicked">#0D000000</color>
 </resources>

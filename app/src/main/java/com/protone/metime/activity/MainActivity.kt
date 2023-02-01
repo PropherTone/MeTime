@@ -109,12 +109,7 @@ class MainActivity :
         initTimeList()
 
         musicController.bindMusicService()
-        toGallery {
-            withTransition(
-                com.protone.component.R.anim.card_in_ltr,
-                com.protone.component.R.anim.card_out_ltr
-            )
-        }
+
         observeViewEvent()
     }
 
