@@ -13,17 +13,21 @@ class GalleryListFragmentViewModel : BaseViewModel() {
         data class OnGalleryMediasSelect(val medias: List<GalleryMedia>) : GallerySelectData()
     }
 
-    suspend fun getGalleryData(gallery: Gallery, isVideo: Boolean, combine: Boolean) = withIOContext {
-        galleryDAO.run {
-            if (gallery.custom) return@withIOContext getGalleryBucket(gallery.name)?.galleryBucketId
-                ?.let { getGalleryMediasByBucket(it) }
-            when {
-                combine && gallery.name == ALL_GALLERY -> getAllSignedMedia()
-                combine -> getAllMediaByGallery(gallery.name)
-                gallery.name == ALL_GALLERY -> getAllMediaByType(isVideo)
-                else -> getAllMediaByGallery(gallery.name, isVideo)
+    suspend fun getGalleryData(gallery: Gallery, isVideo: Boolean, combine: Boolean) =
+        withIOContext {
+            galleryDAO.run {
+                if (gallery.custom) return@withIOContext getGalleryBucket(gallery.name)
+                    ?.galleryBucketId?.let {
+                        if (combine) getGalleryMediasByBucket(it)
+                        else getGalleryMediasByBucket(it, isVideo)
+                    }
+                when {
+                    combine && gallery.name == ALL_GALLERY -> getAllSignedMedia()
+                    combine -> getAllMediaByGallery(gallery.name)
+                    gallery.name == ALL_GALLERY -> getAllMediaByType(isVideo)
+                    else -> getAllMediaByGallery(gallery.name, isVideo)
+                }
             }
         }
-    }
 
 }

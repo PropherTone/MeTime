@@ -63,11 +63,10 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
             notifyItemChanged(position, SELECT)
         }
     }
-
-    abstract val select: (content: VB, position: Int, isSelect: Boolean) -> Unit
+    
     abstract fun itemIndex(path: Item): Int
 
-    fun setSelect(content: VB, position: Int, state: Boolean) = select(content, position, state)
+    abstract fun setSelect(content: VB, position: Int, isSelect: Boolean)
 
     fun clearSelected() {
         if (selectList.size > 0) {

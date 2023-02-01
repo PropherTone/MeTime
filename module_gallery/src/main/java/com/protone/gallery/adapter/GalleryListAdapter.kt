@@ -89,13 +89,16 @@ class GalleryListAdapter(
         }
     }
 
-    override val select: (GalleryListAdapterLayoutBinding, Int, Boolean) -> Unit =
-        { binding, _, select ->
-            binding.apply {
-                checkSeen.isVisible = select
-                checkCheck.isChecked = select
-            }
+    override fun setSelect(
+        content: GalleryListAdapterLayoutBinding,
+        position: Int,
+        isSelect: Boolean
+    ) {
+        content.apply {
+            checkSeen.isVisible = isSelect
+            checkCheck.isChecked = isSelect
         }
+    }
 
     override fun itemIndex(path: GalleryMedia): Int {
         return mList.indexOf(path)
@@ -164,6 +167,7 @@ class GalleryListAdapter(
                         onSelectMod = true
                         checkSelect(position, mList[position])
                         onSelectListener?.select(mList[position])
+                        onSelectListener?.onItemLongClick()
                         true
                     }
                 }
@@ -194,6 +198,12 @@ class GalleryListAdapter(
                 else -> itemCount
             }
         )
+    }
+
+    fun select(position: Int) {
+        if (position <= 0 || position >= mList.size) return
+        selectList.add(mList[position])
+        notifyItemChanged(position, SELECT)
     }
 
     fun selectAll() {
@@ -230,6 +240,7 @@ class GalleryListAdapter(
         fun select(media: GalleryMedia)
         fun select(medias: List<GalleryMedia>)
         fun openView(galleryMedia: GalleryMedia, elementView: View)
+        fun onItemLongClick()
     }
 
     fun setNewSelectList(list: List<GalleryMedia>) {

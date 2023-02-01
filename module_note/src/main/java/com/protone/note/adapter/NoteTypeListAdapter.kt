@@ -20,10 +20,9 @@ class NoteTypeListAdapter(
         NoteTypeListAdapterDataProxy().block()
     }
 
-    override val select: (NoteTpyeListAdapterBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, select ->
-            binding.noteTypeSelectGuide.isGone = !select
-        }
+    override fun setSelect(content: NoteTpyeListAdapterBinding, position: Int, isSelect: Boolean) {
+        content.noteTypeSelectGuide.isGone = !isSelect
+    }
 
     override fun itemIndex(path: NoteDir): Int = mList.indexOf(path)
 

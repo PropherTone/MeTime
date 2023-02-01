@@ -2,7 +2,6 @@ package com.protone.music.activity
 
 import android.text.method.ScrollingMovementMethod
 import androidx.activity.viewModels
-import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +27,7 @@ import com.protone.component.view.customView.StatusImageView
 import com.protone.component.view.customView.musicPlayer.getBitmap
 import com.protone.music.adapter.MusicBucketAdapter
 import com.protone.music.adapter.MusicListAdapter
-import com.protone.music.databinding.MusicActivityLayoutBinding
+import com.protone.music.databinding.MusicActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 import com.protone.music.viewModel.MusicModel
 import com.protone.music.viewModel.MusicModel.MusicEvent
@@ -38,15 +37,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Route(path = RouterPath.MusicRouterPath.Main)
-class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, MusicViewEvent>(),
+class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicViewEvent>(),
     StatusImageView.StateListener {
 
     override val viewModel: MusicModel by viewModels()
 
     internal class BindingViewModel {
-        lateinit var binding: MusicActivityLayoutBinding
         lateinit var activity: MusicActivity
         val isContainerOpen = ObservableField(true)
+        lateinit var binding: MusicActivityBinding
 
         fun search() {
             activity.sendViewEvent(MusicViewEvent.Search)
@@ -77,8 +76,8 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
         }
     }
 
-    override fun createView(): MusicActivityLayoutBinding {
-        return MusicActivityLayoutBinding.inflate(layoutInflater, root, false).apply {
+    override fun createView(): MusicActivityBinding {
+        return MusicActivityBinding.inflate(layoutInflater, root, false).apply {
             runBlocking {
                 blurredBucketCover.setBlurBitmap(
                     userConfig.lastMusicBucketCover.getBitmap(),
@@ -91,6 +90,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                 it.activity = this@MusicActivity
                 it.binding = this
             }
+
             val barHeight = statuesBarHeight
             musicFinish.y += barHeight
             musicModelContainer.fitStatuesBar()
@@ -196,6 +196,16 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.addBucket(mb) }
                 is MusicViewEvent.DeleteBucket ->
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.deleteBucket(mb) }
+                is MusicViewEvent.OnBucketSelect -> {
+                    if (currentBucket == it.musicBucket.name) {
+                        binding.musicShowBucket.negative()
+                        return@onViewEvent
+                    }
+                    currentBucket = it.musicBucket.name
+                    binding.onMusicBucketSelected(it.musicBucket)
+                    switchMusicBucket(it.musicBucket)
+                    binding.musicShowBucket.negative()
+                }
                 is MusicViewEvent.Locate -> {
                     getMusicListAdapter()?.getPlayingPosition()?.let { position ->
                         if (position != -1) binding.musicMusicList.smoothScrollToPosition(position)
@@ -281,24 +291,14 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
         }
     }
 
-    private suspend fun MusicModel.initMusicBucketList() {
+    private suspend fun initMusicBucketList() {
         binding.musicBucket.apply {
             layoutManager = LinearLayoutManager(this@MusicActivity)
             adapter = MusicBucketAdapter(this@MusicActivity).apply {
-                setData(getMusicBuckets())
+                setData(viewModel.getMusicBuckets())
                 musicBucketEventListener = object : MusicBucketAdapter.MusicBucketEvent {
-                    override fun onBucketClicked(musicBucket: MusicBucket) {
-                        launch {
-                            if (currentBucket == musicBucket.name) {
-                                binding.musicShowBucket.negative()
-                                return@launch
-                            }
-                            currentBucket = musicBucket.name
-                            binding.onMusicBucketSelected(musicBucket)
-                            switchMusicBucket(musicBucket)
-                            binding.musicShowBucket.negative()
-                        }
-                    }
+                    override fun onBucketClicked(musicBucket: MusicBucket) =
+                        sendViewEvent(MusicViewEvent.OnBucketSelect(musicBucket))
 
                     override fun addMusic(bucket: String, position: Int) =
                         sendViewEvent(MusicViewEvent.AddMusic(bucket))
@@ -322,11 +322,11 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
         }
     }
 
-    private suspend fun MusicModel.switchMusicBucket(musicBucket: MusicBucket) {
+    private suspend fun switchMusicBucket(musicBucket: MusicBucket) {
         binding.musicMusicList.swapAdapter(
             MusicListAdapter(
                 this@MusicActivity,
-                getCurrentMusicList(musicBucket)
+                viewModel.getCurrentMusicList(musicBucket)
             ).apply {
                 getMusicListAdapter()?.getPlayingMusic()?.let { selectList.add(it) }
                 clickCallback = getMusicListAdapter()?.clickCallback
@@ -334,7 +334,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
         )
     }
 
-    private suspend fun MusicActivityLayoutBinding.onMusicBucketSelected(bucket: MusicBucket) {
+    private suspend fun MusicActivityBinding.onMusicBucketSelected(bucket: MusicBucket) {
         viewModel.getBucket(bucket.name)?.let { mb ->
             userConfig.lastMusicBucketCover = mb.icon ?: ""
             if (mb.icon != null) {
@@ -357,7 +357,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityLayoutBinding, MusicModel, 
 
     private fun getMusicListAdapter() = (binding.musicMusicList.adapter as MusicListAdapter?)
 
-    private fun MusicActivityLayoutBinding.translatePlayerCoverToFit(fitTop: Boolean) {
+    private fun MusicActivityBinding.translatePlayerCoverToFit(fitTop: Boolean) {
         TransitionManager.beginDelayedTransition(musicBucketContainer)
         musicPlayerCover.updateLayoutParams {
             if (fitTop) height += viewModel.playerFitTopH

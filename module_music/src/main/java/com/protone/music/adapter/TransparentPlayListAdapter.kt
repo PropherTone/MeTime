@@ -13,14 +13,17 @@ class TransparentPlayListAdapter(
     onPlay: Music?,
     playList: List<Music>
 ) : SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music, Any>(context) {
-    override val select: (TpPlaylistAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, isSelect ->
-            if (isSelect) {
-                binding.playListName.setBackgroundResource(R.drawable.round_background_tans_white_lite)
-            } else {
-                binding.playListName.setBackgroundResource(R.drawable.round_background_fore_dark)
-            }
+    override fun setSelect(
+        content: TpPlaylistAdapterLayoutBinding,
+        position: Int,
+        isSelect: Boolean
+    ) {
+        if (isSelect) {
+            content.playListName.setBackgroundResource(R.drawable.round_background_tans_white_lite)
+        } else {
+            content.playListName.setBackgroundResource(R.drawable.round_background_fore_dark)
         }
+    }
 
     init {
         mList.addAll(playList)

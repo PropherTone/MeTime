@@ -245,7 +245,7 @@ class DatabaseBridge : DatabaseHelper() {
                 var count = 0
                 val tempName = galleryBucket.type
                 val names = mutableMapOf<String, Int>()
-                getAllGalleryBucket(galleryBucket.isImage)?.forEach {
+                getAllGalleryBucket()?.forEach {
                     names[it.type] = 1
                     if (it.type == galleryBucket.type) {
                         galleryBucket.type = "${tempName}(${++count})"

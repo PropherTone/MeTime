@@ -1,17 +1,18 @@
 package com.protone.common.context
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Outline
 import android.graphics.Rect
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewOutlineProvider
-import android.view.ViewTreeObserver
+import android.util.Log
+import android.view.*
 import android.widget.ImageView
 import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.utils.displayUtils.Blur
 import com.protone.common.utils.displayUtils.BlurFactor
 
@@ -87,4 +88,28 @@ fun View.clipOutLine(radius: Float) {
         }
     }
     this.clipToOutline = true
+}
+
+@SuppressLint("ClickableViewAccessibility")
+inline fun RecyclerView.doHoverSelect(crossinline onHoverPosition: (Int) -> Unit) {
+    parent.requestDisallowInterceptTouchEvent(true)
+    setOnTouchListener { _, event ->
+        when (event.action) {
+            MotionEvent.ACTION_MOVE -> {
+                findChildViewUnder(event.x, event.y)?.let { child ->
+                    getChildViewHolder(child)?.let { vh ->
+                        onHoverPosition(vh.layoutPosition)
+                    }
+                }
+                return@setOnTouchListener true
+            }
+            MotionEvent.ACTION_UP -> {
+                setOnTouchListener(null)
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                setOnTouchListener(null)
+            }
+        }
+        return@setOnTouchListener false
+    }
 }

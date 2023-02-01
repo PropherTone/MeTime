@@ -43,26 +43,25 @@ class AddMusicListAdapter(
 
     private var onBusy = false
 
-    override val select: (MusicListLayoutBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, isSelect ->
-            binding.apply {
-                clickAnimation(
-                    isSelect,
-                    musicListContainer,
-                    musicListInContainer,
-                    musicListPlayState,
-                    musicListName,
-                    musicListTime,
-                    musicListDetail,
-                    backgroundColor = R.color.transparent_black1,
-                    backgroundColorPressed = R.color.transparent_black,
-                    textsColor = R.color.white
-                )
-                if (isSelect) {
-                    musicListPlayState.setImageDrawable(R.drawable.load_animation.getDrawable())
-                }
+    override fun setSelect(content: MusicListLayoutBinding, position: Int, isSelect: Boolean) {
+        content.apply {
+            clickAnimation(
+                isSelect,
+                musicListContainer,
+                musicListInContainer,
+                musicListPlayState,
+                musicListName,
+                musicListTime,
+                musicListDetail,
+                backgroundColor = R.color.transparent_black1,
+                backgroundColorPressed = R.color.transparent_black,
+                textsColor = R.color.white
+            )
+            if (isSelect) {
+                musicListPlayState.setImageDrawable(R.drawable.load_animation.getDrawable())
             }
         }
+    }
 
     override fun itemIndex(path: Music): Int = mList.indexOf(path)
 

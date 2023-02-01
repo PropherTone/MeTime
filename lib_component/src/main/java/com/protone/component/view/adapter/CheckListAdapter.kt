@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import com.protone.common.context.newLayoutInflater
-import com.protone.common.entity.GalleryBucket
 import com.protone.component.databinding.CheckListAdapterLayoutBinding
 
 class CheckListAdapter(
@@ -22,10 +21,13 @@ class CheckListAdapter(
         }
     }
 
-    override val select: (CheckListAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, isSelect ->
-            binding.clCheck.isChecked = isSelect
-        }
+    override fun setSelect(
+        content: CheckListAdapterLayoutBinding,
+        position: Int,
+        isSelect: Boolean
+    ) {
+        content.clCheck.isChecked = isSelect
+    }
 
     override fun itemIndex(path: String): Int = mList.indexOf(path)
 

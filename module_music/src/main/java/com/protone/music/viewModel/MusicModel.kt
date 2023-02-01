@@ -28,6 +28,7 @@ class MusicModel : BaseViewModel() {
         data class Delete(val bucket: String) : MusicViewEvent()
         data class AddBucket(val bucket: String) : MusicViewEvent()
         data class DeleteBucket(val bucket: String) : MusicViewEvent()
+        data class OnBucketSelect(val musicBucket: MusicBucket) : MusicViewEvent()
         object AddMusicBucket : MusicViewEvent()
         object Locate : MusicViewEvent()
         object Search : MusicViewEvent()

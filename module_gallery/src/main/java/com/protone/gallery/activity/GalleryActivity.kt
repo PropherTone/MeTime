@@ -140,13 +140,9 @@ class GalleryActivity :
             layoutManager = LinearLayoutManager(context)
             adapter = GalleryBucketAdapter(context) {
                 selectBucket { gallery ->
-                    launch {
-                        setSelectGallery(gallery)
-                    }
+                    launch { setSelectGallery(gallery) }
                 }
-                deleteGalleryBucket {
-                    viewModel.deleteGalleryBucket(it)
-                }
+                deleteGalleryBucket { viewModel.deleteGalleryBucket(it) }
             }
             addItemDecoration(
                 GalleryBucketItemDecoration(
@@ -156,7 +152,7 @@ class GalleryActivity :
         }
     }
 
-    private fun GalleryViewModel.initPager(chooseType: String = "") {
+    private fun initPager(chooseType: String = "") {
         val combine = userConfig.combineGallery || chooseType == CHOOSE_MEDIA
         binding.galleryPager.adapter = MyFragmentStateAdapter(
             this@GalleryActivity,
@@ -164,15 +160,17 @@ class GalleryActivity :
                 var initializeSize = 0
                 fun generateFragment(isVideo: Boolean) {
                     GalleryListFragment().also {
-                        it.connect(chooseType.isEmpty(), generateMailer(isVideo).onSubscription {
-                            getBucket(ALL_GALLERY)?.let { gallery ->
-                                getBucketAdapter().setSelected(gallery)
-                                setSelectGallery(gallery)
-                            }
-                            if (++initializeSize == fs.size) {
-                                isInit = true
-                            }
-                        }, dataFlow)
+                        it.connect(
+                            chooseType.isEmpty(),
+                            viewModel.generateMailer(isVideo).onSubscription {
+                                viewModel.getBucket(ALL_GALLERY)?.let { gallery ->
+                                    getBucketAdapter().setSelected(gallery)
+                                    setSelectGallery(gallery)
+                                }
+                                if (++initializeSize == fs.size) isInit = true
+                            },
+                            viewModel.dataFlow
+                        )
                         fs.add(it)
                     }
                 }
@@ -199,7 +197,7 @@ class GalleryActivity :
                 binding.galleryTab.apply {
                     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab?) {
-                            tab?.text?.let { if (onTabChanged(it)) launch { onGalleryTabSwapped() } }
+                            tab?.text?.let { if (viewModel.onTabChanged(it)) launch { onGalleryTabSwapped() } }
                         }
 
                         override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
@@ -332,7 +330,7 @@ class GalleryActivity :
     override fun popMoveTo() {
         viewModel.chooseData.let {
             if (it.size <= 0) return
-            moveTo(binding.galleryActionMenu, it[0].isVideo, it) { _, _ -> }
+            moveTo(binding.galleryActionMenu, it) { _, _ -> }
         }
     }
 

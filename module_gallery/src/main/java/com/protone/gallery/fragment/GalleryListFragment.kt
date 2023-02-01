@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.launchMain
+import com.protone.common.context.doHoverSelect
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseFragment
@@ -53,6 +54,12 @@ class GalleryListFragment :
 
             override fun openView(galleryMedia: GalleryMedia, elementView: View) {
                 toGalleryView(galleryMedia.toJson(), galleryMedia.isVideo, galleryName)
+            }
+
+            override fun onItemLongClick() {
+                binding.galleryList.doHoverSelect {
+                    getListAdapter().select(it)
+                }
             }
 
         }

@@ -1,6 +1,9 @@
 package com.protone.component.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.android.arouter.facade.Postcard
 import com.alibaba.android.arouter.launcher.ARouter
+import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchMain
 import com.protone.common.context.*
 import com.protone.common.utils.IntentDataHolder
@@ -49,8 +53,26 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
 
     val code = AtomicInteger(0)
 
+    private val activityOperationReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                ACTIVITY_FINISH -> {
+                    finishAll()
+                }
+                ACTIVITY_RESTART -> {}
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTransparentClipStatusBar()
+        launchDefault {
+            ARouter.getInstance().inject(this)
+            activityOperationBroadcast.registerReceiver(
+                activityOperationReceiver,
+                IntentFilter(ACTIVITY_FINISH)
+            )
+        }
         super.onCreate(savedInstanceState)
         binding = createView().apply {
             setContentView(root)
@@ -252,6 +274,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseV
     override fun onDestroy() {
         try {
             Log.d(TAG, "onDestroy: ${this@BaseActivity::class.simpleName}")
+            activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
             binding.unbind()
         } finally {
             cancel()

@@ -25,11 +25,21 @@ interface MediaWithGalleryBucketDAO {
     @RewriteQueriesToDropUnusedColumns
     @Query(
         "SELECT * FROM GalleryMedia " +
-                "INNER JOIN MediaWithGalleryBucket" +
-                " ON GalleryMedia.mediaId = MediaWithGalleryBucket.mediaId" +
-                " WHERE MediaWithGalleryBucket.galleryBucketId IS :bucketId"
+                "INNER JOIN MediaWithGalleryBucket " +
+                "ON GalleryMedia.mediaId = MediaWithGalleryBucket.mediaId " +
+                "WHERE MediaWithGalleryBucket.galleryBucketId IS :bucketId"
     )
     fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia>?
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        "SELECT * FROM GalleryMedia " +
+                "INNER JOIN MediaWithGalleryBucket " +
+                "ON GalleryMedia.mediaId = MediaWithGalleryBucket.mediaId " +
+                "WHERE MediaWithGalleryBucket.galleryBucketId IS :bucketId " +
+                "AND isVideo is :isVideo"
+    )
+    fun getGalleryMediasByBucket(bucketId: Long, isVideo: Boolean): List<GalleryMedia>?
 
     @RewriteQueriesToDropUnusedColumns
     @Query(

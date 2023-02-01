@@ -64,12 +64,20 @@
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_baseline_data_usage_24_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_load_animation.xml" value="0.1" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_outline_category_24.xml" value="0.168" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_outline_delete_24.xml" value="0.168" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_outline_move_24.xml" value="0.168" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_outline_rename_24_black.xml" value="0.168" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_outline_select_all_24.xml" value="0.168" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_outline_surfing_24.xml" value="0.168" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_round_arrow_drop_down_24_blue.xml" value="0.1275" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/ic_round_close_24_white.xml" value="0.1705" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/load_animation.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/main_background.xml" value="0.1225" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/none_state_background.xml" value="0.168" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/oval_back_white.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/oval_background.xml" value="0.1225" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/drawable/round_background_fore_dark.xml" value="0.168" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/round_background_tans_white_lite.xml" value="0.1225" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/select_up_down_icon.xml" value="0.1115" />
         <entry key="..\:/MeTime/lib_component/src/main/res/drawable/trans_ripple.xml" value="0.1225" />
@@ -84,7 +92,7 @@
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/date_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/drag_card_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/drag_rect_layout.xml" value="0.24114583333333334" />
-        <entry key="..\:/MeTime/lib_component/src/main/res/layout/gallery_option_pop.xml" value="0.1" />
+        <entry key="..\:/MeTime/lib_component/src/main/res/layout/gallery_option_pop.xml" value="0.2" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/image_cate_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/image_list_dialog_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/lib_component/src/main/res/layout/list_pop_windows_layout.xml" value="0.24114583333333334" />

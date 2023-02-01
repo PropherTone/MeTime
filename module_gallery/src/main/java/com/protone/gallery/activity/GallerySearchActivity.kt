@@ -134,6 +134,10 @@ class GallerySearchActivity : BaseMediaActivity<
         )
     }
 
+    override fun onItemLongClick() {
+
+    }
+
     override fun popDelete() {
         tryDelete(viewModel.selectList) {
             binding.apply {
@@ -154,9 +158,7 @@ class GallerySearchActivity : BaseMediaActivity<
 
     override fun popMoveTo() {
         launch {
-            viewModel.selectList.let {
-                moveTo(binding.toolbar, it[0].isVideo, it) { _, _ -> }
-            }
+            moveTo(binding.toolbar, viewModel.selectList) { _, _ -> }
         }
     }
 

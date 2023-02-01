@@ -22,8 +22,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>
-    : BaseMsgActivity<VB, VM, T>(),
+abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
+    receiveEvent: Boolean = false
+) : BaseMsgActivity<VB, VM, T>(receiveEvent),
     View.OnClickListener {
 
     val popLayout: GalleryOptionPopBinding by lazy {
@@ -119,7 +120,6 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 
     fun moveTo(
         anchor: View,
-        isVideo: Boolean,
         gms: MutableList<GalleryMedia>,
         callback: (GalleryBucket, MutableList<GalleryMedia>) -> Unit
     ) = launch {
@@ -127,7 +127,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         pop.startListPopup(
             anchor = anchor,
             dataList = (viewModel.galleryDAO
-                .getAllGalleryBucket(isVideo) as MutableList<GalleryBucket>?)
+                .getAllGalleryBucket() as MutableList<GalleryBucket>?)
                 ?.map { it.type } ?: mutableListOf()
         ) { re ->
             if (re == null) {

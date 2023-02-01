@@ -30,24 +30,23 @@ class MusicListAdapter(context: Context, musicList: Collection<Music>) :
 
     private var playPosition = -1
 
-    override val select: (MusicListLayoutBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, isSelect ->
-            binding.apply {
-                clickAnimation(
-                    isSelect,
-                    musicListContainer,
-                    musicListInContainer,
-                    musicListPlayState,
-                    musicListName,
-                    musicListTime,
-                    musicListDetail,
-                    dispatch = false,
-                    backgroundColor = R.color.bucket_normal,
-                    textsColor = com.protone.component.R.color.white,
-                    backgroundColorPressed = R.color.bucket_selected
-                )
-            }
+    override fun setSelect(content: MusicListLayoutBinding, position: Int, isSelect: Boolean) {
+        content.apply {
+            clickAnimation(
+                isSelect,
+                musicListContainer,
+                musicListInContainer,
+                musicListPlayState,
+                musicListName,
+                musicListTime,
+                musicListDetail,
+                dispatch = false,
+                backgroundColor = R.color.bucket_normal,
+                textsColor = com.protone.component.R.color.white,
+                backgroundColorPressed = R.color.bucket_selected
+            )
         }
+    }
 
     override suspend fun handleEventAsynchronous(data: MusicListEvent) {
         when (data) {

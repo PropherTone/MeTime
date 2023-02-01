@@ -73,10 +73,9 @@ class GalleryBucketAdapter(
         }
     }
 
-    override val select: (GalleryBucketListLayoutBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, isSelect ->
-            binding.bucket.check = isSelect
-        }
+    override fun setSelect(content: GalleryBucketListLayoutBinding, position: Int, isSelect: Boolean) {
+        content.bucket.check = isSelect
+    }
 
     override fun itemIndex(path: Gallery): Int {
         return mList.indexOf(path)

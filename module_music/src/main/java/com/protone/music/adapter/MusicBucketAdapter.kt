@@ -9,14 +9,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.protone.common.baseType.getColor
 import com.protone.common.baseType.getDrawable
-import com.protone.common.context.marginEnd
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
-import com.protone.music.R
 import com.protone.component.view.adapter.SelectListAdapter
+import com.protone.music.R
 import com.protone.music.databinding.MusicBucketAdapterLayoutBinding
 
 class MusicBucketAdapter(context: Context) :
@@ -70,12 +69,15 @@ class MusicBucketAdapter(context: Context) :
         }
     }
 
-    override val select: (MusicBucketAdapterLayoutBinding, Int, isSelect: Boolean) -> Unit =
-        { binding, _, isSelect ->
-            binding.back.setBackgroundColor(
-                (if (isSelect) R.color.bucket_selected else R.color.bucket_normal).getColor()
-            )
-        }
+    override fun setSelect(
+        content: MusicBucketAdapterLayoutBinding,
+        position: Int,
+        isSelect: Boolean
+    ) {
+        content.back.setBackgroundColor(
+            (if (isSelect) R.color.bucket_selected else R.color.bucket_normal).getColor()
+        )
+    }
 
     override fun itemIndex(path: MusicBucket): Int = mList.indexOf(path)
 

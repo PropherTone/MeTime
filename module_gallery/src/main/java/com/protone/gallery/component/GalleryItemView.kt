@@ -62,7 +62,7 @@ class GalleryItemView @JvmOverloads constructor(
                 bucketCheck.animate().scaleX(0f).withEndAction {
                     bucketCheck.isVisible = false
                 }.start()
-                reveal?.start()
+                reveal?.start() ?: run { bucketCheck.isVisible = false }
             } else {
                 val reveal = try {
                     ViewAnimationUtils.createCircularReveal(
@@ -75,12 +75,13 @@ class GalleryItemView @JvmOverloads constructor(
                 bucketCheck.animate().scaleX(1f).withStartAction {
                     bucketCheck.isVisible = true
                 }.start()
-                if (reveal == null) {
+                reveal?.let {
+                    it.doOnEnd { bucket.isGone = true }
+                    it.start()
+                } ?: run {
                     bucket.isGone = true
-                } else reveal.doOnEnd {
-                    bucket.isGone = true
+                    bucketCheck.isVisible = true
                 }
-                reveal?.start()
             }
         }
     }

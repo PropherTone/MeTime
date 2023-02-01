@@ -287,6 +287,10 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
         )
     }
 
+    override fun onItemLongClick() {
+
+    }
+
     override fun onDestroy() {
         binding.unbind()
         cancel()

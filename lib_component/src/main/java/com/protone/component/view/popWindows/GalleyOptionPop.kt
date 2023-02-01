@@ -10,8 +10,8 @@ class GalleryOptionPop(val context: Context, val view: View) : PopupWindow() {
 
     init {
         contentView = view
-        height = ViewGroup.LayoutParams.WRAP_CONTENT
         width = ViewGroup.LayoutParams.MATCH_PARENT
+        height = ViewGroup.LayoutParams.WRAP_CONTENT
         isOutsideTouchable = true
         isFocusable = true
     }

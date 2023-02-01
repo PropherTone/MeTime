@@ -243,7 +243,6 @@ class GalleryViewActivity : BaseMediaActivity<
         launch {
             moveTo(
                 binding.galleryVAction,
-                viewModel.getCurrentMedia().isVideo,
                 mutableListOf(viewModel.getCurrentMedia())
             ) { _, _ -> }
         }

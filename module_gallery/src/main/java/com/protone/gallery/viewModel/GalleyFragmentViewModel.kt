@@ -116,10 +116,6 @@ class GalleryFragmentViewModel : BaseViewModel() {
         if (combine) getMediaCount() else getMediaCount(isVideo)
     }
 
-    private suspend fun getAllGalleryBucket() = galleryDAO.run {
-        if (combine) getAllGalleryBucket() else getAllGalleryBucket(isVideo)
-    }
-
     private suspend fun getNewestMedia(gallery: String) = galleryDAO.run {
         if (combine) getNewestMediaInGallery(gallery)
         else getNewestMediaInGallery(gallery, isVideo)
@@ -130,7 +126,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
     fun getBucket(bucket: String) = galleryData.find { it.name == bucket }
 
     fun addBucket(name: String) {
-        galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideo)) { re, _ ->
+        galleryDAO.insertGalleryBucketCB(GalleryBucket(name)) { re, _ ->
             if (!re) R.string.failed_msg.getString().toast()
         }
     }
@@ -168,7 +164,7 @@ class GalleryFragmentViewModel : BaseViewModel() {
 
     private fun sortPrivateData() {
         viewModelScope.launchDefault {
-            getAllGalleryBucket()?.forEach {
+            galleryDAO.getAllGalleryBucket()?.forEach {
                 Gallery(it.type, 0, null, custom = true).cacheAndNotice()
             }
             isDataSorted = true

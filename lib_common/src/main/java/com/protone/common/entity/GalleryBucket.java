@@ -14,12 +14,8 @@ public class GalleryBucket {
     @ColumnInfo(name = "type")
     private String type;
 
-    @ColumnInfo(name = "image")
-    private boolean image;
-
-    public GalleryBucket(String type, boolean image) {
+    public GalleryBucket(String type) {
         this.type = type;
-        this.image = image;
     }
 
     public Long getGalleryBucketId() {
@@ -38,14 +34,6 @@ public class GalleryBucket {
         this.type = type;
     }
 
-    public boolean isImage() {
-        return image;
-    }
-
-    public void setImage(boolean image) {
-        this.image = image;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,14 +41,11 @@ public class GalleryBucket {
 
         GalleryBucket that = (GalleryBucket) o;
 
-        if (image != that.image) return false;
         return type.equals(that.type);
     }
 
     @Override
     public int hashCode() {
-        int result = type.hashCode();
-        result = 31 * result + (image ? 1 : 0);
-        return result;
+        return type.hashCode();
     }
 }

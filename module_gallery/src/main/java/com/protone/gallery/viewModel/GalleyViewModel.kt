@@ -120,11 +120,14 @@ class GalleryViewModel : BaseViewModel() {
 
     fun sortData() {
         observeGallery()
-        if (combine) {
-            sortData(false)
-        } else {
-            sortData(false)
-            sortData(true)
+        viewModelScope.launchDefault {
+            if (combine) {
+                sortData(false)
+            } else {
+                sortData(false)
+                sortData(true)
+            }
+            if (!isLock) sortPrivateData() else isDataSorted = true
         }
     }
 
@@ -161,16 +164,8 @@ class GalleryViewModel : BaseViewModel() {
     fun getSelectedBucket() = getGalleryData(isVideoGallery).find { it.name == rightGallery }
 
     fun addBucket(name: String) {
-        galleryDAO.insertGalleryBucketCB(GalleryBucket(name, isVideoGallery)) { re, reName ->
-            if (re) {
-                if (!isLock) {
-                    galleryData.add(Gallery(reName, 0, null, custom = true))
-                } else {
-                    R.string.locked.getString().toast()
-                }
-            } else {
-                R.string.failed_msg.getString().toast()
-            }
+        galleryDAO.insertGalleryBucketCB(GalleryBucket(name)) { re, _ ->
+            if (!re) R.string.failed_msg.getString().toast()
         }
     }
 
@@ -222,13 +217,13 @@ class GalleryViewModel : BaseViewModel() {
         }
     }
 
-    private fun sortData(isVideo: Boolean) = viewModelScope.launchDefault {
+    private suspend fun sortData(isVideo: Boolean) {
         galleryDAO.run {
             val galleries =
                 (if (combine) getAllGallery() else getAllGallery(isVideo)) as MutableList<String>?
             if (galleries == null) {
                 R.string.none.getString().toast()
-                return@launchDefault
+                return
             }
 
             Gallery(
@@ -244,17 +239,14 @@ class GalleryViewModel : BaseViewModel() {
                     getNewestMedia(it, isVideo)
                 ).cacheAndNotice(isVideo)
             }
-            if (!isLock) sortPrivateData(isVideo) else isDataSorted = true
         }
     }
 
-    private fun sortPrivateData(isVideo: Boolean) {
-        viewModelScope.launchDefault {
-            getAllGalleryBucket(isVideo)?.forEach {
-                Gallery(it.type, 0, null, custom = true).cacheAndNotice(isVideo)
-            }
-            isDataSorted = true
+    private suspend fun sortPrivateData() {
+        getAllGalleryBucket()?.forEach {
+            Gallery(it.type, 0, null, custom = true).cacheAndNotice(true)
         }
+        isDataSorted = true
     }
 
     private fun observeGallery() {
@@ -319,10 +311,8 @@ class GalleryViewModel : BaseViewModel() {
                     is MediaAction.GalleryDataAction.OnGalleryBucketInserted -> {
                         if (!isLock) {
                             Gallery(it.galleryBucket.type, 0, null, custom = true)
-                                .cacheAndNotice(isVideoGallery)
-                        } else {
-                            R.string.locked.getString().toast()
-                        }
+                                .cacheAndNotice(true)
+                        } else R.string.locked.getString().toast()
                     }
                     is MediaAction.GalleryDataAction.OnGalleryBucketDeleted -> {
                         galleryData.find { gallery ->
@@ -341,9 +331,7 @@ class GalleryViewModel : BaseViewModel() {
                                         galleryDAO.getGalleryMediasByBucket(bucketId)
                                             ?.let { medias ->
                                                 sendListEvent(
-                                                    GalleryListEvent.OnMediasInserted(
-                                                        medias
-                                                    )
+                                                    GalleryListEvent.OnMediasInserted(medias)
                                                 )
                                             }
                                     }
@@ -356,8 +344,13 @@ class GalleryViewModel : BaseViewModel() {
     }
 
     private suspend fun Gallery.cacheAndNotice(isVideo: Boolean) {
-        getGalleryData(isVideo).add(this)
-        if (isVideoGallery == isVideo)
+        if (custom) {
+            getGalleryData(true).add(this)
+            getGalleryData(false).add(this)
+        } else {
+            getGalleryData(isVideo).add(this)
+        }
+        if (isVideoGallery == isVideo || custom)
             sendBucketEvent(GalleryEvent.OnNewGallery(this), true)
     }
 
@@ -405,8 +398,8 @@ class GalleryViewModel : BaseViewModel() {
         if (combine) getMediaCount() else getMediaCount(isVideo)
     }
 
-    private suspend fun getAllGalleryBucket(isVideo: Boolean) = galleryDAO.run {
-        if (combine) getAllGalleryBucket() else getAllGalleryBucket(isVideo)
+    private suspend fun getAllGalleryBucket() = galleryDAO.run {
+        getAllGalleryBucket()
     }
 
     private suspend fun getNewestMedia(gallery: String, isVideo: Boolean) = galleryDAO.run {

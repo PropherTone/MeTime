@@ -168,11 +168,6 @@ sealed class GalleryBucketDAO : BaseDAO<MediaAction.GalleryDataAction>() {
         galleryBucketDAO.getGalleryBucket(id)
     }
 
-    suspend fun getAllGalleryBucket(isVideo: Boolean): List<GalleryBucket>? =
-        withIOContext {
-            galleryBucketDAO.getAllGalleryBucket(isVideo)
-        }
-
     suspend fun getAllGalleryBucket(): List<GalleryBucket>? =
         withIOContext {
             galleryBucketDAO.getAllGalleryBucket()
@@ -267,6 +262,12 @@ sealed class MediasWithGalleriesDAO : GalleriesWithNotesDAO() {
     suspend fun getGalleryMediasByBucket(bucketId: Long): List<GalleryMedia>? = withIOContext {
         return@withIOContext mediaWithGalleryBucketDAO.getGalleryMediasByBucket(bucketId)
     }
+
+    suspend fun getGalleryMediasByBucket(bucketId: Long, isVideo: Boolean): List<GalleryMedia>? =
+        withIOContext {
+            return@withIOContext mediaWithGalleryBucketDAO
+                .getGalleryMediasByBucket(bucketId, isVideo)
+        }
 
     suspend fun getGalleryBucketByMedias(mediaId: Long): List<GalleryBucket>? = withIOContext {
         return@withIOContext mediaWithGalleryBucketDAO.getGalleryBucketByMedias(mediaId)
