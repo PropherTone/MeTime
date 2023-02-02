@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.withIOContext
 import com.protone.common.context.MApplication
 import com.protone.common.utils.ALL_MUSIC

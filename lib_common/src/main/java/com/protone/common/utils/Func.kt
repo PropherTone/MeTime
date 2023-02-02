@@ -45,7 +45,7 @@ suspend inline fun <T> onResult(
             this.runnable(it)
         } catch (e: Exception) {
             if (isInDebug()) e.printStackTrace()
-            R.string.unknown_error.getString().toast()
+            R.string.failed_msg.getString().toast()
         }
     }
 }

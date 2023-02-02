@@ -4,10 +4,12 @@ import android.net.Uri
 import com.protone.common.baseType.deleteFile
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
+import com.protone.common.baseType.toBase64
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.MUSIC_BUCKET
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseViewModel
+import com.protone.component.view.customView.musicPlayer.bitmapCachePool
 import com.protone.music.R
 
 class AddBucketViewModel : BaseViewModel() {
@@ -35,7 +37,7 @@ class AddBucketViewModel : BaseViewModel() {
         musicDAO.addMusicBucketWithCallBack(
             MusicBucket(
                 name,
-                uri?.imageSaveToDisk(name, MUSIC_BUCKET),
+                uri?.imageSaveToDisk(name.getBucketSaveIconName(), MUSIC_BUCKET),
                 0,
                 detail,
                 todayDate("yyyy/MM/dd")
@@ -51,12 +53,22 @@ class AddBucketViewModel : BaseViewModel() {
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
             mb.icon?.deleteFile()
-            val toFile = uri?.imageSaveToDisk(name, MUSIC_BUCKET)
-            if (mb.icon?.equals(toFile) == false) mb.icon = toFile
+            val toFile = uri?.imageSaveToDisk(
+                mb.name.getBucketSaveIconName(),
+                MUSIC_BUCKET
+            )
+            if (mb.icon == null || mb.icon?.equals(toFile) == false) {
+                mb.icon = toFile
+                toFile?.let { icon -> bitmapCachePool.remove(icon) }
+            }
             if (mb.detail != detail) mb.detail = detail
             todayDate("yyyy/MM/dd")
         }
     )
+
+    private fun String.getBucketSaveIconName(): String {
+        return "${this}[${todayDate("yyyy/MM/dd-hh:mm:ss")}]".toBase64() ?: this
+    }
 
     suspend fun getMusicBucketByName(name: String) = musicDAO.getMusicBucketByName(name)
 

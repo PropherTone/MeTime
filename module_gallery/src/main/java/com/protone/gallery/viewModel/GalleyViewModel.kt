@@ -1,7 +1,7 @@
 package com.protone.gallery.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.*
 import com.protone.common.entity.Gallery
 import com.protone.common.entity.Gallery.ItemState
@@ -169,6 +169,13 @@ class GalleryViewModel : BaseViewModel() {
         }
     }
 
+    fun removeMediasFromCustomGallery(medias: List<GalleryMedia>): Boolean {
+        return getSelectedBucket().takeIf { it != null && it.custom }?.let {
+            galleryDAO.deleteMediasWithGalleryBucketAsync(medias, it.name)
+            true
+        } ?: false
+    }
+
     fun generateMailer(isVideo: Boolean) = MutableSharedFlow<GalleryListEvent>().also {
         mailers[if (isVideo) 1 else 0] = it
     }.asSharedFlow()
@@ -190,8 +197,8 @@ class GalleryViewModel : BaseViewModel() {
     fun onTabChanged(tabText: CharSequence): Boolean {
         val mailer = rightMailer
         when (tabText) {
-            R.string.photo.getString() -> rightMailer = 0
-            R.string.video.getString() -> rightMailer = 1
+            com.protone.gallery.R.string.photo.getString() -> rightMailer = 0
+            com.protone.gallery.R.string.video.getString() -> rightMailer = 1
         }
         return mailer != rightMailer
     }

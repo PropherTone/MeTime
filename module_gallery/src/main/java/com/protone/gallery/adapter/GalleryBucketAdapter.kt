@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.getString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Gallery

@@ -3,7 +3,6 @@ package com.protone.component
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
-import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.*
 import com.protone.common.entity.GalleryBucket

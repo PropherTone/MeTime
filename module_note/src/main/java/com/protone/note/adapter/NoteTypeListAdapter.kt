@@ -5,9 +5,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.entity.NoteDir
+import com.protone.component.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.note.databinding.NoteTpyeListAdapterBinding
 

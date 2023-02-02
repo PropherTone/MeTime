@@ -1,18 +1,15 @@
 package com.protone.note.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.*
 import com.protone.common.context.MApplication
-import com.protone.component.database.MediaAction
 import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
 import com.protone.common.entity.NoteDirWithNotes
 import com.protone.component.BaseViewModel
-import kotlinx.coroutines.Dispatchers
+import com.protone.component.database.MediaAction
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class NoteViewModel : BaseViewModel() {
 

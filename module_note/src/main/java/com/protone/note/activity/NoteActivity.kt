@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
@@ -15,6 +14,7 @@ import com.protone.common.entity.Note
 import com.protone.common.entity.NoteDir
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE_DIR
+import com.protone.component.R
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.database.MediaAction
 import com.protone.component.view.dialog.titleDialog
@@ -158,9 +158,6 @@ class NoteActivity :
     }
 
     override fun getSwapAnim(): Pair<Int, Int> {
-        return Pair(
-            com.protone.component.R.anim.card_in_ltr,
-            com.protone.component.R.anim.card_out_ltr
-        )
+        return Pair(R.anim.card_in_ltr, R.anim.card_out_ltr)
     }
 }

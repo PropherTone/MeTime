@@ -13,7 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault

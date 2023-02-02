@@ -10,6 +10,7 @@ import com.protone.common.baseType.withMainContext
 import com.protone.common.context.marginBottom
 import com.protone.common.context.root
 import com.protone.common.context.setSoftInputStatusListener
+import com.protone.common.context.showFailedToast
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
@@ -19,6 +20,7 @@ import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrat
 import com.protone.common.utils.json.toUri
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.toGallery
+import com.protone.component.view.customView.musicPlayer.bitmapCachePool
 import com.protone.music.databinding.AddBucketActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 
@@ -68,7 +70,7 @@ class AddBucketActivity : BaseMsgActivity<
         editName?.let { eName ->
             musicBucket = getMusicBucketByName(eName)
             if (musicBucket == null) {
-                com.protone.common.R.string.come_up_unknown_error.toString().toast()
+                showFailedToast()
                 finish()
                 return@let
             } else {

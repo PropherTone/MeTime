@@ -1,7 +1,7 @@
 package com.protone.note.viewModel
 
 import android.net.Uri
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.baseType.toast

@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.config.databinding.UserConfigActivityBinding
-import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.baseType.toast
@@ -19,6 +18,7 @@ import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
 import com.protone.common.utils.json.toEntity
+import com.protone.component.R
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.database.userConfig
 import com.protone.component.databinding.UserConfigItemLayoutBinding
@@ -214,7 +214,9 @@ class UserConfigActivity : BaseMsgActivity<
 
     private fun startNameDialog() {
         titleDialog(R.string.user_name.getString(), "") {
-            if (it.isNotEmpty()) { userConfig.userName = it }
+            if (it.isNotEmpty()) {
+                userConfig.userName = it
+            }
         }
     }
 

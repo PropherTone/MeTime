@@ -7,7 +7,7 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchDefault
 import com.protone.common.baseType.launchMain

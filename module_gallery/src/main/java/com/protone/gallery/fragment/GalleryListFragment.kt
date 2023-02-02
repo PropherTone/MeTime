@@ -13,6 +13,7 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.json.toJson
 import com.protone.component.BaseFragment
 import com.protone.component.toGalleryView
+import com.protone.gallery.R
 import com.protone.gallery.adapter.GalleryListAdapter
 import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.databinding.GalleryListFragmentLayoutBinding
@@ -148,7 +149,7 @@ class GalleryListFragment :
     private fun GalleryListFragmentLayoutBinding.initList() {
         galleryList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            addItemDecoration(GalleryItemDecoration(paddingEnd))
+            addItemDecoration(GalleryItemDecoration(resources.getDimensionPixelSize(R.dimen.item_margin)))
             adapter =
                 GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
                     it.multiChoose = true

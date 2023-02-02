@@ -37,7 +37,7 @@ data class MusicBucket(
     @Ignore
     constructor() : this("", null, 0, null, null)
 
-    fun getChangeState(bucket: MusicBucket, ignored: Int?): Int {
+    fun getChangeState(bucket: MusicBucket, ignored: Int? = null): Int {
         var payloads = ALL
         if (ignored != null || ignored == NAME || ignored == COVER || ignored == SIZE || ignored == DETAIL) {
             payloads = payloads xor ignored

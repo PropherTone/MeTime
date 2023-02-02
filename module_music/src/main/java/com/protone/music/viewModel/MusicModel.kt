@@ -13,7 +13,6 @@ import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.io.File
@@ -29,6 +28,7 @@ class MusicModel : BaseViewModel() {
         data class AddBucket(val bucket: String) : MusicViewEvent()
         data class DeleteBucket(val bucket: String) : MusicViewEvent()
         data class OnBucketSelect(val musicBucket: MusicBucket) : MusicViewEvent()
+        data class OnBucketRefresh(val musicBucket: MusicBucket, val state: Int) : MusicViewEvent()
         object AddMusicBucket : MusicViewEvent()
         object Locate : MusicViewEvent()
         object Search : MusicViewEvent()

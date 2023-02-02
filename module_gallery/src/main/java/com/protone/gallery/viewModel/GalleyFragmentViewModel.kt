@@ -2,7 +2,7 @@ package com.protone.gallery.viewModel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.*
 import com.protone.common.entity.Gallery
 import com.protone.common.entity.GalleryBucket

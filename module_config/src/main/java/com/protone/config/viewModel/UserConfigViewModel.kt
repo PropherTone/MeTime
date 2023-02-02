@@ -1,13 +1,13 @@
 package com.protone.config.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.common.R
 import com.protone.common.baseType.getParentPath
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.baseType.withIOContext
 import com.protone.common.utils.SCrashHandler
 import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.component.R
 import com.protone.component.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

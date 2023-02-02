@@ -4,6 +4,6 @@
     <com.protone.gallery.component.GalleryItemView
         android:id="@+id/bucket"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="@dimen/gallery_item_height" />
 
 </layout>

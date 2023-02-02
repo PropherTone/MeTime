@@ -54,7 +54,7 @@ fun File.getSHA(): String? {
 
 fun String.toBase64(): String? {
     return try {
-        Base64.decode(this, Base64.DEFAULT).decodeToString()
+        Base64.decode(this, Base64.DEFAULT).toString()
     } catch (e: Exception) {
         null
     }

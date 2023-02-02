@@ -71,7 +71,7 @@ abstract class DatabaseHelper {
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             e.printStackTrace()
-            R.string.unknown_error.getString().toast()
+            R.string.failed_msg.getString().toast()
         } finally {
             cancel()
         }

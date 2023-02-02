@@ -8,7 +8,6 @@ import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.common.context.isKeyBroadShow
 import com.protone.common.context.marginBottom
@@ -31,6 +30,7 @@ import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.spans.ISpanForUse
 import com.protone.common.utils.spans.SpanStates
+import com.protone.component.R
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.toGallery
 import com.protone.component.view.customView.richText.RichNoteImageLoader
@@ -296,7 +296,7 @@ class NoteEditActivity :
         withMainContext {
             AnimationHelper.apply {
                 animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
-                    view.setImageDrawable(com.protone.component.R.drawable.ic_baseline_check_24.getDrawable())
+                    view.setImageDrawable(R.drawable.ic_baseline_check_24.getDrawable())
                     animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true, doOnEnd = {
                         alpha(view, 0f, play = true, doOnEnd = {
                             view.isVisible = false

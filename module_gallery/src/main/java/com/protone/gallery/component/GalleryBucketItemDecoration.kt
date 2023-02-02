@@ -14,7 +14,9 @@ class GalleryBucketItemDecoration(private val margin: Int) : RecyclerView.ItemDe
         state: RecyclerView.State
     ) {
         super.getItemOffsets(outRect, view, parent, state)
-        outRect.top = margin
+        if (parent.getChildAdapterPosition(view) > 0) {
+            outRect.top = margin
+        }
         outRect.left = margin
         outRect.right = margin
     }

@@ -21,6 +21,8 @@
             android:id="@+id/gallery_bucket"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:paddingTop="@dimen/bucket_margin"
+            android:paddingBottom="@dimen/bucket_margin"
             app:layout_constraintBottom_toTopOf="@id/add_gallery"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gallery_detail" />

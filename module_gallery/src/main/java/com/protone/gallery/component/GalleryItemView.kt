@@ -3,17 +3,17 @@ package com.protone.gallery.component
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
+import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.animation.doOnEnd
-import androidx.core.view.doOnAttach
-import androidx.core.view.doOnDetach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.transition.TransitionManager
+import com.protone.common.baseType.getColor
 import com.protone.common.context.newLayoutInflater
-import com.protone.common.utils.displayUtils.AnimationHelper
+import com.protone.gallery.R
 import com.protone.gallery.databinding.GalleryItemLayoutBinding
 import kotlin.math.hypot
 
@@ -26,13 +26,36 @@ class GalleryItemView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private val binding =
-        GalleryItemLayoutBinding.inflate(context.newLayoutInflater, this, true).apply {
+        GalleryItemLayoutBinding.inflate(context.newLayoutInflater, this, false).apply {
             root.setOnTouchListener { _, event ->
                 mX = event.x
                 mY = event.y
                 false
             }
         }
+
+    private val bucketCheck: View
+
+    init {
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            resources.getDimensionPixelSize(R.dimen.gallery_item_height)
+        )
+        setBackgroundResource(com.protone.component.R.drawable.background_ripple_glass)
+        addView(binding.root)
+        addView(View(context).apply {
+            layoutParams = LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.bucket_check_line_height),
+                Gravity.BOTTOM
+            )
+            isFocusable = false
+            isClickable = false
+            setBackgroundColor(com.protone.component.R.color.white.getColor())
+            isVisible = false
+            bucketCheck = this
+        })
+    }
 
     val thumb get() = binding.bucketThumb
 
@@ -88,7 +111,7 @@ class GalleryItemView @JvmOverloads constructor(
 
     fun stopAnimate() {
         binding.bucket.animate().cancel()
-        binding.bucketCheck.animate().cancel()
+        bucketCheck.animate().cancel()
     }
 
 }

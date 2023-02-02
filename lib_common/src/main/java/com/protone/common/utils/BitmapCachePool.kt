@@ -30,6 +30,14 @@ class BitmapCachePool {
         }
     }
 
+    fun remove(uri: Uri) {
+        blurMemCache.remove(generateKey(uri.toString()))
+    }
+
+    fun remove(key: String) {
+        blurMemCache.remove(key)
+    }
+
     fun clear() {
         blurMemCache.evictAll()
     }

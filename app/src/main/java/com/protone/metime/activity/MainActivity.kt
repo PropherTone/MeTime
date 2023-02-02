@@ -4,7 +4,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.*
 import com.protone.common.context.MApplication
 import com.protone.common.context.clipOutLine
@@ -142,27 +142,18 @@ class MainActivity :
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
                     toGallery {
-                        withTransition(
-                            com.protone.component.R.anim.card_in_ltr,
-                            com.protone.component.R.anim.card_out_ltr
-                        )
+                        withTransition(R.anim.card_in_ltr, R.anim.card_out_ltr)
                     }
                 MainViewModel.MainViewEvent.Note ->
                     if (userConfig.lockNote == "")
                         startActivity(RouterPath.NoteRouterPath.Main) {
-                            withTransition(
-                                com.protone.component.R.anim.card_in_rtl,
-                                com.protone.component.R.anim.card_out_rtl
-                            )
+                            withTransition(R.anim.card_in_rtl, R.anim.card_out_rtl)
                         }
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
                     if (userConfig.lockMusic == "") {
                         startActivity(RouterPath.MusicRouterPath.Main) {
-                            withTransition(
-                                com.protone.component.R.anim.card_top_in,
-                                com.protone.component.R.anim.card_top_out
-                            )
+                            withTransition(R.anim.card_top_in, R.anim.card_top_out)
                         }
                         userConfig.lastMusicBucketCover.getBitmap()
                     } else R.string.locked.getString().toast()

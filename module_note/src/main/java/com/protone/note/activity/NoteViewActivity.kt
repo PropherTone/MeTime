@@ -3,7 +3,6 @@ package com.protone.note.activity
 import android.net.Uri
 import androidx.activity.viewModels
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
@@ -15,6 +14,7 @@ import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toJson
+import com.protone.component.R
 import com.protone.component.BaseMusicActivity
 import com.protone.component.service.MusicBinder
 import com.protone.component.view.customView.richText.RichNoteImageLoader

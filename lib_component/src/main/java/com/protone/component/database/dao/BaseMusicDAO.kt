@@ -89,8 +89,9 @@ sealed class MusicBucketDAO : MusicWithMusicBucketDAO() {
     }
 
     suspend fun updateMusicBucket(musicBucket: MusicBucket): Int = withIOContext {
-        sendEvent(MediaAction.MusicDataAction.OnMusicBucketUpdated(musicBucket))
-        musicBucketDAO.updateMusicBucket(musicBucket)
+        musicBucketDAO.updateMusicBucket(musicBucket).also {
+            if (it > 0) sendEvent(MediaAction.MusicDataAction.OnMusicBucketUpdated(musicBucket))
+        }
     }
 
     suspend fun deleteMusicBucket(musicBucket: MusicBucket) = withIOContext {

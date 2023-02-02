@@ -4,7 +4,7 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.root

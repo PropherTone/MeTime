@@ -39,7 +39,7 @@ class MusicBucketAdapter(context: Context) :
                 notifyItemInsertedChecked(mList.size - 1)
             }
             is MusicBucketAEvent.RefreshBucket -> {
-                mList.indexOfFirst { it.name == data.bucket.name }
+                mList.indexOfFirst { it.musicBucketId == data.bucket.musicBucketId }
                     .takeIf { it != -1 }
                     ?.let {
                         val bucket = mList[it]
@@ -47,6 +47,10 @@ class MusicBucketAdapter(context: Context) :
                         notifyItemChangedChecked(
                             it,
                             bucket.getChangeState(data.bucket, MusicBucket.DETAIL)
+                        )
+                        musicBucketEventListener?.onSelectedBucketRefresh(
+                            data.bucket,
+                            bucket.getChangeState(data.bucket)
                         )
                     }
             }
@@ -247,6 +251,7 @@ class MusicBucketAdapter(context: Context) :
         fun addMusic(bucket: String, position: Int)
         fun delete(bucket: String, position: Int)
         fun edit(bucket: String, position: Int)
+        fun onSelectedBucketRefresh(bucket: MusicBucket, state: Int)
     }
 
 }

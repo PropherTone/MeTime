@@ -7,7 +7,6 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.config.databinding.LogActivityBinding
-import com.protone.common.R
 import com.protone.common.baseType.getFileName
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchIO
@@ -16,6 +15,7 @@ import com.protone.common.context.root
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.noteEditPostcard
 import com.protone.common.utils.TAG
+import com.protone.component.R
 import com.protone.component.BaseViewModel
 import com.protone.component.activity.BaseActivity
 import com.protone.component.database.dao.DatabaseBridge

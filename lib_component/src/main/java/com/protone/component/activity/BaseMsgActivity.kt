@@ -4,6 +4,7 @@ import androidx.databinding.ViewDataBinding
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.launchMain
 import com.protone.common.baseType.toast
+import com.protone.common.context.showFailedToast
 import com.protone.component.BaseViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -37,7 +38,7 @@ abstract class BaseMsgActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : Ba
                     } catch (e: Exception) {
                         if (e is CancellationException) throw e
                         e.printStackTrace()
-                        com.protone.common.R.string.unknown_error.getString().toast()
+                        showFailedToast()
                     }
                 }
             }

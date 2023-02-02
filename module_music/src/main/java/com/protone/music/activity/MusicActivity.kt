@@ -7,7 +7,6 @@ import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
 import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
@@ -20,6 +19,7 @@ import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
+import com.protone.component.R
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
 import com.protone.component.database.userConfig
@@ -206,6 +206,8 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                     switchMusicBucket(it.musicBucket)
                     binding.musicShowBucket.negative()
                 }
+                is MusicViewEvent.OnBucketRefresh ->
+                    onMusicBucketRefresh(it.musicBucket, it.state)
                 is MusicViewEvent.Locate -> {
                     getMusicListAdapter()?.getPlayingPosition()?.let { position ->
                         if (position != -1) binding.musicMusicList.smoothScrollToPosition(position)
@@ -308,6 +310,9 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
 
                     override fun edit(bucket: String, position: Int) =
                         sendViewEvent(MusicViewEvent.Edit(bucket))
+
+                    override fun onSelectedBucketRefresh(bucket: MusicBucket, state: Int) =
+                        sendViewEvent(MusicViewEvent.OnBucketRefresh(bucket, state))
                 }
             }
         }
@@ -336,20 +341,56 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
 
     private suspend fun MusicActivityBinding.onMusicBucketSelected(bucket: MusicBucket) {
         viewModel.getBucket(bucket.name)?.let { mb ->
-            userConfig.lastMusicBucketCover = mb.icon ?: ""
-            if (mb.icon != null) {
-                mb.icon?.getBitmap()?.let { bm ->
-                    musicBucketIcon.setImageBitmap(bm)
-                    binding.blurredBucketCover.setBlurBitmap(bm, 24, 10)
-                }
-            } else {
-                blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
-                musicBucketIcon.setImageDrawable(com.protone.component.R.drawable.ic_baseline_music_note_24.getDrawable())
-            }
-            musicBucketName.text = mb.name
+            changeIcon(mb.icon)
+            changeName(mb.name)
+            changeMsg(mb.detail)
             musicBucketTime.text = mb.date
-            musicBucketMsg.text =
-                if (mb.detail != null) "${mb.detail}" else R.string.none.getString()
+        }
+    }
+
+    private suspend fun onMusicBucketRefresh(bucket: MusicBucket, state: Int) {
+        when (state) {
+            MusicBucket.ALL -> {
+                changeIcon(bucket.icon)
+                changeName(bucket.name)
+                changeMsg(bucket.detail)
+            }
+            MusicBucket.DETAIL or MusicBucket.COVER -> {
+                changeIcon(bucket.icon)
+                changeMsg(bucket.detail)
+            }
+            MusicBucket.DETAIL or MusicBucket.NAME -> {
+                changeName(bucket.name)
+                changeMsg(bucket.detail)
+            }
+            MusicBucket.NAME or MusicBucket.COVER -> {
+                changeName(bucket.name)
+                changeIcon(bucket.icon)
+            }
+            MusicBucket.COVER -> changeIcon(bucket.icon)
+            MusicBucket.DETAIL -> changeMsg(bucket.detail)
+            MusicBucket.NAME -> changeName(bucket.name)
+        }
+    }
+
+    private fun changeName(name: String) {
+        binding.musicBucketName.text = name
+    }
+
+    private fun changeMsg(msg: String?) {
+        binding.musicBucketMsg.text = if (msg != null) "$msg" else R.string.none.getString()
+    }
+
+    private suspend fun changeIcon(icon: String?) {
+        binding.apply {
+            userConfig.lastMusicBucketCover = icon ?: ""
+            icon?.getBitmap()?.let { bm ->
+                musicBucketIcon.setImageBitmap(bm)
+                blurredBucketCover.setBlurBitmap(bm, 24, 10)
+            } ?: run {
+                blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
+                musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
+            }
         }
     }
 
@@ -404,10 +445,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
     }
 
     override fun getSwapAnim(): Pair<Int, Int> {
-        return Pair(
-            com.protone.component.R.anim.card_bot_in,
-            com.protone.component.R.anim.card_bot_out
-        )
+        return Pair(R.anim.card_bot_in, R.anim.card_bot_out)
     }
 
 }

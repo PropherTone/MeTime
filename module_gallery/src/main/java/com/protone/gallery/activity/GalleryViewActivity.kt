@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.R
+import com.protone.component.R
 import com.protone.common.baseType.getStorageSize
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toDateString

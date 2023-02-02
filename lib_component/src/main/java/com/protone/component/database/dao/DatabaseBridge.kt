@@ -181,9 +181,15 @@ class DatabaseBridge : DatabaseHelper() {
             }
         }
 
-        fun deleteMediaWithGalleryBucketAsync(mediaWithGalleryBucket: MediaWithGalleryBucket) {
+        fun deleteMediasWithGalleryBucketAsync(medias: List<GalleryMedia>, bucket: String) {
             execute {
-                deleteMediaWithGalleryBucket(mediaWithGalleryBucket)
+                getGalleryBucket(bucket)?.let {
+                    medias.forEach { media ->
+                        deleteMediaWithGalleryBucket(
+                            MediaWithGalleryBucket(media.mediaId, it.galleryBucketId)
+                        )
+                    }
+                }
             }
         }
 

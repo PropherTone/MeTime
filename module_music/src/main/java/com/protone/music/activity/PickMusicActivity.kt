@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import com.protone.common.R
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +21,7 @@ import com.protone.common.utils.RouterPath
 import com.protone.common.utils.SearchModel
 import com.protone.component.BaseMusicActivity
 import com.protone.component.BaseViewModel
+import com.protone.component.R
 import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.service.MusicBinder
 import com.protone.component.view.customView.blurView.DefaultBlurController
@@ -33,7 +33,6 @@ import com.protone.music.viewModel.PickMusicViewModel.Companion.ADD_BUCKET
 import com.protone.music.viewModel.PickMusicViewModel.Companion.SEARCH_MUSIC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.MusicRouterPath.Pick)
 class PickMusicActivity :

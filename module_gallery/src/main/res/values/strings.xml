@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="name_used">名称被占用</string>
+    <string name="photo">相片</string>
+    <string name="video">视频</string>
+</resources>

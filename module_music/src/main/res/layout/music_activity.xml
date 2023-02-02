@@ -48,7 +48,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_baseline_arrow_drop_down_24_white"
+                android:src="@drawable/ic_round_arrow_drop_down_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

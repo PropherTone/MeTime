@@ -16,10 +16,10 @@ import com.protone.common.entity.Music
 import com.protone.component.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.MusicControllerIMP
-import com.protone.common.R
 import com.protone.common.context.activities
 import com.protone.common.utils.RouterPath
 import com.protone.music.adapter.TransparentPlayListAdapter
+import com.protone.component.R
 import com.protone.component.view.customView.blurView.DefaultBlurController
 import com.protone.component.view.customView.blurView.DefaultBlurEngine
 import com.protone.music.adapter.MusicItemDecoration

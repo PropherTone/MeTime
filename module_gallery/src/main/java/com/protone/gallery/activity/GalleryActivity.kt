@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.protone.common.R
+import com.protone.gallery.R
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.root
@@ -145,9 +145,7 @@ class GalleryActivity :
                 deleteGalleryBucket { viewModel.deleteGalleryBucket(it) }
             }
             addItemDecoration(
-                GalleryBucketItemDecoration(
-                    resources.getDimension(com.protone.gallery.R.dimen.bucket_margin).toInt()
-                )
+                GalleryBucketItemDecoration(resources.getDimension(R.dimen.bucket_margin).toInt())
             )
         }
     }
@@ -189,7 +187,7 @@ class GalleryActivity :
             CHOOSE_PHOTO -> arrayOf(R.string.photo)
             CHOOSE_VIDEO -> arrayOf(R.string.video)
             else -> {
-                if (combine) arrayOf(R.string.model_gallery)
+                if (combine) arrayOf(com.protone.component.R.string.model_gallery)
                 else arrayOf(R.string.photo, R.string.video)
             }
         }.let { tabList ->
@@ -237,9 +235,10 @@ class GalleryActivity :
     }
 
     fun addBucket() {
-        titleDialog(R.string.user_name.getString(), "") {
+        titleDialog(com.protone.component.R.string.user_name.getString(), "") {
+            if (it == ALL_GALLERY) R.string.name_used.getString().toast()
             if (it.isNotEmpty()) viewModel.addBucket(it)
-            else R.string.enter.getString().toast()
+            else com.protone.component.R.string.enter.getString().toast()
         }
     }
 
@@ -276,12 +275,12 @@ class GalleryActivity :
         }
     }
 
-    private fun loadGalleyUri(uri: Uri?) {
+    private fun GalleryActivityBinding.loadGalleyUri(uri: Uri?) {
         Image.load(uri)
             .with(this@GalleryActivity)
             .error(com.protone.component.R.drawable.ic_baseline_image_24_white)
             .transition(Transition.CrossFade)
-            .into(binding.galleryAction)
+            .into(galleryAction)
     }
 
     private fun getReveal(): Animator? {
@@ -324,7 +323,10 @@ class GalleryActivity :
     }
 
     override fun popDelete() {
-        tryDelete(viewModel.chooseData) {}
+        viewModel.apply {
+            if (removeMediasFromCustomGallery(chooseData)) return
+            tryDelete(chooseData) {}
+        }
     }
 
     override fun popMoveTo() {

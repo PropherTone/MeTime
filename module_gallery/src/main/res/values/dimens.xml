@@ -5,4 +5,6 @@
 
     <dimen name="border_distance">10dp</dimen>
     <dimen name="bucket_margin">5dp</dimen>
+    <dimen name="item_margin">1dp</dimen>
+    <dimen name="bucket_check_line_height">2dp</dimen>
 </resources>
