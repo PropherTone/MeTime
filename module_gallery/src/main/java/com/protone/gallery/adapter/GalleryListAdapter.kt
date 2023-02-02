@@ -71,7 +71,7 @@ class GalleryListAdapter(
                 val index = mList.indexOf(data.media)
                 if (index != -1) {
                     mList.removeAt(index)
-                    if (selectList.contains(mList[index])) selectList.remove(mList[index])
+                    if (selectList.contains(data.media)) selectList.remove(data.media)
                     itemCount = mList.size
                     notifyItemRemovedCO(index)
                 }
@@ -157,18 +157,24 @@ class GalleryListAdapter(
                     .placeholder(R.drawable.none_state_background)
                     .into(image)
                 image.setOnClickListener {
-                    if (onSelectMod) {
-                        checkSelect(position, mList[position])
-                        onSelectListener?.select(mList[position])
-                    } else onSelectListener?.openView(mList[position], imageView)
+                    val layoutPosition = holder.layoutPosition
+                    mList[layoutPosition].let { media ->
+                        if (onSelectMod) {
+                            checkSelect(layoutPosition, media)
+                            onSelectListener?.select(media)
+                        } else onSelectListener?.openView(media, imageView)
+                    }
                 }
                 if (useSelect) {
                     image.setOnLongClickListener {
-                        onSelectMod = true
-                        checkSelect(position, mList[position])
-                        onSelectListener?.select(mList[position])
-                        onSelectListener?.onItemLongClick()
-                        true
+                        val layoutPosition = holder.layoutPosition
+                        mList[layoutPosition].let { media ->
+                            onSelectMod = true
+                            checkSelect(layoutPosition, media)
+                            onSelectListener?.select(media)
+                            onSelectListener?.onItemLongClick()
+                            true
+                        }
                     }
                 }
             }
@@ -202,7 +208,8 @@ class GalleryListAdapter(
 
     fun select(position: Int) {
         if (position <= 0 || position >= mList.size) return
-        selectList.add(mList[position])
+        checkSelect(position, mList[position])
+        onSelectListener?.select(mList[position])
         notifyItemChanged(position, SELECT)
     }
 

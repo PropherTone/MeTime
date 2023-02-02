@@ -13,7 +13,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/rename"
-            android:textColor="@color/black"
             android:textStyle="bold"
             app:drawableTopCompat="@drawable/ic_outline_rename_24_black" />
 
@@ -23,7 +22,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/moveTo"
-            android:textColor="@color/black"
             android:textStyle="bold"
             app:drawableTopCompat="@drawable/ic_outline_move_24" />
 
@@ -33,7 +31,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/delete"
-            android:textColor="@color/black"
             android:textStyle="bold"
             app:drawableTopCompat="@drawable/ic_outline_delete_24" />
 
@@ -43,7 +40,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/setCategory"
-            android:textColor="@color/black"
             android:textStyle="bold"
             app:drawableTopCompat="@drawable/ic_outline_category_24" />
 
@@ -53,7 +49,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/selectAll"
-            android:textColor="@color/black"
             android:textStyle="bold"
             app:drawableTopCompat="@drawable/ic_outline_select_all_24" />
 
@@ -63,7 +58,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/surfing"
-            android:textColor="@color/black"
             android:textStyle="bold"
             app:drawableTopCompat="@drawable/ic_outline_surfing_24" />
 

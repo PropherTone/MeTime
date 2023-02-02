@@ -40,7 +40,7 @@ class AddBucketViewModel : BaseViewModel() {
                 uri?.imageSaveToDisk(name.getBucketSaveIconName(), MUSIC_BUCKET),
                 0,
                 detail,
-                todayDate("yyyy/MM/dd")
+                todayDate("yyyy-MM-dd hh:mm:ss")
             )
         ) { result, rName ->
             callback.invoke(result, rName)
@@ -52,17 +52,16 @@ class AddBucketViewModel : BaseViewModel() {
     ) = musicDAO.updateMusicBucket(
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
-            mb.icon?.deleteFile()
-            val toFile = uri?.imageSaveToDisk(
-                mb.name.getBucketSaveIconName(),
-                MUSIC_BUCKET
-            )
-            if (mb.icon == null || mb.icon?.equals(toFile) == false) {
-                mb.icon = toFile
-                toFile?.let { icon -> bitmapCachePool.remove(icon) }
+            uri?.let {
+                mb.icon?.deleteFile()
+                it.imageSaveToDisk(mb.name.getBucketSaveIconName(), MUSIC_BUCKET)
+            }?.takeIf { mb.icon == null || mb.icon?.equals(it) == false }?.let {
+                if (mb.icon == null || mb.icon?.equals(it) == false) {
+                    mb.icon = it
+                    bitmapCachePool.remove(it)
+                }
             }
             if (mb.detail != detail) mb.detail = detail
-            todayDate("yyyy/MM/dd")
         }
     )
 

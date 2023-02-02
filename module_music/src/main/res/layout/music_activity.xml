@@ -37,7 +37,6 @@
             android:id="@+id/music_model_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipChildren="false"
             android:minHeight="?attr/actionBarSize"
             app:layoutDescription="@xml/music_layout_scene">
 
@@ -59,9 +58,10 @@
                 android:layout_marginTop="28dp"
                 android:background="@color/foreDark"
                 android:contentDescription="@string/icon"
+                android:cropToPadding="true"
                 android:padding="@dimen/icon_padding"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_baseline_music_note_24"
+                android:src="@drawable/ic_music_note_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/music_finish" />
@@ -97,6 +97,8 @@
                 android:layout_marginTop="@dimen/texts_margin"
                 android:layout_marginEnd="@dimen/icon_margin"
                 android:layout_marginBottom="@dimen/icon_margin"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:padding="@dimen/texts_padding"
                 android:scrollbars="vertical"
                 android:textColor="@color/white"

@@ -36,6 +36,8 @@ import com.protone.music.viewModel.PickMusicViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+private typealias musicR = com.protone.music.R.drawable
+
 @Route(path = RouterPath.MusicRouterPath.Main)
 class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicViewEvent>(),
     StatusImageView.StateListener {
@@ -98,7 +100,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
             mySmallMusicPlayer.interceptAlbumCover = true
             viewModel.playerFitTopH = barHeight
             translatePlayerCoverToFit(true)
-            musicBucketTime.movementMethod = ScrollingMovementMethod()
+            musicBucketMsg.movementMethod = ScrollingMovementMethod.getInstance()
 
             root.onGlobalLayout {
                 musicBucketContainer.botBlock =
@@ -389,7 +391,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                 blurredBucketCover.setBlurBitmap(bm, 24, 10)
             } ?: run {
                 blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
-                musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
+                musicBucketIcon.setImageDrawable(musicR.ic_music_note_24_white.getDrawable())
             }
         }
     }

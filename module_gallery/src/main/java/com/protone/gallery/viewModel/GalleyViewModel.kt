@@ -172,6 +172,11 @@ class GalleryViewModel : BaseViewModel() {
     fun removeMediasFromCustomGallery(medias: List<GalleryMedia>): Boolean {
         return getSelectedBucket().takeIf { it != null && it.custom }?.let {
             galleryDAO.deleteMediasWithGalleryBucketAsync(medias, it.name)
+            viewModelScope.launchDefault {
+                medias.forEach { media ->
+                    sendListEvent(GalleryListEvent.OnMediaDeleted(media))
+                }
+            }
             true
         } ?: false
     }
