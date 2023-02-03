@@ -45,7 +45,7 @@ class GallerySearchViewModel : BaseViewModel() {
             }
             launchDefault {
                 data.filter {
-                    val notesWithGallery = galleryDAO.getNotesWithGallery(it.uri)
+                    val notesWithGallery = galleryDAO.getNotesWithGallery(it.mediaId)
                         .map { note -> note.title }
                     notesWithGallery.any { name -> name.contains(input, true) }
                 }.let { noteFilterList ->

@@ -9,13 +9,12 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.context.root
-import com.protone.common.entity.GalleryBucket
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.onResult
 import com.protone.component.R
 import com.protone.component.databinding.*
 import com.protone.component.view.adapter.BaseAdapter
-import com.protone.component.view.adapter.CheckListAdapter
+import com.protone.component.view.adapter.NoteCheckListAdapter
 import kotlinx.coroutines.Dispatchers
 
 fun Activity.loginDialog(
@@ -129,11 +128,11 @@ fun Activity.checkListDialog(
         listTitle.text = title
         listList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = CheckListAdapter(context, dataList)
+            adapter = NoteCheckListAdapter(context, dataList)
         }
         listConfirm.setOnClickListener {
             listList.adapter.let {
-                if (it is CheckListAdapter)
+                if (it is NoteCheckListAdapter)
                     callBack?.invoke(it.selectList.takeIf { list -> list.isNotEmpty() }?.first())
             }
             create.dismiss()

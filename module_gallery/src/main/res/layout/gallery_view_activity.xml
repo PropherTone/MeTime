@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="@dimen/small_elevation"
-            android:visibility="invisible">
+            android:visibility="visible">
 
             <TextView
                 android:id="@+id/galleryV_title"
@@ -157,8 +157,6 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@color/foreDark_1"
-                android:overScrollMode="never"
-                android:padding="@dimen/main_padding"
                 app:layout_constraintBottom_toBottomOf="@id/galleryV_links_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/galleryV_links_name"

@@ -41,6 +41,17 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         diff = adapterDiff
     }
 
+    fun getDefaultDiff() = object : AdapterDiff<String> {
+        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun getChangePayload(oldItem: String, newItem: String): Boolean {
+            return oldItem == newItem
+        }
+
+    }
+
     open fun setData(collection: Collection<Item>) {
         mList.clear()
         mList.addAll(collection)

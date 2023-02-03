@@ -1,7 +1,6 @@
 package com.protone.gallery.activity
 
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.core.view.isGone
@@ -11,10 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.component.R
-import com.protone.common.baseType.getStorageSize
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.toDateString
+import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
@@ -30,22 +26,21 @@ import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUri
 import com.protone.common.utils.onResult
 import com.protone.component.BaseMediaActivity
+import com.protone.component.R
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.adapter.CatoListAdapter
-import com.protone.component.view.adapter.CheckListAdapter
+import com.protone.gallery.adapter.NoteLinkListAdapter
 import com.protone.gallery.databinding.GalleryViewActivityBinding
 import com.protone.gallery.fragment.GalleryViewFragment
 import com.protone.gallery.viewModel.GalleryViewViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 @Route(path = RouterPath.GalleryRouterPath.GalleryView)
 class GalleryViewActivity : BaseMediaActivity<
         GalleryViewActivityBinding,
         GalleryViewViewModel,
-        GalleryViewViewModel.GalleryViewEvent>() {
+        GalleryViewViewModel.GalleryViewEvent>(true) {
     override val viewModel: GalleryViewViewModel by viewModels()
 
     override fun createView(): GalleryViewActivityBinding {
@@ -118,8 +113,10 @@ class GalleryViewActivity : BaseMediaActivity<
 
     private fun GalleryViewActivityBinding.initList() {
         galleryVLinks.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
+            layoutManager = LinearLayoutManager(context).also {
+                it.orientation = LinearLayoutManager.HORIZONTAL
+            }
+            adapter = NoteLinkListAdapter(this@GalleryViewActivity, listOf()).also {
                 it.startNote = {
                     startActivity(RouterPath.NoteRouterPath.NoteView) { noteViewPostcard(it) }
                 }
@@ -171,10 +168,11 @@ class GalleryViewActivity : BaseMediaActivity<
         }
     }
 
-    private suspend fun GalleryViewViewModel.setInfo() = withContext(Dispatchers.Default) {
-        val galleryMedia = getSignedMedia()
-        refreshCate(galleryMedia?.cate)
-        setNotes(getNotesWithGallery(galleryMedia?.uri ?: Uri.EMPTY))
+    private suspend fun GalleryViewViewModel.setInfo() = withDefaultContext {
+        getSignedMedia()?.let {
+            refreshCate(it.cate)
+            setNotes(getNotesWithGallery(it.mediaId))
+        }
     }
 
     private fun GalleryViewViewModel.setMediaInfo(position: Int) {
@@ -218,13 +216,12 @@ class GalleryViewActivity : BaseMediaActivity<
             type.ifEmpty { R.string.none.getString() })
     }
 
-    private suspend fun setNotes(notes: MutableList<String>) = withContext(Dispatchers.Main) {
-        binding.galleryVLinks.isGone = notes.isEmpty()
-        if (binding.galleryVLinks.adapter is CheckListAdapter)
-            (binding.galleryVLinks.adapter as CheckListAdapter).notifyListChangedCO(notes)
+    private suspend fun setNotes(notes: List<String>) = withMainContext {
+        if (binding.galleryVLinks.adapter is NoteLinkListAdapter)
+            (binding.galleryVLinks.adapter as NoteLinkListAdapter).notifyListChangedCO(notes)
     }
 
-    private suspend fun refreshCate(cate: List<String>?) = withContext(Dispatchers.Main) {
+    private suspend fun refreshCate(cate: List<String>?) = withMainContext {
         (binding.galleryVCatoContainer.adapter as CatoListAdapter).refresh(cate)
     }
 

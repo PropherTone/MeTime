@@ -55,7 +55,6 @@ class GalleryListFragment :
         selectedList: MediaSelectedList,
     ) {
         selectedMedias = selectedList
-        runCatching { getListAdapter().selectList = selectedList }
         launchMain {
             fun changeSpanCount(isOpen: Boolean, layoutManager: GridLayoutManager) {
                 val count = if (isOpen) 2 else 4
@@ -137,6 +136,7 @@ class GalleryListFragment :
             addItemDecoration(GalleryItemDecoration(resources.getDimensionPixelSize(R.dimen.item_margin)))
             adapter = GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
                 it.multiChoose = true
+                it.selectList = selectedMedias
                 it.setOnSelectListener(onSelect)
             }
         }

@@ -11,21 +11,12 @@ import com.protone.common.utils.displayUtils.imageLoader.Image
 import kotlinx.coroutines.launch
 
 class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListDataProxy) :
-    BaseAdapter<String,ViewDataBinding, Any>(context) {
+    BaseAdapter<String, ViewDataBinding, Any>(context) {
 
     private var itemClick: ((String) -> Unit)? = null
 
     init {
-        setAdapterDiff(object : AdapterDiff<String>{
-            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-                return oldItem == newItem
-            }
-
-            override fun getChangePayload(oldItem: String, newItem: String): Boolean {
-                return oldItem == newItem
-            }
-
-        })
+        setAdapterDiff(getDefaultDiff())
     }
 
     override fun getItemViewType(position: Int): Int {

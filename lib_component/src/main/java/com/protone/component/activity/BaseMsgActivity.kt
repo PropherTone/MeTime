@@ -10,6 +10,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 abstract class BaseMsgActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>(
     receiveEvent: Boolean = true
@@ -46,7 +47,7 @@ abstract class BaseMsgActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : Ba
     }
 
     fun sendViewEvent(event: VE) {
-        viewEvent?.trySend(event)
+        launch { viewEvent?.send(event) }
     }
 
     private fun closeEvent() {

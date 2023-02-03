@@ -15,8 +15,8 @@ interface GalleriesWithNotesDAO {
     fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes)
 
     @RewriteQueriesToDropUnusedColumns
-    @Query("SELECT * FROM Note INNER JOIN GalleriesWithNotes ON Note.noteId = GalleriesWithNotes.noteId WHERE GalleriesWithNotes.mediaId IS:uri")
-    fun getNotesWithGallery(uri: Uri): List<Note>?
+    @Query("SELECT * FROM Note INNER JOIN GalleriesWithNotes ON Note.noteId = GalleriesWithNotes.noteId WHERE GalleriesWithNotes.mediaId IS:mediaId")
+    fun getNotesWithGallery(mediaId: Long): List<Note>?
 
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM GalleryMedia INNER JOIN GalleriesWithNotes ON GalleryMedia.media_uri = GalleriesWithNotes.mediaId WHERE GalleriesWithNotes.noteId IS:noteId")

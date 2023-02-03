@@ -4,6 +4,7 @@ import android.net.Uri
 import com.protone.common.baseType.*
 import com.protone.component.database.userConfig
 import com.protone.common.entity.GalleryMedia
+import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.BaseViewModel
 import kotlin.streams.toList
 
@@ -21,21 +22,23 @@ class GalleryViewViewModel : BaseViewModel() {
         withDefaultContext {
             galleryMedias = (galleryDAO.let {
                 val combine = userConfig.combineGallery
-                if (isCustom) {
-                    it.getGalleryBucket(gallery)?.galleryBucketId?.let { bucketId ->
+                when {
+                    isCustom -> it.getGalleryBucket(gallery)?.galleryBucketId?.let { bucketId ->
                         if (combine) it.getGalleryMediasByBucket(bucketId)
                         else it.getGalleryMediasByBucket(bucketId, isVideo)
                     }
-                } else if (combine) it.getAllSignedMedia()
-                else it.getAllMediaByGallery(gallery, isVideo)
+                    combine -> it.getAllSignedMedia()
+                    gallery == ALL_GALLERY -> it.getAllSignedMedia()
+                    else -> it.getAllMediaByGallery(gallery, isVideo)
+                }
             } ?: mutableListOf()) as MutableList<GalleryMedia>
         }
 
     suspend fun getSignedMedia() = galleryDAO.getSignedMedia(galleryMedias[curPosition].uri)
 
-    suspend fun getNotesWithGallery(mediaUri: Uri): MutableList<String> =
+    suspend fun getNotesWithGallery(mediaId: Long): MutableList<String> =
         withDefaultContext {
-            galleryDAO.getNotesWithGallery(mediaUri)
+            galleryDAO.getNotesWithGallery(mediaId)
                 .stream()
                 .map { note ->
                     note.title

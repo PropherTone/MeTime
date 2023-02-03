@@ -200,8 +200,8 @@ sealed class GalleriesWithNotesDAO : GalleryBucketDAO() {
             }
         }
 
-    suspend fun getNotesWithGallery(uri: Uri): List<Note> = withIOContext {
-        galleriesWithNotesDAO.getNotesWithGallery(uri) ?: mutableListOf()
+    suspend fun getNotesWithGallery(mediaId: Long): List<Note> = withIOContext {
+        galleriesWithNotesDAO.getNotesWithGallery(mediaId) ?: mutableListOf()
     }
 
     suspend fun getGalleriesWithNote(noteId: Long): List<GalleryMedia> =

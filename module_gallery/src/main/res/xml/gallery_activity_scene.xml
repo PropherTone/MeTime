@@ -50,7 +50,8 @@
             android:padding="16dp"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/gallery_tab"
@@ -141,7 +142,8 @@
             android:padding="16dp"
             android:src="@drawable/ic_baseline_more_horiz_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/gallery_tab"

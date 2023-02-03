@@ -6,7 +6,7 @@ import androidx.core.view.isGone
 import com.protone.common.context.newLayoutInflater
 import com.protone.component.databinding.CheckListAdapterLayoutBinding
 
-class CheckListAdapter(
+class NoteCheckListAdapter(
     context: Context,
     dataList: List<String>? = null,
     private val check: Boolean = true
@@ -19,6 +19,7 @@ class CheckListAdapter(
         if (dataList != null) {
             this.mList.addAll(dataList)
         }
+        setAdapterDiff(getDefaultDiff())
     }
 
     override fun setSelect(

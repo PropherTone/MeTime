@@ -15,11 +15,10 @@ import androidx.transition.TransitionManager
 import com.protone.common.baseType.toInt
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.context.root
-import com.protone.common.entity.GalleryBucket
 import com.protone.common.utils.spans.SpanStates
 import com.protone.component.R
 import com.protone.component.databinding.*
-import com.protone.component.view.adapter.CheckListAdapter
+import com.protone.component.view.adapter.NoteCheckListAdapter
 import java.lang.ref.WeakReference
 
 class ColorfulPopWindow(context: Context) : PopupWindow(context) {
@@ -67,11 +66,11 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
         binding.listTitle.text = title
         binding.listList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = CheckListAdapter(context, dataList)
+            adapter = NoteCheckListAdapter(context, dataList)
         }
         binding.listConfirm.setOnClickListener {
             binding.listList.adapter.let {
-                if (it is CheckListAdapter)
+                if (it is NoteCheckListAdapter)
                     onCall.invoke(it.selectList.takeIf { list -> list.isNotEmpty() }?.first())
             }
         }

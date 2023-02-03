@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/cato_back"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="@string/icon" />
+            android:contentDescription="@string/icon"
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/cato_name"
-            android:maxWidth="@dimen/huge_icon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center"
+            android:maxWidth="@dimen/huge_icon"
             android:padding="@dimen/main_padding"
             android:textColor="@color/white"
             android:textSize="@dimen/sub_text" />
