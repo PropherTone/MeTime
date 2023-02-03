@@ -30,11 +30,12 @@ suspend fun BaseFragment<*, *>.toGallery(chooseMode: String) =
 fun BaseActivity<*, *, *>.toGalleryView(
     mediaJson: String,
     isVideo: Boolean,
+    isCustom: Boolean,
     targetGallery: String = ALL_GALLERY,
     elementView: View? = null
 ) {
     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-        galleryViewPostcard(mediaJson, isVideo, targetGallery).let {
+        galleryViewPostcard(mediaJson, isVideo, isCustom, targetGallery).let {
             elementView?.let { view ->
                 it.withOptionsCompat(
                     ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -51,11 +52,12 @@ fun BaseActivity<*, *, *>.toGalleryView(
 fun BaseFragment<*, *>.toGalleryView(
     mediaJson: String,
     isVideo: Boolean,
+    isCustom: Boolean,
     targetGallery: String = ALL_GALLERY,
     elementView: View? = null
 ) {
     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-        galleryViewPostcard(mediaJson, isVideo, targetGallery).let {
+        galleryViewPostcard(mediaJson, isVideo, isCustom, targetGallery).let {
             elementView?.let view@{ view ->
                 val fragmentActivity = activity ?: return@view null
                 it.withOptionsCompat(

@@ -22,6 +22,7 @@ import com.protone.common.utils.RouterPath
 import com.protone.component.R
 import com.protone.component.BaseMusicActivity
 import com.protone.component.MusicControllerIMP
+import com.protone.component.activity.BaseActivity
 import com.protone.component.database.userConfig
 import com.protone.component.view.customView.StatusImageView
 import com.protone.component.view.customView.musicPlayer.getBitmap
@@ -44,7 +45,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
 
     override val viewModel: MusicModel by viewModels()
 
-    internal class BindingViewModel {
+    internal class BindingModel {
         lateinit var activity: MusicActivity
         val isContainerOpen = ObservableField(true)
         lateinit var binding: MusicActivityBinding
@@ -88,7 +89,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                 )
             }
 
-            model = BindingViewModel().also {
+            model = BindingModel().also {
                 it.activity = this@MusicActivity
                 it.binding = this
             }

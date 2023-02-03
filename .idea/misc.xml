@@ -8,13 +8,6 @@
         <entry key="..\:/AndroidStudioProject/MeTime/app/src/main/res/layout/video_card.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/background_ripple_fore_dark.xml" value="0.2025" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/background_ripple_glass.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_baseline_music_note_24.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_outline_category_24.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_outline_delete_24.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_outline_move_24.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_outline_rename_24_black.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_outline_select_all_24.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/ic_outline_surfing_24.xml" value="0.2025" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/main_background.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/none_state_background.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/round_background_fore_dark.xml" value="0.2025" />
@@ -22,7 +15,6 @@
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/trans_dark_ripple.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/drawable/trans_ripple.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/layout/auto_music_player_layout_full.xml" value="0.3605072463768116" />
-        <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/layout/gallery_option_pop.xml" value="0.3605072463768116" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/layout/rich_video_layout.xml" value="0.2296195652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/lib_component/src/main/res/layout/video_player_layout.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_activity.xml" value="0.1527777777777778" />
@@ -31,8 +23,6 @@
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_view_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_gallery/src/main/res/layout/gallery_vp2_adapter_layout.xml" value="0.2296195652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/drawable/background_ripple_fore_dark.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/drawable/ic_baseline_music_note_24.xml" value="0.2025" />
-        <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/drawable/ic_music_note_24_white.xml" value="0.2025" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_music/src/main/res/layout/music_view_activity.xml" value="0.358695652173913" />
         <entry key="..\:/AndroidStudioProject/MeTime/module_note/src/main/res/layout/note_activity.xml" value="0.17806484295845998" />
@@ -152,7 +142,7 @@
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/gallery_list_fragment_layout.xml" value="0.24010416666666667" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/gallery_option_pop.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/gallery_search_activity.xml" value="0.24114583333333334" />
-        <entry key="..\:/MeTime/module_gallery/src/main/res/layout/gallery_view_activity.xml" value="0.1" />
+        <entry key="..\:/MeTime/module_gallery/src/main/res/layout/gallery_view_activity.xml" value="0.264" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/gallery_vp2_adapter_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_activity.xml" value="0.1" />
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_gif_layout.xml" value="0.24114583333333334" />
@@ -160,6 +150,7 @@
         <entry key="..\:/MeTime/module_gallery/src/main/res/layout/picture_box_adapter_video_layout.xml" value="0.24114583333333334" />
         <entry key="..\:/MeTime/module_music/src/main/res/drawable/ic_album_black.xml" value="0.1605" />
         <entry key="..\:/MeTime/module_music/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.1115" />
+        <entry key="..\:/MeTime/module_music/src/main/res/drawable/ic_baseline_arrow_drop_down_24_white.xml" value="0.168" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_activity.xml" value="0.1" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_activity_layout.xml" value="0.2" />
         <entry key="..\:/MeTime/module_music/src/main/res/layout/music_bucket_adapter_layout.xml" value="0.264" />

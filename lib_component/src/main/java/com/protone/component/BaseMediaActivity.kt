@@ -95,7 +95,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    fun addCate(gms: MutableList<GalleryMedia>) {
+    fun addCate(gms: List<GalleryMedia>) {
         cateDialog(addCate = {
             titleDialog(R.string.addCate.getString(), "") { re ->
                 if (re.isEmpty()) {
@@ -119,15 +119,13 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 
     fun moveTo(
         anchor: View,
-        gms: MutableList<GalleryMedia>,
-        callback: (GalleryBucket, MutableList<GalleryMedia>) -> Unit
+        gms: List<GalleryMedia>,
+        callback: (GalleryBucket, List<GalleryMedia>) -> Unit
     ) = launch {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,
-            dataList = (viewModel.galleryDAO
-                .getAllGalleryBucket() as MutableList<GalleryBucket>?)
-                ?.map { it.type } ?: mutableListOf()
+            dataList = viewModel.galleryDAO.getAllGalleryBucket()?.map { it.type } ?: listOf()
         ) { re ->
             if (re == null) {
                 R.string.none.getString().toast()
@@ -222,7 +220,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    private fun addCate(cate: String, gms: MutableList<GalleryMedia>) {
+    private fun addCate(cate: String, gms: List<GalleryMedia>) {
         gms.let { list ->
             list.forEach { gm ->
                 gm.also { g ->

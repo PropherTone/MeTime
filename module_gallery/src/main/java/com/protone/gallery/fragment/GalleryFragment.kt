@@ -201,7 +201,7 @@ class GalleryFragment : Fragment(), CoroutineScope by MainScope(),
             }
             galleryToolButton.setOnClickListener {
                 if (!viewModel.isBucketShowUp) {
-                    (galleryList.adapter as GalleryListAdapter).quitSelectMod()
+                    (galleryList.adapter as GalleryListAdapter).exitSelectMod()
                     onSelectMod = false
                 } else {
                     activity?.titleDialog(R.string.user_name.getString(), "") {

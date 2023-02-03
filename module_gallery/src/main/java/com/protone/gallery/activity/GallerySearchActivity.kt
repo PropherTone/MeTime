@@ -119,9 +119,9 @@ class GallerySearchActivity : BaseMediaActivity<
     override fun select(medias: List<GalleryMedia>) {
         if (medias.isEmpty()) {
             binding.apply {
-                (resultGalleries.adapter as GalleryListAdapter).quitSelectMod()
-                (resultCato.adapter as GalleryListAdapter).quitSelectMod()
-                (resultNotes.adapter as GalleryListAdapter).quitSelectMod()
+                (resultGalleries.adapter as GalleryListAdapter).exitSelectMod()
+                (resultCato.adapter as GalleryListAdapter).exitSelectMod()
+                (resultNotes.adapter as GalleryListAdapter).exitSelectMod()
             }
         }
     }
@@ -130,6 +130,7 @@ class GallerySearchActivity : BaseMediaActivity<
         toGalleryView(
             galleryMedia.toJson(),
             galleryMedia.isVideo,
+            false,
             intent.extras?.getString("gallery") ?: ALL_GALLERY
         )
     }

@@ -8,12 +8,10 @@ import android.view.ViewAnimationUtils
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.protone.gallery.R
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.root
@@ -35,8 +33,9 @@ import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
 import com.protone.component.view.dialog.titleDialog
+import com.protone.gallery.R
 import com.protone.gallery.adapter.GalleryBucketAdapter
-import com.protone.gallery.adapter.MyFragmentStateAdapter
+import com.protone.gallery.adapter.GalleryListStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
 import com.protone.gallery.databinding.GalleryActivityBinding
 import com.protone.gallery.fragment.GalleryListFragment
@@ -47,10 +46,54 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.hypot
 
+private typealias componentDrawable = com.protone.component.R.drawable
+private typealias componentString = com.protone.component.R.string
+private typealias componentAni = com.protone.component.R.anim
+
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
     BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>() {
     override val viewModel: GalleryViewModel by viewModels()
+
+    internal inner class BindModel {
+
+        fun finishEvent() {
+            if (onSelectMode) exitSelectMode() else finish()
+        }
+
+        fun showBucket() {
+            val progress = binding.motionRoot.progress
+            if (progress != 0f && progress != 1f) return
+            ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
+                addUpdateListener {
+                    binding.motionRoot.progress = (it.animatedValue as Float)
+                }
+            }.start()
+            viewModel.drawerStateChanged(progress != 1f)
+        }
+
+        fun showPop() {
+            showPop(binding.galleryActionMenu, viewModel.selectedMedias.size <= 0)
+        }
+
+        fun toSearch() {
+            launch {
+                IntentDataHolder.put(viewModel.getRightGalleryMedias())
+                startActivity(GallerySearchActivity::class.intent.also { intent ->
+                    intent.putExtra("gallery", viewModel.rightGallery)
+                })
+            }
+        }
+
+        fun addBucket() {
+            titleDialog(componentString.user_name.getString(), "") {
+                if (it == ALL_GALLERY) R.string.name_used.getString().toast()
+                if (it.isNotEmpty()) viewModel.addBucket(it)
+                else componentString.enter.getString().toast()
+            }
+        }
+
+    }
 
     private var isInit = false
 
@@ -58,15 +101,15 @@ class GalleryActivity :
         set(value) {
             if (field == value) return
             binding.finish.setImageResource(
-                if (value) com.protone.component.R.drawable.ic_round_close_24_white
-                else com.protone.component.R.drawable.ic_round_arrow_left_white_24
+                if (value) componentDrawable.ic_round_close_24_white
+                else componentDrawable.ic_round_arrow_left_white_24
             )
             field = value
         }
 
     override fun createView(): GalleryActivityBinding {
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
-            activity = this@GalleryActivity
+            model = BindModel()
             root.fitStatuesBar()
         }
     }
@@ -76,12 +119,11 @@ class GalleryActivity :
             intent.getStringExtra(RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MODE) ?: ""
 
         val notEmpty = chooseType.isNotEmpty()
-        if (notEmpty) {
-            binding.galleryActionMenu.isVisible = false
-            binding.galleryChooseConfirm.isGone = !notEmpty
-            binding.galleryChooseConfirm.setOnClickListener {
-                chooseData.let { list ->
-                    if (list.size <= 0) return@let
+        if (notEmpty) binding.apply {
+            galleryActionMenu.isVisible = false
+            galleryChooseConfirm.isGone = !notEmpty
+            galleryChooseConfirm.setOnClickListener {
+                getSelectedMedias().ifNotEmpty { list ->
                     setResult(
                         RESULT_OK,
                         Intent().putExtra(URI, list.last().uri.toUriJson())
@@ -99,11 +141,12 @@ class GalleryActivity :
     }
 
     private fun GalleryViewModel.observeEvent() {
-        observeSelectData { onSelectMode = it }
         launchDefault {
             galleryFlow.bufferCollect {
                 while (!isInit) delay(20L)
                 when (it) {
+                    GalleryViewModel.GalleryEvent.OnSelectedMode -> onSelectMode = true
+                    GalleryViewModel.GalleryEvent.ExitSelectedMode -> onSelectMode = false
                     is GalleryViewModel.GalleryEvent.OnNewGallery -> {
                         getBucketAdapter().insertBucket(it.gallery)
                     }
@@ -117,7 +160,7 @@ class GalleryActivity :
                         viewModel.run {
                             getBucketAdapter().apply {
                                 if (it.gallery.name == rightGallery) {
-                                    refreshSelectGallery(it.gallery, it.itemState, false)
+                                    binding.refreshSelectGallery(it.gallery, it.itemState, false)
                                 }
                                 refreshBucket(it.gallery, it.itemState)
                                 getBucket(ALL_GALLERY)?.let { gallery ->
@@ -152,9 +195,9 @@ class GalleryActivity :
 
     private fun initPager(chooseType: String = "") {
         val combine = userConfig.combineGallery || chooseType == CHOOSE_MEDIA
-        binding.galleryPager.adapter = MyFragmentStateAdapter(
+        binding.galleryPager.adapter = GalleryListStateAdapter(
             this@GalleryActivity,
-            mutableListOf<Fragment>().also { fs ->
+            mutableListOf<GalleryListFragment>().also { fs ->
                 var initializeSize = 0
                 fun generateFragment(isVideo: Boolean) {
                     GalleryListFragment().also {
@@ -167,7 +210,7 @@ class GalleryActivity :
                                 }
                                 if (++initializeSize == fs.size) isInit = true
                             },
-                            viewModel.dataFlow
+                            viewModel.selectedMedias
                         )
                         fs.add(it)
                     }
@@ -187,7 +230,7 @@ class GalleryActivity :
             CHOOSE_PHOTO -> arrayOf(R.string.photo)
             CHOOSE_VIDEO -> arrayOf(R.string.video)
             else -> {
-                if (combine) arrayOf(com.protone.component.R.string.model_gallery)
+                if (combine) arrayOf(componentString.model_gallery)
                 else arrayOf(R.string.photo, R.string.video)
             }
         }.let { tabList ->
@@ -207,41 +250,6 @@ class GalleryActivity :
         }
     }
 
-    fun finishEvent() {
-        if (onSelectMode) quiteSelectMode() else finish()
-    }
-
-    fun showBucket() {
-        val progress = binding.motionRoot.progress
-        if (progress != 0f && progress != 1f) return
-        ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
-            addUpdateListener {
-                binding.motionRoot.progress = (it.animatedValue as Float)
-            }
-        }.start()
-        viewModel.drawerStateChanged(progress != 1f)
-    }
-
-    fun showPop() {
-        showPop(binding.galleryActionMenu, viewModel.chooseData.size <= 0)
-    }
-
-    fun toSearch() {
-        val gallery = viewModel.rightGallery
-        IntentDataHolder.put(getGalleryData())
-        startActivity(GallerySearchActivity::class.intent.also { intent ->
-            intent.putExtra("gallery", gallery)
-        })
-    }
-
-    fun addBucket() {
-        titleDialog(com.protone.component.R.string.user_name.getString(), "") {
-            if (it == ALL_GALLERY) R.string.name_used.getString().toast()
-            if (it.isNotEmpty()) viewModel.addBucket(it)
-            else com.protone.component.R.string.enter.getString().toast()
-        }
-    }
-
     private suspend fun onGalleryTabSwapped() {
         viewModel.drawerStateChanged(binding.motionRoot.progress == 1f)
         getBucketAdapter().setData(viewModel.getGalleryData())
@@ -253,69 +261,60 @@ class GalleryActivity :
 
     private suspend fun setSelectGallery(gallery: Gallery) {
         viewModel.onGallerySelected(gallery, binding.motionRoot.progress == 1f)
-        refreshSelectGallery(gallery)
+        binding.refreshSelectGallery(gallery)
     }
 
-    private suspend fun refreshSelectGallery(
+    private suspend fun GalleryActivityBinding.refreshSelectGallery(
         gallery: Gallery,
         itemState: ItemState = ItemState.ALL_CHANGED,
         doAni: Boolean = true
     ): Unit = withMainContext {
-        binding.apply {
-            when (itemState) {
-                ItemState.ALL_CHANGED -> {
-                    loadGalleyUri(gallery.uri)
-                    galleryName.text = gallery.name
-                    galleryItemNumber.text = gallery.size.toString()
-                }
-                ItemState.SIZE_CHANGED -> galleryItemNumber.text = gallery.size.toString()
-                ItemState.URI_CHANGED -> loadGalleyUri(gallery.uri)
+        when (itemState) {
+            ItemState.ALL_CHANGED -> {
+                loadGalleyUri(gallery.uri)
+                galleryName.text = gallery.name
+                galleryItemNumber.text = gallery.size.toString()
             }
-            if (doAni) getReveal()?.start()
+            ItemState.SIZE_CHANGED -> galleryItemNumber.text = gallery.size.toString()
+            ItemState.URI_CHANGED -> loadGalleyUri(gallery.uri)
         }
+        if (doAni) getReveal()?.start()
     }
 
     private fun GalleryActivityBinding.loadGalleyUri(uri: Uri?) {
         Image.load(uri)
             .with(this@GalleryActivity)
-            .error(com.protone.component.R.drawable.ic_baseline_image_24_white)
+            .error(componentDrawable.ic_baseline_image_24_white)
             .transition(Transition.CrossFade)
             .into(galleryAction)
     }
 
-    private fun getReveal(): Animator? {
-        val mX = binding.galleryDetail.measuredWidth / 2
-        val mY = binding.galleryDetail.measuredHeight / 2
+    private fun GalleryActivityBinding.getReveal(): Animator? {
+        val mX = galleryDetail.measuredWidth / 2
+        val mY = galleryDetail.measuredHeight / 2
         val radius = hypot(mX.toDouble(), mY.toDouble()).toFloat()
         return ViewAnimationUtils.createCircularReveal(
-            binding.galleryDetail, mX,
+            galleryDetail, mX,
             mY, 0f, radius
         ).also { it.duration = 500L }
     }
 
-    private fun quiteSelectMode() {
-        viewModel.quiteSelect()
+    private fun exitSelectMode() {
+        viewModel.exitSelect()
         onSelectMode = false
     }
 
     private fun getBucketAdapter() = binding.galleryBucket.adapter as GalleryBucketAdapter
 
-    private fun getGalleryData() = ((binding.galleryPager.adapter as MyFragmentStateAdapter)
-        .getFragment(viewModel.rightMailer) as GalleryListFragment?)
-        ?.getGalleryData()
-
     override fun getSwapAnim(): Pair<Int, Int>? {
         if (!binding.galleryChooseConfirm.isGone) return null
-        return Pair(
-            com.protone.component.R.anim.card_in_rtl,
-            com.protone.component.R.anim.card_out_rtl
-        )
+        return Pair(componentAni.card_in_rtl, componentAni.card_out_rtl)
     }
 
     override fun onBackPressed() {
         if (!doOnBackPressed()) {
             if (onSelectMode) {
-                quiteSelectMode()
+                exitSelectMode()
                 return
             }
         } else return
@@ -324,23 +323,19 @@ class GalleryActivity :
 
     override fun popDelete() {
         viewModel.apply {
-            if (removeMediasFromCustomGallery(chooseData)) return
-            tryDelete(chooseData) {}
+            if (removeMediasFromCustomGallery(getSelectedMedias())) return
+            tryDelete(getSelectedMedias()) {}
         }
     }
 
     override fun popMoveTo() {
-        viewModel.chooseData.let {
-            if (it.size <= 0) return
+        viewModel.getSelectedMedias().ifNotEmpty {
             moveTo(binding.galleryActionMenu, it) { _, _ -> }
         }
     }
 
     override fun popRename() {
-        viewModel.chooseData.let {
-            if (it.size <= 0) return
-            tryRename(it)
-        }
+        viewModel.getSelectedMedias().ifNotEmpty { tryRename(it) }
     }
 
     override fun popSelectAll() {
@@ -348,18 +343,16 @@ class GalleryActivity :
     }
 
     override fun popSetCate() {
-        viewModel.chooseData.let { list ->
-            if (list.size <= 0) return
-            addCate(list)
-        }
+        viewModel.getSelectedMedias().ifNotEmpty { addCate(it) }
     }
 
     override fun popIntoBox() {
-        IntentDataHolder.put(
-            if (viewModel.chooseData.isEmpty()) getGalleryData() ?: viewModel.chooseData
-            else viewModel.chooseData
-        )
-        startActivity(PictureBoxActivity::class.intent)
+        launch {
+            viewModel.getSelectedMedias().let {
+                IntentDataHolder.put(it.ifEmpty { viewModel.getRightGalleryMedias() ?: it })
+                startActivity(PictureBoxActivity::class.intent)
+            }
+        }
     }
 
 }

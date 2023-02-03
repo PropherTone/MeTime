@@ -209,7 +209,7 @@ class DatabaseBridge : DatabaseHelper() {
             }
         }
 
-        fun updateMediaMultiAsync(list: MutableList<GalleryMedia>) {
+        fun updateMediaMultiAsync(list: List<GalleryMedia>) {
             execute { updateSignedMediaMulti(list) }
         }
 

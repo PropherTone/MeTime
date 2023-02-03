@@ -49,7 +49,7 @@ abstract class BaseMsgActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : Ba
         viewEvent?.trySend(event)
     }
 
-    fun closeEvent() {
+    private fun closeEvent() {
         viewEventTask?.cancel()
         viewEventTask = null
         viewEvent?.close()

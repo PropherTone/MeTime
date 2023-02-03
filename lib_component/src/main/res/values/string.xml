@@ -73,6 +73,7 @@
     <string name="time">日期:%s</string>
     <string name="size">大小:%s</string>
     <string name="cato">标签:</string>
+    <string name="links">链接:</string>
     <string name="location">路径:%s</string>
     <string name="gap_width">间距:</string>
     <string name="radius">半径:</string>

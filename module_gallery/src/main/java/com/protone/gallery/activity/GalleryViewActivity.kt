@@ -20,6 +20,7 @@ import com.protone.common.context.root
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
+import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.CUSTOM_GALLERY
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.GALLERY
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.IS_VIDEO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.MEDIA
@@ -65,35 +66,37 @@ class GalleryViewActivity : BaseMediaActivity<
 
     override suspend fun GalleryViewViewModel.init() {
         intent.extras.let {
-            val targetGallery =
-                it?.getString(GALLERY) ?: ALL_GALLERY
-            val isVideo =
-                it?.getBoolean(IS_VIDEO) ?: false
-            initGalleryData(targetGallery, isVideo)
+            val targetGallery = it?.getString(GALLERY) ?: ALL_GALLERY
+            val isVideo = it?.getBoolean(IS_VIDEO) ?: false
+            val isCustom = it?.getBoolean(CUSTOM_GALLERY) ?: false
+            initGalleryData(targetGallery, isVideo, isCustom)
         }
 
         val mediaIndex = getMediaIndex()
-        initViewPager(mediaIndex, galleryMedias)
+        binding.initViewPager(mediaIndex, galleryMedias)
         binding.initList()
         setMediaInfo(mediaIndex)
         setInfo()
         observeEvent()
     }
 
-    private fun initViewPager(position: Int, data: MutableList<GalleryMedia>) {
-        binding.galleryVView.apply {
+    private fun GalleryViewActivityBinding.initViewPager(
+        position: Int,
+        data: MutableList<GalleryMedia>
+    ) {
+        galleryVView.apply {
             adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
                 override fun getItemCount(): Int = data.size
                 override fun getItemViewType(position: Int): Int = position
                 override fun createFragment(position: Int): Fragment =
                     GalleryViewFragment(data[position], singleClick = {
-                        binding.galleryVCover.isVisible = !binding.galleryVCover.isVisible
-                        if (binding.galleryVCover.isVisible) {
+                        galleryVCover.isVisible = !galleryVCover.isVisible
+                        if (galleryVCover.isVisible) {
                             sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
                         }
                     })
             }
-            binding.galleryVCover.isVisible = false
+            galleryVCover.isVisible = false
 
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -104,7 +107,7 @@ class GalleryViewActivity : BaseMediaActivity<
 
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    if (state == ViewPager2.SCREEN_STATE_OFF && binding.galleryVCover.isVisible) {
+                    if (state == ViewPager2.SCREEN_STATE_OFF && galleryVCover.isVisible) {
                         sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
                     }
                 }
@@ -177,7 +180,7 @@ class GalleryViewActivity : BaseMediaActivity<
     private fun GalleryViewViewModel.setMediaInfo(position: Int) {
         if (position >= 0 && position < galleryMedias.size) {
             galleryMedias[position].let { m ->
-                setMediaInfo(
+                binding.setMediaInfo(
                     m.name,
                     m.date.toDateString("yyyy/MM/dd").toString(),
                     m.size.getStorageSize(),
@@ -189,25 +192,28 @@ class GalleryViewActivity : BaseMediaActivity<
 
     private suspend fun GalleryViewViewModel.getMediaIndex() = onResult { co ->
         val galleryMedia = intent.getStringExtra(MEDIA)?.toEntity(GalleryMedia::class.java)
-        val indexOf = galleryMedias.indexOf(galleryMedia)
-        curPosition = indexOf
-        co.resumeWith(Result.success(indexOf))
+        val index = galleryMedias.indexOf(galleryMedia)
+        curPosition = index
+        co.resumeWith(Result.success(index))
     }
 
-    private fun setMediaInfo(
+    private fun GalleryViewActivityBinding.setMediaInfo(
         title: String,
         time: String,
         size: String,
         type: String,
-    ) = binding.run {
+    ) {
         galleryVTitle.text = title
+
         galleryVTime.text = String.format(
             R.string.time.getString(),
             time.ifEmpty { R.string.none.getString() })
+
         galleryVSize.text = String.format(
             R.string.size.getString(),
             size.ifEmpty { R.string.none.getString() })
-        galleryVType.text = String.format(
+
+        galleryVPath.text = String.format(
             R.string.location.getString(),
             type.ifEmpty { R.string.none.getString() })
     }

@@ -19,42 +19,25 @@ import com.protone.gallery.component.GalleryItemDecoration
 import com.protone.gallery.databinding.GalleryListFragmentLayoutBinding
 import com.protone.gallery.viewModel.GalleryListFragmentViewModel
 import com.protone.gallery.viewModel.GalleryViewModel
+import com.protone.gallery.viewModel.MediaSelectedList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 
 class GalleryListFragment :
     BaseFragment<GalleryListFragmentLayoutBinding, GalleryListFragmentViewModel>() {
 
-    private var isInit = false
-    private lateinit var selectFlow: MutableSharedFlow<GalleryListFragmentViewModel.GallerySelectData?>
-    private var galleryName = ""
+    private var selectedMedias = MediaSelectedList()
 
     private val onSelect by lazy {
         object : GalleryListAdapter.OnSelect {
-            override fun select(media: GalleryMedia) {
-                launch {
-                    selectFlow.emit(
-                        GalleryListFragmentViewModel
-                            .GallerySelectData
-                            .OnGalleryMediaSelect(media)
-                    )
-                }
-            }
-
-            override fun select(medias: List<GalleryMedia>) {
-                launch {
-                    selectFlow.emit(
-                        GalleryListFragmentViewModel
-                            .GallerySelectData
-                            .OnGalleryMediasSelect(medias)
-                    )
-                }
-            }
 
             override fun openView(galleryMedia: GalleryMedia, elementView: View) {
-                toGalleryView(galleryMedia.toJson(), galleryMedia.isVideo, galleryName)
+                toGalleryView(
+                    galleryMedia.toJson(),
+                    galleryMedia.isVideo,
+                    viewModel.isCustom,
+                    viewModel.galleryName
+                )
             }
 
             override fun onItemLongClick() {
@@ -69,9 +52,10 @@ class GalleryListFragment :
     fun connect(
         multiChoose: Boolean,
         mailer: Flow<GalleryViewModel.GalleryListEvent>,
-        flow: MutableSharedFlow<GalleryListFragmentViewModel.GallerySelectData?>
+        selectedList: MediaSelectedList,
     ) {
-        selectFlow = flow
+        selectedMedias = selectedList
+        runCatching { getListAdapter().selectList = selectedList }
         launchMain {
             fun changeSpanCount(isOpen: Boolean, layoutManager: GridLayoutManager) {
                 val count = if (isOpen) 2 else 4
@@ -80,11 +64,12 @@ class GalleryListFragment :
                 layoutManager.requestSimpleAnimationsInNextLayout()
             }
             mailer.bufferCollect {
-                while (!isInit) delay(20L)
+                while (!viewModel.isInit) delay(20L)
                 when (it) {
                     is GalleryViewModel.GalleryListEvent.OnGallerySelected -> {
-                        if (galleryName == it.gallery.name) return@bufferCollect
-                        galleryName = it.gallery.name
+                        if (viewModel.galleryName == it.gallery.name) return@bufferCollect
+                        viewModel.galleryName = it.gallery.name
+                        viewModel.isCustom = it.gallery.custom
                         if (it.isDrawerOpen) changeSpanCount(true, getLayoutManager())
                         if (getListAdapter().itemCount > 0) {
                             binding.galleryList.swapAdapter(
@@ -93,6 +78,8 @@ class GalleryListFragment :
                                     true,
                                     itemCount = it.gallery.size
                                 ).also { adapter ->
+                                    adapter.onSelectMod = getListAdapter().onSelectMod
+                                    adapter.selectList = selectedMedias
                                     adapter.itemLength = getListAdapter().itemLength
                                     adapter.multiChoose = multiChoose
                                     adapter.setOnSelectListener(onSelect)
@@ -106,8 +93,8 @@ class GalleryListFragment :
                     is GalleryViewModel.GalleryListEvent.SelectAll -> {
                         getListAdapter().selectAll()
                     }
-                    is GalleryViewModel.GalleryListEvent.QuiteSelect -> {
-                        getListAdapter().quitSelectMod()
+                    is GalleryViewModel.GalleryListEvent.ExitSelect -> {
+                        getListAdapter().exitSelectMod()
                     }
                     is GalleryViewModel.GalleryListEvent.OnDrawerEvent -> {
                         changeSpanCount(it.isOpen, getLayoutManager())
@@ -128,8 +115,6 @@ class GalleryListFragment :
         }
     }
 
-    fun getGalleryData() = getListAdapter().mList
-
     override fun createViewModel(): GalleryListFragmentViewModel {
         val model: GalleryListFragmentViewModel by viewModels()
         return model
@@ -142,7 +127,7 @@ class GalleryListFragment :
     ): GalleryListFragmentLayoutBinding {
         return GalleryListFragmentLayoutBinding.inflate(inflater, container, false).apply {
             initList()
-            isInit = true
+            viewModel.isInit = true
         }
     }
 
@@ -150,11 +135,10 @@ class GalleryListFragment :
         galleryList.apply {
             layoutManager = GridLayoutManager(context, 4)
             addItemDecoration(GalleryItemDecoration(resources.getDimensionPixelSize(R.dimen.item_margin)))
-            adapter =
-                GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
-                    it.multiChoose = true
-                    it.setOnSelectListener(onSelect)
-                }
+            adapter = GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
+                it.multiChoose = true
+                it.setOnSelectListener(onSelect)
+            }
         }
     }
 

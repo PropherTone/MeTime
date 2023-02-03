@@ -2,16 +2,14 @@ package com.protone.gallery.viewModel
 
 import com.protone.common.baseType.withIOContext
 import com.protone.common.entity.Gallery
-import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.BaseViewModel
 
 class GalleryListFragmentViewModel : BaseViewModel() {
 
-    sealed class GallerySelectData {
-        data class OnGalleryMediaSelect(val media: GalleryMedia) : GallerySelectData()
-        data class OnGalleryMediasSelect(val medias: List<GalleryMedia>) : GallerySelectData()
-    }
+    var isInit = false
+    var galleryName = ""
+    var isCustom = false
 
     suspend fun getGalleryData(gallery: Gallery, isVideo: Boolean, combine: Boolean) =
         withIOContext {

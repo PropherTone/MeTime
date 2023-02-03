@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:background="@color/foreDark_1"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/galleryV_type">
+            app:layout_constraintBottom_toTopOf="@+id/galleryV_path">
 
             <TextView
                 android:id="@+id/galleryV_cato_name"
@@ -117,7 +117,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/galleryV_type"
+            android:id="@+id/galleryV_path"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/foreDark_1"

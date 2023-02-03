@@ -42,9 +42,10 @@ class CheckListAdapter(
         holder.binding.apply {
             clCheck.isGone = !check
             root.setOnClickListener {
+                val layoutPosition = holder.layoutPosition
                 if (check) {
-                    checkSelect(position, mList[position])
-                } else startNote?.invoke(mList[position])
+                    checkSelect(layoutPosition, mList[layoutPosition])
+                } else startNote?.invoke(mList[layoutPosition])
             }
             clCheck.isClickable = false
             clName.text = mList[position]

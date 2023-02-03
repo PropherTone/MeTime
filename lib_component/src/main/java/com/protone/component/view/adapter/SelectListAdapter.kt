@@ -19,7 +19,7 @@ abstract class SelectListAdapter<VB : ViewDataBinding, Item : Any, Event>(
 ) : BaseAdapter<Item, VB, Event>(context, handleEvent) {
 
     var selectList = LinkedBlockingDeque<Item>()
-        private set
+
     var multiChoose = false
 
     var hasFixedSize = true

@@ -7,7 +7,7 @@
 
         <variable
             name="model"
-            type="com.protone.music.activity.MusicActivity.BindingViewModel" />
+            type="com.protone.music.activity.MusicActivity.BindingModel" />
 
     </data>
 

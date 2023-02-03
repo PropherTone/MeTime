@@ -16,10 +16,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.LinkedBlockingDeque
 
 class GalleryViewModel : BaseViewModel() {
 
     sealed class GalleryEvent {
+        object OnSelectedMode : GalleryEvent()
+        object ExitSelectedMode : GalleryEvent()
         data class OnNewGallery(val gallery: Gallery) : GalleryEvent()
         data class OnNewGalleries(val galleries: List<Gallery>) : GalleryEvent()
         data class OnGalleryRemoved(val gallery: Gallery) : GalleryEvent()
@@ -32,7 +35,7 @@ class GalleryViewModel : BaseViewModel() {
     sealed class GalleryListEvent : GalleryEvent() {
         data class OnDrawerEvent(val isOpen: Boolean) : GalleryListEvent()
         object SelectAll : GalleryListEvent()
-        object QuiteSelect : GalleryListEvent()
+        object ExitSelect : GalleryListEvent()
         data class OnGallerySelected(
             val gallery: Gallery,
             val isVideo: Boolean,
@@ -59,8 +62,30 @@ class GalleryViewModel : BaseViewModel() {
     private fun getGalleryData(isVideo: Boolean) = if (isVideo) galleryVideoData else galleryData
     fun getGalleryData() = if (isVideoGallery) galleryVideoData else galleryData
 
-    val dataFlow by lazy { MutableSharedFlow<GalleryListFragmentViewModel.GallerySelectData?>() }
-    val chooseData by lazy { mutableListOf<GalleryMedia>() }
+    val selectedMedias by lazy {
+        MediaSelectedList().apply list@{
+            var onSelectMode = false
+            dataListener = object : MediaSelectedList.DataListener {
+                override fun onAdded() {
+                    if (!onSelectMode) {
+                        viewModelScope.launchDefault {
+                            sendBucketEvent(GalleryEvent.OnSelectedMode)
+                        }
+                        onSelectMode = true
+                    }
+                }
+
+                override fun onCleared() {
+                    if (onSelectMode) {
+                        viewModelScope.launchDefault {
+                            sendBucketEvent(GalleryEvent.ExitSelectedMode)
+                        }
+                        onSelectMode = false
+                    }
+                }
+            }
+        }
+    }
 
     private var rightMediaGallery = ALL_GALLERY
     private var rightVideoGallery = ALL_GALLERY
@@ -74,8 +99,7 @@ class GalleryViewModel : BaseViewModel() {
             return if (isVideoGallery) rightVideoGallery else rightMediaGallery
         }
 
-    var rightMailer = 0
-        private set
+    private var rightMailer = 0
     private var isDataSorted = false
     private val combine = userConfig.combineGallery
     private val isVideoGallery: Boolean get() = rightMailer == 1
@@ -140,16 +164,14 @@ class GalleryViewModel : BaseViewModel() {
     }
 
     fun selectAll() {
-        viewModelScope.launch {
+        viewModelScope.launchDefault {
             getCurrentMailer()?.emit(GalleryListEvent.SelectAll)
         }
     }
 
-    fun quiteSelect() {
-        viewModelScope.launch {
-            chooseData.clear()
-            dataFlow.emit(null)
-            sendListEvent(GalleryListEvent.QuiteSelect)
+    fun exitSelect() {
+        viewModelScope.launchDefault {
+            sendListEvent(GalleryListEvent.ExitSelect)
         }
     }
 
@@ -158,6 +180,8 @@ class GalleryViewModel : BaseViewModel() {
             sendListEvent(GalleryListEvent.OnDrawerEvent(isOpen))
         }
     }
+
+    fun getSelectedMedias() = selectedMedias.toList()
 
     fun getBucket(bucket: String) = getGalleryData(isVideoGallery).find { it.name == bucket }
 
@@ -208,25 +232,8 @@ class GalleryViewModel : BaseViewModel() {
         return mailer != rightMailer
     }
 
-    inline fun observeSelectData(crossinline onPost: (Boolean) -> Unit) {
-        viewModelScope.launchDefault {
-            dataFlow.bufferCollect {
-                when (it) {
-                    is GalleryListFragmentViewModel.GallerySelectData.OnGalleryMediaSelect -> {
-                        chooseData.add(it.media)
-                        onPost(true)
-                    }
-                    is GalleryListFragmentViewModel.GallerySelectData.OnGalleryMediasSelect -> {
-                        chooseData.addAll(it.medias)
-                        onPost(true)
-                    }
-                    null -> {
-                        chooseData.clear()
-                        onPost(false)
-                    }
-                }
-            }
-        }
+    suspend fun getRightGalleryMedias(): List<GalleryMedia>? {
+        return galleryDAO.getAllMediaByGallery(rightGallery)
     }
 
     private suspend fun sortData(isVideo: Boolean) {
@@ -268,7 +275,7 @@ class GalleryViewModel : BaseViewModel() {
                     sendBucketEvent(GalleryEvent.OnGalleryUpdated(it), false)
                 }
                 if (media.isVideo != isVideoGallery && media.bucket != rightGallery) return
-                chooseData.remove(media)
+                selectedMedias.remove(media)
                 sendListEvent(GalleryListEvent.OnMediaDeleted(media), true)
             }
 
@@ -424,4 +431,72 @@ class GalleryViewModel : BaseViewModel() {
         else getNewestMedia(isVideo)
     }
 
+}
+
+class MediaSelectedList : LinkedBlockingDeque<GalleryMedia>() {
+
+    var dataListener: DataListener? = null
+
+    interface DataListener {
+        fun onAdded() {}
+        fun onRemoved() {}
+        fun onCleared() {}
+    }
+
+    override fun add(element: GalleryMedia): Boolean {
+        return super.add(element).also {
+            if (it) dataListener?.onAdded()
+        }
+    }
+
+    override fun addFirst(e: GalleryMedia?) {
+        super.addFirst(e)
+        dataListener?.onAdded()
+    }
+
+    override fun addLast(e: GalleryMedia?) {
+        super.addLast(e)
+        dataListener?.onAdded()
+    }
+
+    override fun addAll(elements: Collection<GalleryMedia>): Boolean {
+        return super.addAll(elements).also {
+            if (it) dataListener?.onAdded()
+        }
+    }
+
+    override fun remove(element: GalleryMedia?): Boolean {
+        return super.remove(element).also {
+            if (it) dataListener?.onRemoved()
+        }
+    }
+
+    override fun removeAll(elements: Collection<GalleryMedia>): Boolean {
+        return super.removeAll(elements.toSet()).apply {
+            dataListener?.onRemoved()
+        }
+    }
+
+    override fun remove(): GalleryMedia {
+        return super.remove().apply {
+            dataListener?.onRemoved()
+        }
+    }
+
+    override fun removeFirst(): GalleryMedia {
+        return super.removeFirst().apply {
+            dataListener?.onRemoved()
+        }
+    }
+
+    override fun removeLast(): GalleryMedia {
+        return super.removeLast().apply {
+            dataListener?.onRemoved()
+        }
+    }
+
+    override fun clear() {
+        super.clear()
+        dataListener?.onCleared()
+    }
 }

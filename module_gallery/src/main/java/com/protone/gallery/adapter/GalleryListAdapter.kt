@@ -29,7 +29,7 @@ class GalleryListAdapter(
 
     sealed class GalleryListEvent {
         object SelectAll : GalleryListEvent()
-        object QuiteSelectAll : GalleryListEvent()
+        object ExitSelectAll : GalleryListEvent()
         data class NoticeSelectChange(val item: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemUpdate(val media: GalleryMedia) : GalleryListEvent()
         data class NoticeListItemDelete(val media: GalleryMedia) : GalleryListEvent()
@@ -38,11 +38,11 @@ class GalleryListAdapter(
     }
 
     var itemLength = 0
-    private var onSelectMod = false
+    var onSelectMod = false
 
     override suspend fun handleEventAsynchronous(data: GalleryListEvent) {
         when (data) {
-            is GalleryListEvent.QuiteSelectAll -> {
+            is GalleryListEvent.ExitSelectAll -> {
                 if (!onSelectMod) return
                 onSelectMod = false
                 clearAllSelected()
@@ -208,17 +208,19 @@ class GalleryListAdapter(
 
     fun select(position: Int) {
         if (position <= 0 || position >= mList.size) return
-        checkSelect(position, mList[position])
-        onSelectListener?.select(mList[position])
-        notifyItemChanged(position, SELECT)
+        mList[position].takeIf { !selectList.contains(it) }?.let {
+            selectList.add(it)
+            notifyItemChanged(position, SELECT)
+            onSelectListener?.select(it)
+        }
     }
 
     fun selectAll() {
         emit(GalleryListEvent.SelectAll)
     }
 
-    fun quitSelectMod() {
-        emit(GalleryListEvent.QuiteSelectAll)
+    fun exitSelectMod() {
+        emit(GalleryListEvent.ExitSelectAll)
     }
 
     fun noticeSelectChange(item: GalleryMedia) {
@@ -244,10 +246,10 @@ class GalleryListAdapter(
     private var onSelectListener: OnSelect? = null
 
     interface OnSelect {
-        fun select(media: GalleryMedia)
-        fun select(medias: List<GalleryMedia>)
-        fun openView(galleryMedia: GalleryMedia, elementView: View)
-        fun onItemLongClick()
+        fun select(media: GalleryMedia) {}
+        fun select(medias: List<GalleryMedia>) {}
+        fun openView(galleryMedia: GalleryMedia, elementView: View) {}
+        fun onItemLongClick() {}
     }
 
     fun setNewSelectList(list: List<GalleryMedia>) {

@@ -47,15 +47,18 @@ class RouterPath {
             const val MEDIA = "MEDIA"
             const val IS_VIDEO = "IS_VIDEO"
             const val GALLERY = "GALLERY"
+            const val CUSTOM_GALLERY = "CUSTOM"
 
             fun Postcard.galleryViewPostcard(
                 mediaJson: String,
                 isVideo: Boolean,
+                isCustom: Boolean,
                 targetGallery: String = "全部"
             ): Postcard = with(Bundle().apply {
                 putString(MEDIA, mediaJson)
                 putBoolean(IS_VIDEO, isVideo)
                 putString(GALLERY, targetGallery)
+                putBoolean(CUSTOM_GALLERY, isCustom)
             })
         }
     }

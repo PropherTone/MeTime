@@ -179,13 +179,13 @@ class MainActivity :
             TimeListAdapter(object : TimeListAdapter.CardEvent {
                 override fun onPhotoClick(media: GalleryMedia) {
                     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                        galleryViewPostcard(media.toJson(), false, ALL_GALLERY)
+                        galleryViewPostcard(media.toJson(), false, isCustom = false, ALL_GALLERY)
                     }
                 }
 
                 override fun onVideoClick(media: GalleryMedia) {
                     startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                        galleryViewPostcard(media.toJson(), true, ALL_GALLERY)
+                        galleryViewPostcard(media.toJson(), true, isCustom = false, ALL_GALLERY)
                     }
                 }
             }).let { timeListAdapter ->

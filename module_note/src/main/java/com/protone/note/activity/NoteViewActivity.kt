@@ -17,6 +17,7 @@ import com.protone.common.utils.json.toJson
 import com.protone.component.R
 import com.protone.component.BaseMusicActivity
 import com.protone.component.service.MusicBinder
+import com.protone.component.toGalleryView
 import com.protone.component.view.customView.richText.RichNoteImageLoader
 import com.protone.component.view.customView.richText.RichNoteView
 import com.protone.note.databinding.NoteViewActivityBinding
@@ -91,9 +92,7 @@ class NoteViewActivity :
                     launch {
                         val collect = filterMedia(uri, isVideo)
                         if (collect != null && collect.size > 0) {
-                            startActivity(RouterPath.GalleryRouterPath.GalleryView) {
-                                galleryViewPostcard(collect[0].toJson(), isVideo)
-                            }
+                            toGalleryView(collect[0].toJson(), isVideo, false)
                         } else R.string.none.getString().toast()
                     }
                 }

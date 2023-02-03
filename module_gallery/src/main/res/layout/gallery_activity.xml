@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="activity"
-            type="com.protone.gallery.activity.GalleryActivity" />
+            name="model"
+            type="com.protone.gallery.activity.GalleryActivity.BindModel" />
 
     </data>
 
@@ -43,7 +43,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:contentDescription="@string/action"
                 android:elevation="@dimen/small_elevation"
-                android:onClick="@{()->activity.showBucket()}"
+                android:onClick="@{()->model.showBucket()}"
                 android:padding="@dimen/border_distance"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_round_arrow_left_white_24"
@@ -81,7 +81,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/background_ripple_glass"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.toSearch()}"
+            android:onClick="@{()->model.toSearch()}"
             android:padding="@dimen/border_distance"
             android:src="@drawable/ic_baseline_search_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -94,7 +94,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/background_ripple_glass"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.addBucket()}"
+            android:onClick="@{()->model.addBucket()}"
             android:padding="@dimen/border_distance"
             android:src="@drawable/ic_baseline_add_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -106,7 +106,7 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.showPop()}"
+            android:onClick="@{()->model.showPop()}"
             android:padding="16dp"
             android:src="@drawable/ic_baseline_menu_24_white"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
@@ -129,7 +129,7 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:contentDescription="@string/back"
-            android:onClick="@{()->activity.finishEvent()}"
+            android:onClick="@{()->model.finishEvent()}"
             android:padding="@dimen/border_distance"
             android:src="@drawable/ic_round_arrow_left_white_24"
             app:layout_constraintEnd_toEndOf="parent"

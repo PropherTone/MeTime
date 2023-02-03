@@ -1,13 +1,10 @@
 package com.protone.gallery.viewModel
 
 import android.net.Uri
-import com.protone.common.R
 import com.protone.common.baseType.*
 import com.protone.component.database.userConfig
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.utils.ALL_GALLERY
 import com.protone.component.BaseViewModel
-import java.util.stream.Collectors
 import kotlin.streams.toList
 
 class GalleryViewViewModel : BaseViewModel() {
@@ -20,16 +17,19 @@ class GalleryViewViewModel : BaseViewModel() {
     var curPosition: Int = 0
     lateinit var galleryMedias: MutableList<GalleryMedia>
 
-    suspend fun initGalleryData(gallery: String, isVideo: Boolean) = withDefaultContext {
-        var allMedia = (galleryDAO.let {
-            if (userConfig.combineGallery) it.getAllSignedMedia() else it.getAllMediaByType(isVideo)
-        } ?: mutableListOf()) as MutableList<GalleryMedia>
-        if (gallery != ALL_GALLERY)
-            allMedia = allMedia.stream().filter {
-                (it.bucket == gallery) || (it.type?.contains(gallery) == true)
-            }.collect(Collectors.toList())
-        galleryMedias = allMedia
-    }
+    suspend fun initGalleryData(gallery: String, isVideo: Boolean, isCustom: Boolean) =
+        withDefaultContext {
+            galleryMedias = (galleryDAO.let {
+                val combine = userConfig.combineGallery
+                if (isCustom) {
+                    it.getGalleryBucket(gallery)?.galleryBucketId?.let { bucketId ->
+                        if (combine) it.getGalleryMediasByBucket(bucketId)
+                        else it.getGalleryMediasByBucket(bucketId, isVideo)
+                    }
+                } else if (combine) it.getAllSignedMedia()
+                else it.getAllMediaByGallery(gallery, isVideo)
+            } ?: mutableListOf()) as MutableList<GalleryMedia>
+        }
 
     suspend fun getSignedMedia() = galleryDAO.getSignedMedia(galleryMedias[curPosition].uri)
 
