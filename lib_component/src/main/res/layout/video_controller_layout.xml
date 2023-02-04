@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/icon" />
+
+        <View
+            android:id="@+id/cover"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/foreDark_1"
+            app:constraint_referenced_ids="cover
+            ,title,progressBar
+            ,timeSplit,currentTime,totalTime
+            ,start,pre,next"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@id/progressBar" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/foreDark_1"
+            android:gravity="center"
+            android:padding="@dimen/texts_padding"
+            android:textSize="@dimen/mid_title_text"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/centerStart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/oval_fore_ripple_dark"
+            android:contentDescription="@string/action"
+            android:padding="@dimen/icon_padding"
+            android:src="@drawable/ic_round_play_arrow_24_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.16" />
+
+        <com.protone.component.view.customView.ColorfulProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:layout_marginBottom="@dimen/texts_margin"
+            app:layout_constraintBottom_toTopOf="@id/timeSplit" />
+
+        <TextView
+            android:id="@+id/timeSplit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/texts_margin"
+            android:text="@string/split"
+            android:textColor="@color/white"
+            android:textSize="@dimen/small_title_text"
+            app:layout_constraintBottom_toTopOf="@id/start"
+            app:layout_constraintEnd_toEndOf="@id/start"
+            app:layout_constraintStart_toStartOf="@id/start" />
+
+        <TextView
+            android:id="@+id/currentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/texts_margin"
+            android:text="@string/default_time"
+            android:textColor="@color/white"
+            android:textSize="@dimen/small_title_text"
+            app:layout_constraintBottom_toTopOf="@id/start"
+            app:layout_constraintEnd_toStartOf="@id/timeSplit" />
+
+        <TextView
+            android:id="@+id/totalTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/texts_margin"
+            android:text="@string/default_time"
+            android:textColor="@color/white"
+            android:textSize="@dimen/small_title_text"
+            app:layout_constraintBottom_toTopOf="@id/start"
+            app:layout_constraintStart_toEndOf="@id/timeSplit" />
+
+        <ImageView
+            android:id="@+id/start"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/action"
+            android:src="@drawable/ic_round_play_arrow_24_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.99"
+            app:layout_constraintWidth_percent="0.16" />
+
+        <ImageView
+            android:id="@+id/pre"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/action"
+            android:src="@drawable/ic_round_arrow_left_white_24"
+            app:layout_constraintBottom_toBottomOf="@id/start"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/start"
+            app:layout_constraintTop_toTopOf="@id/start" />
+
+        <ImageView
+            android:id="@+id/next"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/action"
+            android:src="@drawable/ic_round_arrow_right_white_24"
+            app:layout_constraintBottom_toBottomOf="@id/start"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/start"
+            app:layout_constraintTop_toTopOf="@id/start" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

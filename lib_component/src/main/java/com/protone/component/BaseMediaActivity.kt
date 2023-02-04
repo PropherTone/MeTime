@@ -1,6 +1,9 @@
 package com.protone.component
 
+import android.app.Activity
+import android.content.Intent
 import android.view.View
+import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
 import com.protone.common.baseType.*
@@ -19,6 +22,7 @@ import com.protone.component.view.popWindows.GalleryOptionPop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.streams.toList
 
 abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
@@ -229,6 +233,22 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 }
             }
             viewModel.galleryDAO.updateMediaMultiAsync(list)
+        }
+    }
+
+    suspend fun shareGalleryMedia(galleryMedia: GalleryMedia) {
+        galleryMedia.uri.imageSaveToDisk(galleryMedia.name, "SharedMedia")?.let { path ->
+            startActivityForResult(Intent(Intent.ACTION_SEND).apply {
+                putExtra(
+                    Intent.EXTRA_STREAM,
+                    FileProvider.getUriForFile(
+                        this@BaseMediaActivity,
+                        "com.protone.MeTime.fileProvider",
+                        File(path)
+                    )
+                )
+                type = "image/*"
+            }).let { path.deleteFile() }
         }
     }
 

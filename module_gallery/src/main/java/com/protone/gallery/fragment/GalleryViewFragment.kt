@@ -26,24 +26,23 @@ class GalleryViewFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return if (galleryMedia.isVideo) {
-            RichVideoLayoutBinding.inflate(inflater, container, false).also { binding ->
+        return if (galleryMedia.isVideo) RichVideoLayoutBinding
+            .inflate(inflater, container, false)
+            .also { binding ->
                 videoBinding = binding.apply {
                     richVideo.setVideoPath(galleryMedia.uri)
                     richVideo.title = galleryMedia.name
                     richVideo.setOnClickEvent {
-                        if (!richVideo.isPlaying) {
-                            singleClick.invoke()
-                        }
+                        if (!richVideo.isPlaying) singleClick.invoke()
                     }
                 }
             }.root
-        } else {
-            GalleryVp2AdapterLayoutBinding.inflate(inflater, container, false).also {
+        else GalleryVp2AdapterLayoutBinding
+            .inflate(inflater, container, false)
+            .also {
                 imageBinding = it
                 it.image.onSingleTap = singleClick
             }.root
-        }
     }
 
     override fun onResume() {

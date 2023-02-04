@@ -40,20 +40,11 @@ class GalleryViewViewModel : BaseViewModel() {
         withDefaultContext {
             galleryDAO.getNotesWithGallery(mediaId)
                 .stream()
-                .map { note ->
-                    note.title
-                }.toList() as MutableList<String>
+                .map { note -> note.title }
+                .toList() as MutableList<String>
         }
 
-    suspend fun prepareSharedMedia() = withIOContext {
-        getCurrentMedia().let {
-            it.uri.imageSaveToDisk(it.name, "SharedMedia")
-        }
-    }
-
-    suspend fun deleteSharedMedia(path: String) = withIOContext {
-        path.deleteFile()
-    }
+    suspend fun prepareSharedMedia() = withIOContext { getCurrentMedia() }
 
     suspend fun getMediaByUri(uri: Uri) = galleryDAO.getSignedMedia(uri)
 

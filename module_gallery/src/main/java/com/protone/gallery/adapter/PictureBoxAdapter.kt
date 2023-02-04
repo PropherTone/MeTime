@@ -7,11 +7,13 @@ import android.widget.ImageView
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
 import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
 import com.protone.component.view.adapter.BaseAdapter
+import com.protone.component.view.customView.videoPlayer.DefaultVideoController
 import com.protone.gallery.databinding.PictureBoxAdapterGifLayoutBinding
 import com.protone.gallery.databinding.PictureBoxAdapterLayoutBinding
 import com.protone.gallery.databinding.PictureBoxAdapterVideoLayoutBinding
@@ -60,36 +62,19 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
                 }
             is PictureBoxAdapterVideoLayoutBinding ->
                 (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
-                    start.isGone = false
-                    videoCover.isGone = false
-                    loadingMedia(position, videoCover)
-                    start.setOnClickListener {
-                        start.isGone = true
-                        videoCover.isGone = true
-                        videoPlayer.setVideoPath(mList[holder.layoutPosition].uri)
-                    }
-                    videoPlayer.doOnCompletion {
-                        videoPlayer.release()
-                        start.isGone = false
-                        videoCover.isGone = false
-                    }
+                    videoPlayer.controller = DefaultVideoController(context)
+                    videoPlayer.setPath(mList[position].uri)
                 }
         }
     }
 
+    override fun onFailedToRecycleView(holder: Holder<ViewDataBinding>): Boolean {
+        release(holder)
+        return true
+    }
+
     override fun onViewRecycled(holder: Holder<ViewDataBinding>) {
-        when (holder.binding) {
-            is PictureBoxAdapterLayoutBinding ->
-                (holder.binding as PictureBoxAdapterLayoutBinding).apply {
-                    image.clear()
-                }
-            is PictureBoxAdapterVideoLayoutBinding ->
-                (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
-                    start.isGone = false
-                    videoCover.isGone = false
-                    videoPlayer.release()
-                }
-        }
+        release(holder)
         super.onViewRecycled(holder)
     }
 
@@ -112,4 +97,11 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
                 }
             }).into(view)
     }
+
+    private fun release(holder: Holder<ViewDataBinding>) {
+        when (holder.binding) {
+            is PictureBoxAdapterLayoutBinding -> (holder.binding as PictureBoxAdapterLayoutBinding).image.clear()
+        }
+    }
+
 }

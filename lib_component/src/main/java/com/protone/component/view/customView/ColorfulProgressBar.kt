@@ -215,7 +215,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
         stop()
     }
 
-    interface Progress {
+    fun interface Progress {
         fun getProgress(position: Long)
     }
 }

@@ -3,7 +3,10 @@ package com.protone.component
 import android.view.View
 import androidx.core.app.ActivityOptionsCompat
 import com.alibaba.android.arouter.facade.Postcard
+import com.protone.common.context.intent
+import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
+import com.protone.common.utils.IntentDataHolder
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.galleryMainPostcard
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
@@ -70,4 +73,9 @@ fun BaseFragment<*, *>.toGalleryView(
             } ?: it
         }
     }
+}
+
+fun BaseActivity<*, *, *>.toPictureBox(medias: List<GalleryMedia>) {
+    IntentDataHolder.put(medias)
+    startActivity(RouterPath.GalleryRouterPath.Box)
 }

@@ -32,6 +32,7 @@ import com.protone.common.utils.json.toUriJson
 import com.protone.component.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
+import com.protone.component.toPictureBox
 import com.protone.component.view.dialog.titleDialog
 import com.protone.gallery.R
 import com.protone.gallery.adapter.GalleryBucketAdapter
@@ -349,8 +350,7 @@ class GalleryActivity :
     override fun popIntoBox() {
         launch {
             viewModel.getSelectedMedias().let {
-                IntentDataHolder.put(it.ifEmpty { viewModel.getRightGalleryMedias() ?: it })
-                startActivity(PictureBoxActivity::class.intent)
+                toPictureBox(it.ifEmpty { viewModel.getRightGalleryMedias() ?: it })
             }
         }
     }

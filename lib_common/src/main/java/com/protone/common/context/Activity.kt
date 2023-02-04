@@ -10,13 +10,18 @@ import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
+import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.common.R
+import com.protone.common.baseType.deleteFile
 import com.protone.common.baseType.getString
+import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.baseType.toast
+import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.isInDebug
+import java.io.File
 
 val activityOperationBroadcast: LocalBroadcastManager =
     LocalBroadcastManager.getInstance(MApplication.app)

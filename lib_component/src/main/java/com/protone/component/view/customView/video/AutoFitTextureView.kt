@@ -6,7 +6,7 @@ import android.view.TextureView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 
-class MyTextureView @JvmOverloads constructor(
+class AutoFitTextureView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,

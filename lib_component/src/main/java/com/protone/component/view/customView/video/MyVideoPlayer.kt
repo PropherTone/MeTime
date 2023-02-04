@@ -48,7 +48,7 @@ class MyVideoPlayer @JvmOverloads constructor(
     }
 
     private var mediaPlayer: MediaPlayer? = null
-    private val textureView: MyTextureView? by lazy { MyTextureView(context) }
+    private var textureView: AutoFitTextureView? = null
 
     private var surface: Surface? = null
     private var surfaceTexture: SurfaceTexture? = null
@@ -70,11 +70,7 @@ class MyVideoPlayer @JvmOverloads constructor(
         videoController.apply {
             playVideo { play() }
             pauseVideo { pause() }
-            setProgressListener(object : ColorfulProgressBar.Progress {
-                override fun getProgress(position: Long) {
-                    videoSeekTo(position)
-                }
-            })
+            setProgressListener { position -> videoSeekTo(position) }
         }
         removeView(videoController)
         addView(
@@ -106,6 +102,7 @@ class MyVideoPlayer @JvmOverloads constructor(
     private fun initTextureView() {
         textureView?.surfaceTextureListener = this
         removeView(textureView)
+        textureView = AutoFitTextureView(context)
         addView(
             textureView, 0, LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -129,6 +126,14 @@ class MyVideoPlayer @JvmOverloads constructor(
         choreographer.postFrameCallback(frameCallBack)
     }
 
+    private fun loadCover(path: String) {
+        videoController.loadCover(path)
+    }
+
+    private fun loadCover(path: Uri) {
+        videoController.loadCover(path)
+    }
+
     fun play() {
         try {
             if (mediaPlayer?.isPlaying == false && isPrepared) {
@@ -139,14 +144,6 @@ class MyVideoPlayer @JvmOverloads constructor(
         } catch (e: IllegalStateException) {
             if (isInDebug()) e.printStackTrace()
         }
-    }
-
-    private fun loadCover(path: String) {
-        videoController.loadCover(path)
-    }
-
-    private fun loadCover(path: Uri) {
-        videoController.loadCover(path)
     }
 
     fun pause() {

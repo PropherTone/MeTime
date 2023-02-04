@@ -78,10 +78,12 @@
     <string name="gap_width">间距:</string>
     <string name="radius">半径:</string>
     <string name="stripe_width">线宽:</string>
+    <string name="split">/</string>
 
     <string name="loop_list">列表循环</string>
     <string name="loop_single">单曲循环</string>
     <string name="play_list">列表播放</string>
     <string name="no_loop">无循环</string>
     <string name="random">随机播放</string>
+    <string name="default_time">00:00</string>
 </resources>

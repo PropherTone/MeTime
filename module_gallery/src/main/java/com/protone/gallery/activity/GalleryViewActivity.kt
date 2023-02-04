@@ -149,21 +149,7 @@ class GalleryViewActivity : BaseMediaActivity<
         onViewEvent {
             when (it) {
                 GalleryViewViewModel.GalleryViewEvent.SetNote -> setInfo()
-                GalleryViewViewModel.GalleryViewEvent.Share -> prepareSharedMedia()?.let { path ->
-                    startActivityForResult(Intent(Intent.ACTION_SEND).apply {
-                        putExtra(
-                            Intent.EXTRA_STREAM,
-                            FileProvider.getUriForFile(
-                                this@GalleryViewActivity,
-                                "com.protone.MeTime.fileProvider",
-                                File(path)
-                            )
-                        )
-                        type = "image/*"
-                    }).let {
-                        deleteSharedMedia(path)
-                    }
-                }
+                GalleryViewViewModel.GalleryViewEvent.Share -> shareGalleryMedia(prepareSharedMedia())
             }
         }
     }

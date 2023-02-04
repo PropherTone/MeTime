@@ -12,66 +12,6 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
-suspend fun Uri.imageSaveToFile(
-    fileName: String,
-    dir: String? = null,
-    w: Int = 0,
-    h: Int = 0
-) = withIOContext {
-    if (this == Uri.EMPTY) return@withIOContext null
-    toBitmap(w, h)?.let {
-        try {
-            it.saveToFile(fileName, dir)
-        } finally {
-            if (!it.isRecycled) {
-                it.recycle()
-            }
-        }
-    }
-}
-
-
-suspend fun Uri.imageSaveToDisk(
-    fileName: String,
-    dir: String? = null,
-    w: Int = 0,
-    h: Int = 0
-): String? {
-    if (this == Uri.EMPTY) return null
-    var exists = false
-    var mimeType: String
-    return onResult {
-        val bytes = toBitmapByteArray()
-            ?: MApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
-                ?.use { inputStream -> inputStream.readBytes() }
-        it.resumeWith(Result.success(if (bytes == null) {
-            null
-        } else MApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(
-            bytes.getMediaMimeType().let { mime ->
-                mimeType = mime
-                "$fileName.$mimeType"
-            },
-            dir,
-            onExists = { file ->
-                if (file.getSHA() == bytes.getSHA()) {
-                    true
-                } else {
-                    exists = true
-                    true
-                }
-            },
-            onNewFile = { file ->
-                FileOutputStream(file).use { outputStream -> outputStream.write(bytes) }
-                true
-            }
-        )))
-    }.let {
-        if (it == null && exists) {
-            this@imageSaveToDisk.imageSaveToDisk("${fileName}_new", dir, w, h)
-        } else it
-    }
-}
-
 suspend fun Uri.toBitmap(
     w: Int = 0,
     h: Int = 0
