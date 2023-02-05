@@ -27,6 +27,7 @@ class GalleryListFragment :
     BaseFragment<GalleryListFragmentLayoutBinding, GalleryListFragmentViewModel>() {
 
     private var selectedMedias = MediaSelectedList()
+    private var isInit = false
 
     private val onSelect by lazy {
         object : GalleryListAdapter.OnSelect {
@@ -63,7 +64,7 @@ class GalleryListFragment :
                 layoutManager.requestSimpleAnimationsInNextLayout()
             }
             mailer.bufferCollect {
-                while (!viewModel.isInit) delay(20L)
+                while (!isInit) delay(20L)
                 when (it) {
                     is GalleryViewModel.GalleryListEvent.OnGallerySelected -> {
                         if (viewModel.galleryName == it.gallery.name) return@bufferCollect
@@ -126,7 +127,7 @@ class GalleryListFragment :
     ): GalleryListFragmentLayoutBinding {
         return GalleryListFragmentLayoutBinding.inflate(inflater, container, false).apply {
             initList()
-            viewModel.isInit = true
+            isInit = true
         }
     }
 

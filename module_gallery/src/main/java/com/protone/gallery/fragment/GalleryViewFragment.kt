@@ -11,6 +11,7 @@ import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
 import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
 import com.protone.component.databinding.RichVideoLayoutBinding
 import com.protone.component.view.customView.LoadingStatesListener
+import com.protone.component.view.customView.videoPlayer.DefaultVideoController
 import com.protone.gallery.databinding.GalleryVp2AdapterLayoutBinding
 
 class GalleryViewFragment(
@@ -30,11 +31,11 @@ class GalleryViewFragment(
             .inflate(inflater, container, false)
             .also { binding ->
                 videoBinding = binding.apply {
-                    richVideo.setVideoPath(galleryMedia.uri)
-                    richVideo.title = galleryMedia.name
-                    richVideo.setOnClickEvent {
-                        if (!richVideo.isPlaying) singleClick.invoke()
-                    }
+                    richVideo.controller = DefaultVideoController(richVideo.context)
+                    richVideo.setPath(galleryMedia.uri)
+//                    richVideo.setOnClickEvent {
+//                        if (!richVideo.isPlaying) singleClick.invoke()
+//                    }
                 }
             }.root
         else GalleryVp2AdapterLayoutBinding
@@ -66,18 +67,18 @@ class GalleryViewFragment(
             }
             imageBinding?.image?.locate()
         } else {
-            videoBinding?.richVideo?.play()
+//            videoBinding?.richVideo?.play()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (galleryMedia.isVideo) videoBinding?.richVideo?.release()
-        else imageBinding?.image?.clear()
+//        if (galleryMedia.isVideo) videoBinding?.richVideo?.release()
+//        else imageBinding?.image?.clear()
     }
 
     override fun onPause() {
         super.onPause()
-        if (galleryMedia.isVideo) videoBinding?.richVideo?.pause()
+//        if (galleryMedia.isVideo) videoBinding?.richVideo?.pause()
     }
 }

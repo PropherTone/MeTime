@@ -59,8 +59,10 @@ class GalleryViewModel : BaseViewModel() {
 
     private val galleryData = mutableListOf<Gallery>()
     private val galleryVideoData by lazy { mutableListOf<Gallery>() }
-    private fun getGalleryData(isVideo: Boolean) = if (isVideo) galleryVideoData else galleryData
-    fun getGalleryData() = if (isVideoGallery) galleryVideoData else galleryData
+    private fun getGalleryData(isVideo: Boolean) =
+        if (isVideo && !combine) galleryVideoData else galleryData
+
+    fun getGalleryData() = if (isVideoGallery && !combine) galleryVideoData else galleryData
 
     val selectedMedias by lazy {
         MediaSelectedList().apply list@{
@@ -188,8 +190,21 @@ class GalleryViewModel : BaseViewModel() {
     fun getSelectedBucket() = getGalleryData(isVideoGallery).find { it.name == rightGallery }
 
     fun addBucket(name: String) {
-        galleryDAO.insertGalleryBucketCB(GalleryBucket(name)) { re, _ ->
-            if (!re) R.string.failed_msg.getString().toast()
+        viewModelScope.launchIO {
+            galleryDAO.apply {
+                if (name.isEmpty()) {
+                    R.string.enter.getString().toast()
+                    return@launchIO
+                }
+                val galleries = getAllCheckedGallery(isVideoGallery)
+                if (name == ALL_GALLERY && galleries?.contains(name) == true) {
+                    com.protone.gallery.R.string.name_used.getString().toast()
+                    return@launchIO
+                }
+                insertGalleryBucketCB(GalleryBucket(name)) { re, _ ->
+                    if (!re) R.string.failed_msg.getString().toast()
+                }
+            }
         }
     }
 
@@ -232,14 +247,23 @@ class GalleryViewModel : BaseViewModel() {
         return mailer != rightMailer
     }
 
-    suspend fun getRightGalleryMedias(): List<GalleryMedia>? {
-        return galleryDAO.getAllMediaByGallery(rightGallery)
+    suspend fun getRightGalleryMedias(): List<GalleryMedia>? = galleryDAO.run {
+        if (rightGallery == ALL_GALLERY) {
+            if (combine) getAllSignedMedia() else getAllMediaByType(isVideoGallery)
+        } else getGalleryData().find { it.name == rightGallery }?.let {
+            if (it.custom) getGalleryBucket(it.name)?.let { bucket ->
+                if (combine) getGalleryMediasByBucket(bucket.galleryBucketId)
+                else getGalleryMediasByBucket(bucket.galleryBucketId, isVideoGallery)
+            } else null
+        }
+    } ?: galleryDAO.run {
+        if (combine) getAllMediaByType(isVideoGallery)
+        else getAllMediaByGallery(rightGallery, isVideoGallery)
     }
 
     private suspend fun sortData(isVideo: Boolean) {
         galleryDAO.run {
-            val galleries =
-                (if (combine) getAllGallery() else getAllGallery(isVideo)) as MutableList<String>?
+            val galleries = getAllCheckedGallery(isVideo) as MutableList<String>?
             if (galleries == null) {
                 R.string.none.getString().toast()
                 return
@@ -409,6 +433,10 @@ class GalleryViewModel : BaseViewModel() {
         else pool.holdEvent(fragEvent)
     }
 
+    private suspend fun getAllCheckedGallery(isVideo: Boolean) = galleryDAO.run {
+        if (combine) getAllGallery() else getAllGallery(isVideo)
+    }
+
     private suspend fun getGallerySize(name: String, isVideo: Boolean): Int = galleryDAO.run {
         if (combine) getMediaCountByGallery(name) else getMediaCountByGallery(name, isVideo)
     }
@@ -417,9 +445,7 @@ class GalleryViewModel : BaseViewModel() {
         if (combine) getMediaCount() else getMediaCount(isVideo)
     }
 
-    private suspend fun getAllGalleryBucket() = galleryDAO.run {
-        getAllGalleryBucket()
-    }
+    private suspend fun getAllGalleryBucket() = galleryDAO.getAllGalleryBucket()
 
     private suspend fun getNewestMedia(gallery: String, isVideo: Boolean) = galleryDAO.run {
         if (combine) getNewestMediaInGallery(gallery)

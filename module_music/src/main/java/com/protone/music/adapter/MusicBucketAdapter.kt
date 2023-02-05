@@ -59,11 +59,15 @@ class MusicBucketAdapter(context: Context) :
                     it.name == data.musicBucket.name
                 }.let { mList.indexOf(it) }
                 if (index < 0) return
+                val isSelected = selectList.contains(mList[index])
                 mList.removeAt(index)
                 notifyItemRemovedChecked(index)
-                selectList.clear()
-                selectList.add(mList[0])
-                musicBucketEventListener?.onBucketClicked(mList[0])
+                if (isSelected) {
+                    selectList.clear()
+                    selectList.add(mList[0])
+                    checkSelect(0,mList[0])
+                    musicBucketEventListener?.onBucketClicked(mList[0])
+                }
             }
             is MusicBucketAEvent.SelectBucket -> {
                 mList.find { it.name == data.bucketName }?.let {

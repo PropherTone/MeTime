@@ -88,9 +88,7 @@ class GalleryActivity :
 
         fun addBucket() {
             titleDialog(componentString.user_name.getString(), "") {
-                if (it == ALL_GALLERY) R.string.name_used.getString().toast()
-                if (it.isNotEmpty()) viewModel.addBucket(it)
-                else componentString.enter.getString().toast()
+                viewModel.addBucket(it)
             }
         }
 

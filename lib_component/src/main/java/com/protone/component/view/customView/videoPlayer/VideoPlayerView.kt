@@ -7,10 +7,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
-import android.view.Choreographer
-import android.view.Surface
-import android.view.TextureView
-import android.view.ViewGroup
+import android.view.*
 import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import com.protone.component.view.customView.video.AutoFitTextureView
@@ -84,6 +81,7 @@ class VideoPlayerView @JvmOverloads constructor(
         override fun doFrame(frameTimeNanos: Long) {
             if (doPlaying) {
                 play()
+                Choreographer.getInstance().postFrameCallbackDelayed(this, 1000)
                 return
             }
             mediaPlayer?.let { controller?.seekTo(it.currentPosition.toLong()) }
@@ -91,8 +89,7 @@ class VideoPlayerView @JvmOverloads constructor(
         }
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
+    init {
         initTextureView()
     }
 
@@ -131,7 +128,8 @@ class VideoPlayerView @JvmOverloads constructor(
                 it,
                 LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    Gravity.CENTER
                 )
             )
             it.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
@@ -143,7 +141,10 @@ class VideoPlayerView @JvmOverloads constructor(
                     playSurface = Surface(surface)
                     if (mediaPlayer == null) {
                         path?.let { p -> setPath(p) } ?: uriPath?.let { p -> setPath(p) }
-                    } else if (!isInitialized) playSurface?.let { s -> mediaPlayer?.setSurface(s) }
+                    } else if (!isInitialized) playSurface?.let { s ->
+                        mediaPlayer?.setSurface(s)
+                        isInitialized = true
+                    }
                 }
 
                 override fun onSurfaceTextureSizeChanged(
@@ -169,6 +170,7 @@ class VideoPlayerView @JvmOverloads constructor(
             }
         } else {
             doPlaying = true
+            Choreographer.getInstance().postFrameCallback(frameCallBack)
         }
     }
 
@@ -185,7 +187,7 @@ class VideoPlayerView @JvmOverloads constructor(
                 setSurface(surface)
                 isInitialized = true
             }
-            setOnVideoSizeChangedListener { mp, width, height ->
+            setOnVideoSizeChangedListener { _, width, height ->
                 textureView?.adaptVideoSize(width, height)
 //            measure(textureView.measuredWidth, textureView.measuredHeight)
             }

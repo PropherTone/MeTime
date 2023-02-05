@@ -7,7 +7,6 @@ import com.protone.component.BaseViewModel
 
 class GalleryListFragmentViewModel : BaseViewModel() {
 
-    var isInit = false
     var galleryName = ""
     var isCustom = false
 

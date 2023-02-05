@@ -12,15 +12,13 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/icon" />
 
-        <View
+        <androidx.constraintlayout.widget.Group
             android:id="@+id/cover"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:visibility="invisible"
             android:background="@color/foreDark_1"
-            app:constraint_referenced_ids="cover
-            ,title,progressBar
-            ,timeSplit,currentTime,totalTime
-            ,start,pre,next"
+            app:constraint_referenced_ids="title,progressBar,timeSplit,currentTime,totalTime,start,pre,next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="@id/progressBar" />
 

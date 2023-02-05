@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.protone.common.context.newLayoutInflater
 import com.protone.component.databinding.VideoControllerLayoutBinding
 import com.protone.component.view.customView.ColorfulProgressBar

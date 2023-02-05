@@ -1,8 +1,6 @@
 package com.protone.gallery.activity
 
-import android.content.Intent
 import androidx.activity.viewModels
-import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -34,7 +32,6 @@ import com.protone.gallery.databinding.GalleryViewActivityBinding
 import com.protone.gallery.fragment.GalleryViewFragment
 import com.protone.gallery.viewModel.GalleryViewViewModel
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Route(path = RouterPath.GalleryRouterPath.GalleryView)
 class GalleryViewActivity : BaseMediaActivity<

@@ -14,12 +14,13 @@ abstract class VideoBaseController(private val context: Context) {
 
     var isPlaying = false
         set(value) {
+            if (value == field) return
             startBtn.setImageDrawable(
                 if (!value) R.drawable.ic_round_play_arrow_24_white.getDrawable()
                 else R.drawable.ic_round_pause_24_white.getDrawable()
             )
             if (previewCover?.isVisible == true) previewCover?.isGone = true
-            videoPlayer?.let { if (!value) it.play() else it.pause() }
+            videoPlayer?.let { if (value) it.play() else it.pause() }
             controllerVisibleGroup.isVisible = !controllerVisibleGroup.isVisible
             field = value
         }
