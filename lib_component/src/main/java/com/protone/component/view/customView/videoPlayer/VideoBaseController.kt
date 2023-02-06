@@ -2,6 +2,8 @@ package com.protone.component.view.customView.videoPlayer
 
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isGone
@@ -12,39 +14,47 @@ import com.protone.component.R
 
 abstract class VideoBaseController(private val context: Context) {
 
-    var isPlaying = false
-        set(value) {
-            if (value == field) return
-            startBtn.setImageDrawable(
-                if (!value) R.drawable.ic_round_play_arrow_24_white.getDrawable()
-                else R.drawable.ic_round_pause_24_white.getDrawable()
-            )
-            if (previewCover?.isVisible == true) previewCover?.isGone = true
-            videoPlayer?.let { if (value) it.play() else it.pause() }
-            controllerVisibleGroup.isVisible = !controllerVisibleGroup.isVisible
-            field = value
+    private val mHandler by lazy {
+        Handler(Looper.getMainLooper()) {
+            controllerVisibleGroup.isVisible = false
+            false
         }
+    }
+
+    var isPlaying = false
 
     protected var videoPlayer: VideoPlayer? = null
 
     protected abstract val startBtn: ImageView
     protected abstract val preBtn: ImageView?
     protected abstract val nextBtn: ImageView?
-    protected abstract val previewCover: ImageView?
     protected abstract val controllerVisibleGroup: View
     abstract fun getControllerView(): View
     abstract fun seekTo(progress: Long)
+    abstract fun setTitle(title: String)
 
     open fun setDuration(duration: Long) = Unit
 
     open fun reset() {
-        isPlaying = false
-        previewCover?.isGone = false
+        mHandler.removeCallbacksAndMessages(null)
+        setPlayState(false)
+    }
+
+    open fun reverseControllerVisible() {
+        controllerVisibleGroup.isVisible = !controllerVisibleGroup.isVisible.also {
+            if (it) doHideCountdown()
+        }
+    }
+
+    private fun doHideCountdown() {
+        mHandler.removeCallbacksAndMessages(null)
+        mHandler.sendEmptyMessageDelayed(0, 3000L)
     }
 
     protected fun defaultInit() {
         startBtn.setOnClickListener {
-            isPlaying = !isPlaying
+            setPlayState(!isPlaying)
+            doPlay()
         }
         preBtn?.setOnClickListener {
             videoPlayer?.onPre()
@@ -58,12 +68,26 @@ abstract class VideoBaseController(private val context: Context) {
         this.videoPlayer = videoPlayer
     }
 
-    fun loadPreview(path: String) {
-        previewCover?.let { Image.load(path).with(context).into(it) }
+    internal fun doPlay() {
+        videoPlayer?.let {
+            if (isPlaying) it.play() else it.pause()
+            controllerVisibleGroup.isVisible = true
+            doHideCountdown()
+        }
     }
 
-    fun loadPreview(path: Uri) {
-        previewCover?.let { Image.load(path).with(context).into(it) }
+    internal fun setPlayState(isPlaying: Boolean) {
+        if (isPlaying == this.isPlaying) return
+        this.isPlaying = isPlaying
+        startBtn.setImageDrawable(
+            if (!isPlaying) R.drawable.ic_round_play_arrow_24_white.getDrawable()
+            else R.drawable.ic_round_pause_24_white.getDrawable()
+        )
+    }
+
+    fun pause() {
+        setPlayState(false)
+        doPlay()
     }
 
 }

@@ -38,4 +38,7 @@
     <dimen name="texts_margin">10dp</dimen>
     <dimen name="full_edit_margin">24dp</dimen>
 
+    <dimen name="player_item_margin">4dp</dimen>
+    <dimen name="player_item_size">56dp</dimen>
+
 </resources>

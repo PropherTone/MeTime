@@ -33,9 +33,6 @@ class GalleryViewFragment(
                 videoBinding = binding.apply {
                     richVideo.controller = DefaultVideoController(richVideo.context)
                     richVideo.setPath(galleryMedia.uri)
-//                    richVideo.setOnClickEvent {
-//                        if (!richVideo.isPlaying) singleClick.invoke()
-//                    }
                 }
             }.root
         else GalleryVp2AdapterLayoutBinding
@@ -73,12 +70,11 @@ class GalleryViewFragment(
 
     override fun onDestroy() {
         super.onDestroy()
-//        if (galleryMedia.isVideo) videoBinding?.richVideo?.release()
-//        else imageBinding?.image?.clear()
+        imageBinding?.image?.clear()
     }
 
     override fun onPause() {
         super.onPause()
-//        if (galleryMedia.isVideo) videoBinding?.richVideo?.pause()
+        if (galleryMedia.isVideo) videoBinding?.richVideo?.controller
     }
 }

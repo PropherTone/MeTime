@@ -63,7 +63,8 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
             is PictureBoxAdapterVideoLayoutBinding ->
                 (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
                     videoPlayer.controller = DefaultVideoController(context)
-                    videoPlayer.setPath(mList[position].uri)
+                    videoPlayer.setPath(mList[position].uri, autoAdjustToFill = true)
+                    videoPlayer.controller?.setTitle(mList[position].name)
                 }
         }
     }

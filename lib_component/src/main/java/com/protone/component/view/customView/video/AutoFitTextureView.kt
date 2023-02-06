@@ -15,6 +15,10 @@ class AutoFitTextureView @JvmOverloads constructor(
 
     private var videoHeight = 0
     private var videoWidth = 0
+    private var onMeasureResult: ((Int, Int) -> Unit)? = null
+    fun onMeasureResult(block: (Int, Int) -> Unit) {
+        onMeasureResult = block
+    }
 
     fun adaptVideoSize(videoWidth: Int, videoHeight: Int) {
         if (this.videoWidth != videoWidth && this.videoHeight != videoHeight) {
@@ -91,6 +95,7 @@ class AutoFitTextureView @JvmOverloads constructor(
                 }
             }
         }
+        onMeasureResult?.invoke(width, height)
         setMeasuredDimension(width, height)
     }
 }

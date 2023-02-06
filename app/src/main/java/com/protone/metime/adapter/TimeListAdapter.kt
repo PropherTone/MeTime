@@ -10,6 +10,7 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.Transition
 import com.protone.component.view.adapter.BaseAdapter
+import com.protone.component.view.customView.videoPlayer.DefaultVideoController
 import com.protone.metime.databinding.TimePhotoCardLayoutBinding
 import com.protone.metime.databinding.TimeVideoCardLayoutBinding
 
@@ -71,11 +72,12 @@ class TimeListAdapter(private val cardEvent: CardEvent) :
                 }
             }
             is TimeVideoCardLayoutBinding -> getItem(position)?.let { media ->
-                binding.videoPlayer.setVideoPath(media.uri)
+                binding.videoPlayer.controller = DefaultVideoController(binding.root.context)
+                binding.videoPlayer.setPath(media.uri)
                 binding.title.text = media.date.toDateString()
-                binding.videoPlayer.setFullScreen {
-                    cardEvent.onVideoClick(media)
-                }
+//                binding.videoPlayer.setFullScreen {
+//                    cardEvent.onVideoClick(media)
+//                }
             }
         }
     }

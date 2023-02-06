@@ -6,18 +6,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/preview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/icon" />
-
         <androidx.constraintlayout.widget.Group
             android:id="@+id/cover"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="invisible"
             android:background="@color/foreDark_1"
+            android:visibility="invisible"
             app:constraint_referenced_ids="title,progressBar,timeSplit,currentTime,totalTime,start,pre,next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="@id/progressBar" />
@@ -29,13 +23,14 @@
             android:background="@color/foreDark_1"
             android:gravity="center"
             android:padding="@dimen/texts_padding"
-            android:textSize="@dimen/mid_title_text"
+            android:textColor="@color/white"
+            android:textSize="@dimen/small_title_text"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/centerStart"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/player_item_size"
             android:background="@drawable/oval_fore_ripple_dark"
             android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding"
@@ -44,21 +39,20 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.16" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.protone.component.view.customView.ColorfulProgressBar
             android:id="@+id/progressBar"
             android:layout_width="match_parent"
             android:layout_height="16dp"
-            android:layout_marginBottom="@dimen/texts_margin"
+            android:layout_marginBottom="@dimen/player_item_margin"
             app:layout_constraintBottom_toTopOf="@id/timeSplit" />
 
         <TextView
             android:id="@+id/timeSplit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/texts_margin"
+            android:layout_margin="@dimen/player_item_margin"
             android:text="@string/split"
             android:textColor="@color/white"
             android:textSize="@dimen/small_title_text"
@@ -70,7 +64,7 @@
             android:id="@+id/currentTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/texts_margin"
+            android:layout_margin="@dimen/player_item_margin"
             android:text="@string/default_time"
             android:textColor="@color/white"
             android:textSize="@dimen/small_title_text"
@@ -81,7 +75,7 @@
             android:id="@+id/totalTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/texts_margin"
+            android:layout_margin="@dimen/player_item_margin"
             android:text="@string/default_time"
             android:textColor="@color/white"
             android:textSize="@dimen/small_title_text"
@@ -91,7 +85,7 @@
         <ImageView
             android:id="@+id/start"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/player_item_size"
             android:contentDescription="@string/action"
             android:src="@drawable/ic_round_play_arrow_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -99,8 +93,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.99"
-            app:layout_constraintWidth_percent="0.16" />
+            app:layout_constraintVertical_bias="0.99" />
 
         <ImageView
             android:id="@+id/pre"

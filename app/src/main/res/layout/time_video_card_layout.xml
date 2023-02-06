@@ -8,7 +8,7 @@
         android:layout_margin="@dimen/main_margin"
         app:cardConstraintRadius="@dimen/item_radius">
 
-        <com.protone.component.view.customView.video.MyVideoPlayer
+        <com.protone.component.view.customView.videoPlayer.VideoPlayerView
             android:id="@+id/videoPlayer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
