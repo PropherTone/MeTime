@@ -28,7 +28,7 @@ class GalleryViewViewModel : BaseViewModel() {
                         else it.getGalleryMediasByBucket(bucketId, isVideo)
                     }
                     combine -> it.getAllSignedMedia()
-                    gallery == ALL_GALLERY -> it.getAllSignedMedia()
+                    gallery == ALL_GALLERY -> it.getAllMediaByType(isVideo)
                     else -> it.getAllMediaByGallery(gallery, isVideo)
                 }
             } ?: mutableListOf()) as MutableList<GalleryMedia>

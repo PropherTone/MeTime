@@ -151,20 +151,18 @@ class GalleryActivity :
                     }
                     is GalleryViewModel.GalleryEvent.OnGalleryRemoved -> {
                         getBucketAdapter().apply {
-                            viewModel.getBucket(ALL_GALLERY)?.let { g -> setSelected(g) }
+                            getBucket(ALL_GALLERY)?.let { g -> setSelected(g) }
                             deleteBucket(it.gallery)
                         }
                     }
                     is GalleryViewModel.GalleryEvent.OnGalleryUpdated -> {
-                        viewModel.run {
-                            getBucketAdapter().apply {
-                                if (it.gallery.name == rightGallery) {
-                                    binding.refreshSelectGallery(it.gallery, it.itemState, false)
-                                }
-                                refreshBucket(it.gallery, it.itemState)
-                                getBucket(ALL_GALLERY)?.let { gallery ->
-                                    refreshBucket(gallery, it.itemState)
-                                }
+                        getBucketAdapter().apply {
+                            if (it.gallery.name == rightGallery) {
+                                binding.refreshSelectGallery(it.gallery, it.itemState, false)
+                            }
+                            refreshBucket(it.gallery, it.itemState)
+                            getBucket(ALL_GALLERY)?.let { gallery ->
+                                refreshBucket(gallery, it.itemState)
                             }
                         }
                     }
