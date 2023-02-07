@@ -2,6 +2,7 @@ package com.protone.component
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.protone.common.baseType.getString
@@ -67,8 +68,10 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
                     isPlay = it
                 }
                 onMusicPlaying().observe(lifecycle) {
-                    setDetail(it)
-                    onPlaying?.invoke(it)
+                    if (it != null) {
+                        setDetail(it)
+                        onPlaying?.invoke(it)
+                    }
                 }
             }
         }

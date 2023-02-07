@@ -19,7 +19,7 @@ import com.protone.common.entity.Music
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.SearchModel
-import com.protone.component.BaseMusicActivity
+import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.R
 import com.protone.component.broadcast.musicBroadCastManager

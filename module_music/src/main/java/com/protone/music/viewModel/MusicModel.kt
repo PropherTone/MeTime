@@ -18,6 +18,7 @@ import com.protone.music.adapter.MusicBucketAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -25,15 +26,17 @@ class MusicModel : BaseViewModel(),
     ViewEventHandle<MusicModel.MusicViewEvent> by ViewEventHandler() {
 
     sealed class MusicViewEvent : ViewEvent {
+        data class InitList(val list: List<MusicBucket>) : MusicViewEvent()
+
         data class DoEdit(val musicBucket: MusicBucket) : MusicViewEvent()
         data class DoAddMusic(val musicBucket: MusicBucket) : MusicViewEvent()
 
         data class PlayMusic(val music: Music) : MusicViewEvent()
-        data class OnBucketSelect(val musicBucket: MusicBucket) : MusicViewEvent()
+        data class OnBucketSelect(val musicBucket: MusicBucket, val list: List<Music>) :
+            MusicViewEvent()
+
         data class OnBucketRefresh(val musicBucket: MusicBucket, val state: Int) : MusicViewEvent()
         object AddMusicBucket : MusicViewEvent()
-        object Locate : MusicViewEvent()
-        object Search : MusicViewEvent()
     }
 
     sealed class MusicEvent {
@@ -73,7 +76,6 @@ class MusicModel : BaseViewModel(),
 
     val isContainerOpen = ObservableField(true)
 
-
     private var isViewEventInit: AtomicBoolean? = null
     private var isEventInit: AtomicBoolean? = null
     var isInit
@@ -103,25 +105,22 @@ class MusicModel : BaseViewModel(),
         get() = userConfig.lastMusicBucket
 
     private lateinit var defaultBucket: MusicBucket
-    fun getDefaultBucket() = defaultBucket
+    private fun getDefaultBucket() = defaultBucket
 
     private val eventPool by lazy {
         EventCachePool<MusicEvent>(duration = 400L).handleEvent {
             if (it.isEmpty()) return@handleEvent
             when (it.first()) {
                 is MusicEvent.OnMusicInsert -> {
-                    sendMusicInserted(MusicEvent.OnMusicsInsert(
+                    sendMusicsInserted(MusicEvent.OnMusicsInsert(
                         it.map { event -> (event as MusicEvent.OnMusicInsert).music }
                     ))
-                    getBucket(ALL_MUSIC)?.let { bucket ->
-                        sendMusicEvent(MusicEvent.OnMusicBucketUpdated(bucket))
-                    }
                 }
                 is MusicEvent.OnMusicInsertToBucket -> {
                     checkMusicWithBucket(it.map { event ->
                         event as MusicEvent.MusicWithBucketEvent
                     }) { musics, name ->
-                        sendMusicInserted(MusicEvent.OnMusicsInsert(musics, name))
+                        sendMusicsInserted(MusicEvent.OnMusicsInsert(musics, name))
                     }
                 }
                 is MusicEvent.OnMusicRemoveFromBucket -> {
@@ -157,9 +156,10 @@ class MusicModel : BaseViewModel(),
         viewModelScope.launchDefault {
             isEventInit = observeMusicDataMutable(viewModelScope) {
                 when (it) {
-                    is MediaAction.MusicDataAction.OnNewMusicBucket -> {
-                        sendMusicEvent(MusicEvent.OnMusicBucketInsert(it.musicBucket))
-                    }
+                    is MediaAction.MusicDataAction.OnNewMusicBucket ->
+                        musicDAO.getMusicBucketByName(it.musicBucket.name)?.let { mb->
+                            sendMusicEvent(MusicEvent.OnMusicBucketInsert(mb))
+                        }
                     is MediaAction.MusicDataAction.OnMusicBucketUpdated -> {
                         sendMusicEvent(MusicEvent.OnMusicBucketUpdated(it.musicBucket))
                     }
@@ -170,10 +170,10 @@ class MusicModel : BaseViewModel(),
                         eventPool.holdEvent(MusicEvent.OnMusicInsert(it.music))
                     }
                     is MediaAction.MusicDataAction.OnMusicsInserted -> {
-                        sendMusicInserted(MusicEvent.OnMusicsInsert(it.musics))
+                        sendMusicsInserted(MusicEvent.OnMusicsInsert(it.musics))
                     }
                     is MediaAction.MusicDataAction.OnMusicDeleted -> {
-                        sendMusicEvent(MusicEvent.OnMusicDeleted(it.music))
+                        sendMusicDeleted(MusicEvent.OnMusicDeleted(it.music))
                     }
                     is MediaAction.MusicDataAction.OnMusicsDeleted -> {
                         sendMusicEvent(MusicEvent.OnMusicsDeleted(it.musics))
@@ -208,9 +208,28 @@ class MusicModel : BaseViewModel(),
         }
     }
 
+    fun addMusicBucket() {
+        viewModelScope.launch {
+            sendViewEvent(MusicViewEvent.AddMusicBucket)
+        }
+    }
+
+    fun initList() {
+        viewModelScope.launch {
+            sendViewEvent(MusicViewEvent.InitList(getMusicBuckets()))
+        }
+    }
+
     fun getBucketEventListener() = object : MusicBucketAdapter.MusicBucketEvent {
         override fun onBucketClicked(musicBucket: MusicBucket) {
-            sendViewEvent(MusicViewEvent.OnBucketSelect(musicBucket))
+            viewModelScope.launch {
+                sendViewEvent(
+                    MusicViewEvent.OnBucketSelect(
+                        musicBucket,
+                        getCurrentMusicList(musicBucket)
+                    )
+                )
+            }
         }
 
         override fun addMusic(musicBucket: MusicBucket, position: Int) {
@@ -232,14 +251,25 @@ class MusicModel : BaseViewModel(),
 
     fun getDefaultMusicBucket() = defaultBucket
 
-    private suspend fun sendMusicInserted(onMusicsInsert: MusicEvent.OnMusicsInsert) {
-        if (currentBucket == ALL_MUSIC) {
-            getBucket(ALL_MUSIC)?.let { mb ->
+    private suspend fun sendMusicsInserted(onMusicsInsert: MusicEvent.OnMusicsInsert) {
+        if (onMusicsInsert.bucketName == ALL_MUSIC) {
+            defaultBucket.size += onMusicsInsert.musics.size
+            sendMusicEvent(MusicEvent.OnMusicBucketUpdated(defaultBucket))
+            sendMusicEvent(onMusicsInsert)
+        } else {
+            getBucket(onMusicsInsert.bucketName)?.let { mb ->
                 mb.size += onMusicsInsert.musics.size
+                sendMusicEvent(MusicEvent.OnMusicBucketUpdated(mb))
+                if (currentBucket == onMusicsInsert.bucketName) sendMusicEvent(onMusicsInsert)
             }
-            sendMusicEvent(onMusicsInsert)
-        } else if (currentBucket == onMusicsInsert.bucketName) {
-            sendMusicEvent(onMusicsInsert)
+        }
+    }
+
+    private suspend fun sendMusicDeleted(onMusicDeleted: MusicEvent.OnMusicDeleted) {
+        if (currentBucket != ALL_MUSIC) return
+        getBucket(ALL_MUSIC)?.let { mb ->
+            mb.size -= 1
+            sendMusicEvent(onMusicDeleted)
         }
     }
 
@@ -253,7 +283,7 @@ class MusicModel : BaseViewModel(),
     private suspend fun getBucket(name: String) =
         if (name == ALL_MUSIC) defaultBucket else musicDAO.getMusicBucketByName(name)
 
-    private suspend fun getMusicBuckets(): MutableList<MusicBucket> = withIOContext {
+    private suspend fun getMusicBuckets(): List<MusicBucket> = withIOContext {
         musicDAO.run {
             ((getAllMusicBucket() as MutableList<MusicBucket>?)
                 ?: mutableListOf()).let { list ->

@@ -9,13 +9,12 @@ import com.protone.common.context.intent
 import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.utils.RouterPath
-import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE
 import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toJson
 import com.protone.component.R
-import com.protone.component.BaseMusicActivity
+import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.service.MusicBinder
 import com.protone.component.toGalleryView
 import com.protone.component.view.customView.richText.RichNoteImageLoader
@@ -46,7 +45,7 @@ class NoteViewActivity :
             initSeen(noteQueue.poll())
         }
 
-        onViewEvent {
+        viewModel.onViewEvent(this@NoteViewActivity,this@NoteViewActivity) {
             when (it) {
                 NoteViewViewModel.NoteViewEvent.Next -> initSeen(viewModel.noteQueue.poll())
                 NoteViewViewModel.NoteViewEvent.Edit -> edit()
@@ -56,7 +55,7 @@ class NoteViewActivity :
 
     override fun finish() {
         if (viewModel.noteQueue.isNotEmpty()) {
-            sendViewEvent(NoteViewViewModel.NoteViewEvent.Next)
+            viewModel.sendViewEvent(NoteViewViewModel.NoteViewEvent.Next)
         } else super.finish()
     }
 
@@ -131,6 +130,10 @@ class NoteViewActivity :
             noteEditRichNote.setRichList(note.richCode, note.text)
             noteEditRichNote.iRichListener = listener
         }
+    }
+
+    fun sendViewEvent(viewEvent: NoteViewViewModel.NoteViewEvent) {
+        viewModel.sendViewEvent(viewEvent)
     }
 
     fun setMusicProgress(progress: Long) {

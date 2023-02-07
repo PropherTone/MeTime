@@ -1,6 +1,5 @@
-package com.protone.component
+package com.protone.component.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.view.View
 import androidx.core.content.FileProvider
@@ -12,8 +11,10 @@ import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_MEDIA
-import com.protone.component.activity.BaseMsgActivity
+import com.protone.component.BaseViewModel
+import com.protone.component.R
 import com.protone.component.databinding.GalleryOptionPopBinding
+import com.protone.component.toGallery
 import com.protone.component.view.dialog.cateDialog
 import com.protone.component.view.dialog.checkListDialog
 import com.protone.component.view.dialog.titleDialog

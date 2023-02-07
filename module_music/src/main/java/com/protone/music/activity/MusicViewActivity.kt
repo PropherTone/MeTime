@@ -13,7 +13,7 @@ import com.protone.common.context.root
 import com.protone.common.context.statuesBarHeight
 import com.protone.component.database.userConfig
 import com.protone.common.entity.Music
-import com.protone.component.BaseMusicActivity
+import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.MusicControllerIMP
 import com.protone.common.context.activities

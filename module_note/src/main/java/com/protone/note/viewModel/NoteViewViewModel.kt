@@ -3,12 +3,15 @@ package com.protone.note.viewModel
 import android.net.Uri
 import com.protone.common.entity.GalleryMedia
 import com.protone.component.BaseViewModel
+import com.protone.component.ViewEventHandle
+import com.protone.component.ViewEventHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.stream.Collectors
 
-class NoteViewViewModel : BaseViewModel() {
+class NoteViewViewModel : BaseViewModel(),
+    ViewEventHandle<NoteViewViewModel.NoteViewEvent> by ViewEventHandler() {
 
     sealed class NoteViewEvent : ViewEvent {
         object Next : NoteViewEvent()

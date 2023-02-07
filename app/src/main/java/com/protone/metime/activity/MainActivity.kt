@@ -4,7 +4,6 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.protone.component.R
 import com.protone.common.baseType.*
 import com.protone.common.context.MApplication
 import com.protone.common.context.clipOutLine
@@ -21,21 +20,22 @@ import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrat
 import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.todayDate
-import com.protone.component.BaseMusicActivity
-import com.protone.component.MusicControllerIMP
+import com.protone.component.*
+import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
-import com.protone.component.toGallery
 import com.protone.component.view.customView.musicPlayer.getBitmap
 import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity :
-    BaseMusicActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>() {
+    BaseMusicActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>(),
+    ViewEventHandle<MainViewModel.MainViewEvent> by ViewEventHandler() {
     override val viewModel: MainViewModel by viewModels()
 
     private var userName: String? = null
@@ -106,8 +106,21 @@ class MainActivity :
             }
         }
 
-        initTimeList()
+        observeMusicEvent {
+            musicController.setMusicList(it)
+            if (musicController.isPlaying() == true) {
+                musicController.refreshPlayer()
+                return@observeMusicEvent
+            }
+            musicController.refresh(
+                if (userConfig.lastMusic.isNotEmpty()) {
+                    userConfig.lastMusic.toEntity(Music::class.java)
+                } else if (it.isNotEmpty()) it[0] else getEmptyMusic(),
+                userConfig.lastMusicProgress
+            )
+        }
 
+        initTimeList()
         musicController.bindMusicService()
 
         observeViewEvent()
@@ -118,8 +131,10 @@ class MainActivity :
             setBinder(this@MainActivity, it) { loopMode ->
                 userConfig.musicLoopMode = loopMode
             }
+            viewModel.isBindMusicService?.set(true)
             setLoopMode(userConfig.musicLoopMode)
             launchDefault {
+                if (viewModel.isMusicsUpdated) return@launchDefault
                 viewModel.getMusics(userConfig.lastMusicBucket)?.let { list ->
                     setMusicList(list)
                     if (isPlaying() == true) {
@@ -138,7 +153,7 @@ class MainActivity :
     }
 
     private fun observeViewEvent() {
-        onViewEvent {
+        onViewEvent(this, this) {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
                     toGallery {

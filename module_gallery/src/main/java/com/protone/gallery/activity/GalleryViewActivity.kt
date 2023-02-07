@@ -23,7 +23,7 @@ import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUri
 import com.protone.common.utils.onResult
-import com.protone.component.BaseMediaActivity
+import com.protone.component.activity.BaseMediaActivity
 import com.protone.component.R
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.adapter.CatoListAdapter

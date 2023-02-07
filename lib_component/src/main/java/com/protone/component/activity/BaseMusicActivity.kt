@@ -1,4 +1,4 @@
-package com.protone.component
+package com.protone.component.activity
 
 import android.content.ComponentName
 import android.content.ServiceConnection
@@ -6,8 +6,7 @@ import android.os.IBinder
 import androidx.databinding.ViewDataBinding
 import com.protone.common.context.intent
 import com.protone.common.context.isServiceRunning
-import com.protone.component.activity.BaseActivity
-import com.protone.component.activity.BaseMsgActivity
+import com.protone.component.BaseViewModel
 import com.protone.component.service.MusicBinder
 import com.protone.component.service.MusicService
 import com.protone.component.service.observeServiceState

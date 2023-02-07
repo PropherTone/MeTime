@@ -20,7 +20,7 @@ import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.SearchModel
 import com.protone.common.utils.json.toJson
-import com.protone.component.BaseMediaActivity
+import com.protone.component.activity.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.toGalleryView
 import com.protone.gallery.adapter.GalleryListAdapter

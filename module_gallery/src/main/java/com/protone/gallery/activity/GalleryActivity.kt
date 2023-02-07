@@ -29,7 +29,7 @@ import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.displayUtils.imageLoader.constant.Transition
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUriJson
-import com.protone.component.BaseMediaActivity
+import com.protone.component.activity.BaseMediaActivity
 import com.protone.component.BaseViewModel
 import com.protone.component.database.userConfig
 import com.protone.component.toPictureBox

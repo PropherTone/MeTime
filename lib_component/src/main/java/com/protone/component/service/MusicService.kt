@@ -214,6 +214,7 @@ class MusicService : BaseService(), IMusicService {
     override fun setPlayList(list: List<Music>) {
         playList.clear()
         playList.addAll(list)
+        Log.d("TAG", "setPlayList: ${playList.size}")
     }
 
     override fun isPlaying(): Boolean = playState.value == true
@@ -231,6 +232,7 @@ class MusicService : BaseService(), IMusicService {
     override fun onMusicPlaying(): LiveData<Music> = currentMusic
 
     override fun init(music: Music, progress: Long) {
+        Log.d("TAG", "init: ")
         currentMusic.postValue(
             if (playList.isNotEmpty() && music.title != NO_MUSIC) {
                 val index = playList.indexOf(music)
