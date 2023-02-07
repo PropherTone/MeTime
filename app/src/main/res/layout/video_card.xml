@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -13,24 +14,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.protone.component.view.customView.video.MyVideoPlayer
+            <com.protone.component.view.customView.videoPlayer.VideoPlayerView
                 android:id="@+id/videoPlayer"
-                app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@color/white"
                 android:elevation="@dimen/small_elevation"
                 app:layout_constraintBottom_toTopOf="@id/videoCard_title"
-                android:layout_height="match_parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/videoCard_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:textColor="@color/black"
                 android:gravity="center"
                 android:lines="1"
                 android:padding="@dimen/title_texts_padding"
+                android:textColor="@color/black"
                 android:textSize="@dimen/title_text"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/videoPlayer"

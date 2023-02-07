@@ -34,6 +34,7 @@ import com.protone.component.databinding.RichMusicLayoutBinding
 import com.protone.component.databinding.RichPhotoLayoutBinding
 import com.protone.component.databinding.RichTextVideoCardBinding
 import com.protone.component.view.customView.musicPlayer.BaseMusicPlayer
+import com.protone.component.view.customView.videoPlayer.DefaultVideoController
 
 /**
  * RichText editor by ProTone 2022/4/15
@@ -261,10 +262,11 @@ class RichNoteView @JvmOverloads constructor(
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
         addView(RichTextVideoCardBinding.inflate(context.newLayoutInflater, this, false).apply {
-            videoPlayer.setVideoPath(video.uri)
-            videoPlayer.setFullScreen {
-                iRichListener?.open(video.uri, "", true)
-            }
+            videoPlayer.controller = DefaultVideoController(context)
+            videoPlayer.setPath(video.uri)
+//            videoPlayer.setFullScreen {
+//                iRichListener?.open(video.uri, "", true)
+//            }
         }.root.also { r -> r.tag = video }, it)
     }
 

@@ -1,8 +1,6 @@
 package com.protone.component.view.customView.videoPlayer
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.media.AudioAttributes
 import com.protone.common.utils.displayUtils.imageLoader.Image
@@ -10,22 +8,11 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import com.protone.common.baseType.toBitmap
-import com.protone.common.utils.TAG
-import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
-import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
-import com.protone.common.utils.musicContent
-import com.protone.component.view.customView.video.AutoFitTextureView
-import java.io.File
-import kotlin.math.roundToInt
 
 class VideoPlayerView @JvmOverloads constructor(
     context: Context,

@@ -6,6 +6,7 @@ import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.entity.MusicWithMusicBucket
 import com.protone.common.utils.converters.UriTypeConverter
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @TypeConverters(UriTypeConverter::class)
@@ -21,6 +22,10 @@ interface MusicWithMusicBucketDAO {
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId IS:musicBucketId")
     fun getMusicWithMusicBucket(musicBucketId: Long): List<Music>?
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT * FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId IS:musicBucketId")
+    fun getMusicWithMusicBucketFlow(musicBucketId: Long): Flow<List<Music>?>
 
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT uri FROM (SELECT uri,MAX(year) FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId IS:musicBucketId)")

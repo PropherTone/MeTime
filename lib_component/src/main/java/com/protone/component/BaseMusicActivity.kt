@@ -6,6 +6,7 @@ import android.os.IBinder
 import androidx.databinding.ViewDataBinding
 import com.protone.common.context.intent
 import com.protone.common.context.isServiceRunning
+import com.protone.component.activity.BaseActivity
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.service.MusicBinder
 import com.protone.component.service.MusicService
@@ -14,7 +15,7 @@ import com.protone.component.view.customView.musicPlayer.bitmapCachePool
 import kotlinx.coroutines.launch
 
 abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>
-    : BaseMsgActivity<VB, VM, VE>() {
+    : BaseActivity<VB, VM, VE>() {
 
     private var serviceConnection: ServiceConnection? = null
 

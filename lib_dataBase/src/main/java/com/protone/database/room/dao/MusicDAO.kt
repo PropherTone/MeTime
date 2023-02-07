@@ -5,6 +5,7 @@ import androidx.room.*
 import com.protone.common.utils.converters.UriTypeConverter
 import com.protone.common.entity.Music
 import com.protone.database.room.mapToLongList
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @TypeConverters(UriTypeConverter::class)
@@ -20,6 +21,9 @@ interface MusicDAO {
 
     @Query("SELECT * FROM Music ORDER BY year DESC")
     fun getAllMusic(): List<Music>?
+
+    @Query("SELECT * FROM Music ORDER BY year DESC")
+    fun getAllMusicFlow(): Flow<List<Music>?>
 
     @Query("SELECT count(musicBaseId) FROM Music")
     fun getAllMusicSize(): Int

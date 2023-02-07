@@ -2,9 +2,16 @@ package com.protone.database.room.dao
 
 import androidx.room.*
 import com.protone.common.entity.MusicBucket
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MusicBucketDAO {
+
+    @Query("SELECT * FROM MusicBucket ORDER BY date ASC")
+    fun getAllMusicBucketFlow(): Flow<List<MusicBucket>?>
+
+    @Query("SELECT * FROM MusicBucket WHERE name IS :name")
+    fun getMusicBucketFlowByName(name: String): Flow<MusicBucket?>
 
     @Query("SELECT * FROM MusicBucket ORDER BY date ASC")
     fun getAllMusicBucket(): List<MusicBucket>?

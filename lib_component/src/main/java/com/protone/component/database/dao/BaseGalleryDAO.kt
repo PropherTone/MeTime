@@ -6,6 +6,7 @@ import com.protone.common.baseType.withIOContext
 import com.protone.common.entity.*
 import com.protone.component.database.MediaAction
 import com.protone.database.room.*
+import kotlinx.coroutines.flow.Flow
 
 sealed class BaseGalleryDAO : SignedGalleryDAO()
 
@@ -14,6 +15,10 @@ sealed class SignedGalleryDAO : MediasWithGalleriesDAO() {
 
     suspend fun getAllSignedMedia(): List<GalleryMedia>? = withIOContext {
         signedGalleryDAO.getAllSignedMedia()
+    }
+
+    suspend fun getAllMediaByTypeObserve(isVideo: Boolean): Flow<List<GalleryMedia>?> = withIOContext {
+        signedGalleryDAO.getAllMediaByTypeObserve(isVideo)
     }
 
     suspend fun getAllMediaByType(isVideo: Boolean): List<GalleryMedia>? = withIOContext {

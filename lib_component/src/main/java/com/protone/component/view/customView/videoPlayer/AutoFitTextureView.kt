@@ -1,4 +1,4 @@
-package com.protone.component.view.customView.video
+package com.protone.component.view.customView.videoPlayer
 
 import android.content.Context
 import android.util.AttributeSet

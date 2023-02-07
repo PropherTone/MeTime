@@ -7,6 +7,7 @@ import com.protone.common.entity.Gallery
 import com.protone.common.utils.converters.UriTypeConverter
 import com.protone.common.entity.GalleryMedia
 import com.protone.database.room.mapToLongList
+import kotlinx.coroutines.flow.Flow
 import java.lang.Exception
 
 @Dao
@@ -15,6 +16,9 @@ interface SignedGalleryDAO {
 
     @Query("SELECT * FROM GalleryMedia ORDER BY dateModified DESC")
     fun getAllSignedMedia(): List<GalleryMedia>?
+
+    @Query("SELECT * FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
+    fun getAllMediaByTypeObserve(isVideo: Boolean): Flow<List<GalleryMedia>?>
 
     @Query("SELECT * FROM GalleryMedia WHERE isVideo IS :isVideo ORDER BY dateModified DESC")
     fun getAllMediaByType(isVideo: Boolean): List<GalleryMedia>?

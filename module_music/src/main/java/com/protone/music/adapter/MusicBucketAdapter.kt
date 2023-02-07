@@ -159,18 +159,18 @@ class MusicBucketAdapter(context: Context) :
             }
             musicBucketEdit.setOnClickListener {
                 val layoutPosition = holder.layoutPosition
-                musicBucketEventListener?.edit(mList[layoutPosition].name, layoutPosition)
+                musicBucketEventListener?.edit(mList[layoutPosition], layoutPosition)
                 closeMusicBucketBoard()
             }
             musicBucketDelete.setOnClickListener {
                 val layoutPosition = holder.layoutPosition
-                musicBucketEventListener?.delete(mList[layoutPosition].name, layoutPosition)
+                musicBucketEventListener?.delete(mList[layoutPosition], layoutPosition)
                 closeMusicBucketBoard()
             }
             musicBucketAddList.setOnClickListener {
                 closeMusicBucketBoard()
                 val layoutPosition = holder.layoutPosition
-                musicBucketEventListener?.addMusic(mList[layoutPosition].name, layoutPosition)
+                musicBucketEventListener?.addMusic(mList[layoutPosition], layoutPosition)
             }
         }
     }
@@ -252,9 +252,9 @@ class MusicBucketAdapter(context: Context) :
 
     interface MusicBucketEvent {
         fun onBucketClicked(musicBucket: MusicBucket)
-        fun addMusic(bucket: String, position: Int)
-        fun delete(bucket: String, position: Int)
-        fun edit(bucket: String, position: Int)
+        fun addMusic(musicBucket: MusicBucket, position: Int)
+        fun delete(musicBucket: MusicBucket, position: Int)
+        fun edit(musicBucket: MusicBucket, position: Int)
         fun onSelectedBucketRefresh(bucket: MusicBucket, state: Int)
     }
 

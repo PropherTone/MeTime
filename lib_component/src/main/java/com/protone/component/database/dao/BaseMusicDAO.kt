@@ -10,6 +10,7 @@ import com.protone.database.room.getMusicBucketDAO
 import com.protone.database.room.getMusicDAO
 import com.protone.database.room.getMusicWithMusicBucketDAO
 import com.protone.database.room.musicsFilterBy
+import kotlinx.coroutines.flow.Flow
 
 sealed class BaseMusicDAO : MusicDAO()
 
@@ -17,6 +18,10 @@ sealed class MusicDAO : MusicBucketDAO() {
     private val musicDAO = getMusicDAO()
 
     suspend fun getNewestMusicUri(): Uri? = withIOContext { musicDAO.getNewestMusicUri() }
+
+    suspend fun getAllMusicFlow(): Flow<List<Music>?> = withIOContext {
+        musicDAO.getAllMusicFlow()
+    }
 
     suspend fun getAllMusic(): List<Music>? =
         withIOContext { musicDAO.getAllMusic() }
@@ -71,6 +76,14 @@ sealed class MusicDAO : MusicBucketDAO() {
 sealed class MusicBucketDAO : MusicWithMusicBucketDAO() {
     private val musicBucketDAO = getMusicBucketDAO()
 
+    suspend fun getAllMusicBucketFlow(): Flow<List<MusicBucket>?> = withIOContext {
+        musicBucketDAO.getAllMusicBucketFlow()
+    }
+
+    suspend fun getMusicBucketFlowByName(name: String): Flow<MusicBucket?> = withIOContext {
+        musicBucketDAO.getMusicBucketFlowByName(name)
+    }
+
     suspend fun getAllMusicBucket(): List<MusicBucket>? = withIOContext {
         musicBucketDAO.getAllMusicBucket()
     }
@@ -124,6 +137,11 @@ sealed class MusicWithMusicBucketDAO : BaseDAO<MediaAction.MusicDataAction>() {
                     )
                 )
             }
+        }
+
+    suspend fun getMusicWithMusicBucketFlow(musicBucketId: Long): Flow<List<Music>?> =
+        withIOContext {
+            musicWithMusicBucketDAO.getMusicWithMusicBucketFlow(musicBucketId)
         }
 
     suspend fun getMusicWithMusicBucket(musicBucketId: Long): List<Music>? =
