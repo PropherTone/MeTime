@@ -1,6 +1,8 @@
 package com.protone.component.view.customView.videoPlayer
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.media.AudioAttributes
 import com.protone.common.utils.displayUtils.imageLoader.Image
@@ -16,10 +18,13 @@ import androidx.cardview.widget.CardView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import com.protone.common.baseType.toBitmap
 import com.protone.common.utils.TAG
 import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
 import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
+import com.protone.common.utils.musicContent
 import com.protone.component.view.customView.video.AutoFitTextureView
+import java.io.File
 import kotlin.math.roundToInt
 
 class VideoPlayerView @JvmOverloads constructor(
@@ -67,11 +72,7 @@ class VideoPlayerView @JvmOverloads constructor(
                 }
 
                 override fun pause() {
-                    runCatching {
-                        if (mediaPlayer?.isPlaying == false) return
-                        mediaPlayer?.pause()
-                        Choreographer.getInstance().removeFrameCallback(frameCallBack)
-                    }
+                    this@VideoPlayerView.pause()
                 }
 
                 override fun stop() {
@@ -102,64 +103,51 @@ class VideoPlayerView @JvmOverloads constructor(
         }
 
     init {
-        initTextureView()
         addView(
             ImageView(context).also {
                 it.scaleType = ImageView.ScaleType.CENTER_CROP
                 previewCover = it
             },
-            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         )
     }
 
-    fun setPath(path: String, loadPreview: Boolean = true, autoAdjustToFill: Boolean = false) {
+    fun setPath(path: String, loadPreview: Boolean = true) {
         releasePlayer()
-        mediaPlayer = MediaPlayer().also {
-            it.setDataSource(path)
+        runCatching {
             this.path = path
             this.uriPath = null
-            it.initPlayer()
+            initTextureView()
         }
-        if (loadPreview) loadPreview(autoAdjustToFill)
+        if (loadPreview) loadPreview()
     }
 
-    fun setPath(uri: Uri, loadPreview: Boolean = true, autoAdjustToFill: Boolean = false) {
+    fun setPath(uri: Uri, loadPreview: Boolean = true) {
         releasePlayer()
-        mediaPlayer = MediaPlayer().also {
-            it.setDataSource(context, uri)
+        runCatching {
             this.uriPath = uri
             this.path = null
-            it.initPlayer()
+            initTextureView()
         }
-        if (loadPreview) loadPreview(autoAdjustToFill)
+        if (loadPreview) loadPreview()
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        Log.d(TAG, "onDetachedFromWindow: ")
+    fun release() {
         releasePlayer()
         playSurface?.release()
+        controller = null
         playSurface = null
         textureView = null
     }
 
-    private fun loadPreview(autoAdjustToFill: Boolean) {
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        pause()
+    }
+
+    private fun loadPreview() {
         (uriPath?.let { Image.load(it) } ?: path?.let { Image.load(it) })
-            ?.with(context)?.also {
-                if (autoAdjustToFill) it.setInterceptor(object : RequestInterceptor() {
-                    override fun onLoadSuccess(result: LoadSuccessResult) {
-                        result.resource?.apply {
-                            val mix = this.intrinsicWidth.toFloat().let { w ->
-                                this@VideoPlayerView.width / w
-                            }
-                            val heightSpan = (this.intrinsicHeight * mix).roundToInt()
-                            this@VideoPlayerView.updateLayoutParams {
-                                this.height = heightSpan
-                            }
-                        }
-                    }
-                })
-            }?.into(previewCover)
+            ?.with(context)?.into(previewCover)
     }
 
     private fun initTextureView() {
@@ -171,19 +159,25 @@ class VideoPlayerView @JvmOverloads constructor(
                     height: Int
                 ) {
                     playSurface = Surface(surface)
-                    if (mediaPlayer == null) {
-                        path?.let { p -> setPath(p) } ?: uriPath?.let { p -> setPath(p) }
-                    } else if (!isInitialized) playSurface?.let { s ->
-                        mediaPlayer?.setSurface(s)
-                        isInitialized = true
+                    mediaPlayer = MediaPlayer().also { player ->
+                        path?.let { p ->
+                            player.setDataSource(p)
+                        } ?: uriPath?.let { p ->
+                            player.setDataSource(context, p)
+                        }
+                        player.initPlayer()
+                        player.setSurface(playSurface)
                     }
+                    isInitialized = true
                 }
 
                 override fun onSurfaceTextureSizeChanged(
                     surface: SurfaceTexture,
                     width: Int,
                     height: Int
-                ) = Unit
+                ) {
+                    textureView?.adaptVideoSize(width, height)
+                }
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
 
@@ -194,7 +188,7 @@ class VideoPlayerView @JvmOverloads constructor(
                 it, 0,
                 LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
                     Gravity.CENTER
                 )
             )
@@ -212,6 +206,14 @@ class VideoPlayerView @JvmOverloads constructor(
         }
     }
 
+    private fun pause() {
+        runCatching {
+            if (mediaPlayer?.isPlaying == false) return
+            mediaPlayer?.pause()
+            Choreographer.getInstance().removeFrameCallback(frameCallBack)
+        }
+    }
+
     private fun MediaPlayer.initPlayer() {
         runCatching {
             setAudioAttributes(
@@ -221,10 +223,6 @@ class VideoPlayerView @JvmOverloads constructor(
                     .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
                     .build()
             )
-            playSurface?.let { surface ->
-                setSurface(surface)
-                isInitialized = true
-            }
             setOnVideoSizeChangedListener { _, width, height ->
                 textureView?.adaptVideoSize(width, height)
             }

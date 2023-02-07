@@ -63,7 +63,8 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
             is PictureBoxAdapterVideoLayoutBinding ->
                 (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
                     videoPlayer.controller = DefaultVideoController(context)
-                    videoPlayer.setPath(mList[position].uri, autoAdjustToFill = true)
+                    videoPlayer.setPath(mList[position].uri)
+                    videoPlayer.controller?.isPlaying
                     videoPlayer.controller?.setTitle(mList[position].name)
                 }
         }
@@ -101,7 +102,10 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
 
     private fun release(holder: Holder<ViewDataBinding>) {
         when (holder.binding) {
-            is PictureBoxAdapterLayoutBinding -> (holder.binding as PictureBoxAdapterLayoutBinding).image.clear()
+            is PictureBoxAdapterLayoutBinding ->
+                (holder.binding as PictureBoxAdapterLayoutBinding).image.clear()
+            is PictureBoxAdapterVideoLayoutBinding ->
+                (holder.binding as PictureBoxAdapterVideoLayoutBinding).videoPlayer.release()
         }
     }
 

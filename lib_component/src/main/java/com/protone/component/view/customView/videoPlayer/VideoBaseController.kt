@@ -22,6 +22,7 @@ abstract class VideoBaseController(private val context: Context) {
     }
 
     var isPlaying = false
+        protected set
 
     protected var videoPlayer: VideoPlayer? = null
 
@@ -85,7 +86,14 @@ abstract class VideoBaseController(private val context: Context) {
         )
     }
 
+    fun play() {
+        if (isPlaying) return
+        setPlayState(true)
+        doPlay()
+    }
+
     fun pause() {
+        if (!isPlaying) return
         setPlayState(false)
         doPlay()
     }

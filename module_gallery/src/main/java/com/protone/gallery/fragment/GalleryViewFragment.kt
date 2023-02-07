@@ -71,10 +71,11 @@ class GalleryViewFragment(
     override fun onDestroy() {
         super.onDestroy()
         imageBinding?.image?.clear()
+        videoBinding?.richVideo?.release()
     }
 
     override fun onPause() {
         super.onPause()
-        if (galleryMedia.isVideo) videoBinding?.richVideo?.controller
+        if (galleryMedia.isVideo) videoBinding?.richVideo?.controller?.pause()
     }
 }
