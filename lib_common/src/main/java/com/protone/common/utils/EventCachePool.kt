@@ -46,8 +46,7 @@ class EventCachePool<Event : Any>(
     suspend fun holdEvent(event: Event) {
         eventMap[event::class].also {
             if (it == null) eventMap[event::class] = mutableListOf()
-            eventMap[event::class]?.add(event)
-        }
+        }?.add(event)
         flow.emit(event)
     }
 

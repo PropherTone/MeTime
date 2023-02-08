@@ -49,10 +49,7 @@ class PickMusicActivity :
                     root as ViewGroup,
                     DefaultBlurEngine()
                 )
-            )
-                .apply {
-                    setBlurRadius(24f)
-                }
+            ).apply { setBlurRadius(24f) }
             root.viewTreeObserver.addOnPreDrawListener {
                 actionBtnContainer.renderFrame()
                 true

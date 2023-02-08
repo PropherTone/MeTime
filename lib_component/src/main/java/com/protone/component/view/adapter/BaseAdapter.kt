@@ -41,12 +41,12 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
         diff = adapterDiff
     }
 
-    fun getDefaultDiff() = object : AdapterDiff<String> {
-        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
+    fun getDefaultDiff() = object : AdapterDiff<Item> {
+        override fun areContentsTheSame(oldItem: Item, newItem: Item): Boolean {
             return oldItem == newItem
         }
 
-        override fun getChangePayload(oldItem: String, newItem: String): Boolean {
+        override fun getChangePayload(oldItem: Item, newItem: Item): Boolean {
             return oldItem == newItem
         }
 
@@ -134,8 +134,8 @@ abstract class BaseAdapter<Item : Any, VB : ViewDataBinding, Event>(
                         )
                     }
                 }).also {
-                    setData(collection)
                     withMainContext {
+                        setData(collection)
                         it.dispatchUpdatesTo(this@BaseAdapter)
                     }
                 }

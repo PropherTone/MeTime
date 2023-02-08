@@ -23,6 +23,7 @@ class MusicListAdapter(context: Context, musicList: Collection<Music>) :
     }
 
     init {
+        setAdapterDiff(getDefaultDiff())
         mList.addAll(musicList)
     }
 

@@ -44,6 +44,10 @@ class MusicBucketAdapter(context: Context) :
                     ?.let {
                         val bucket = mList[it]
                         mList[it] = data.bucket
+                        if (selectList.contains(bucket)) {
+                            selectList.clear()
+                            selectList.add(data.bucket)
+                        }
                         notifyItemChangedChecked(
                             it,
                             bucket.getChangeState(data.bucket, MusicBucket.DETAIL)
@@ -65,7 +69,7 @@ class MusicBucketAdapter(context: Context) :
                 if (isSelected) {
                     selectList.clear()
                     selectList.add(mList[0])
-                    checkSelect(0,mList[0])
+                    checkSelect(0, mList[0])
                     musicBucketEventListener?.onBucketClicked(mList[0])
                 }
             }

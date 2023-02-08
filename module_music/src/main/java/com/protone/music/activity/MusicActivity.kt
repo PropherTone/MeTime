@@ -144,10 +144,9 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
             return
         }
         startActivity(
-            PickMusicActivity::class.intent.putExtra(
-                PickMusicViewModel.BUCKET_NAME,
-                bucket
-            )
+            PickMusicActivity::class.intent
+                .putExtra(PickMusicViewModel.BUCKET_NAME, bucket)
+                .putExtra(PickMusicViewModel.MODE, PickMusicViewModel.ADD_BUCKET)
         )
     }
 
@@ -181,6 +180,9 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
     private fun MusicModel.observeMusicEvent() {
         observeMusicEvent observeFun@{
             when (it) {
+                is MusicEvent.OnMusicBucketDataChanged->{
+                    getMusicListAdapter()?.notifyListChangedCO(it.musics)
+                }
                 is MusicEvent.OnMusicBucketInsert -> {
                     getMusicBucketAdapter()?.addBucket(it.musicBucket)
                 }
@@ -194,11 +196,9 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                     getMusicListAdapter()?.addMusic(it.music)
                 }
                 is MusicEvent.OnMusicsInsert -> {
-                    getMusicBucketAdapter()?.refreshBucket(getDefaultMusicBucket())
                     getMusicListAdapter()?.addMusics(it.musics)
                 }
                 is MusicEvent.OnMusicDeleted -> {
-                    getMusicBucketAdapter()?.refreshBucket(getDefaultMusicBucket())
                     getMusicListAdapter()?.removeMusic(it.music)
                 }
                 is MusicEvent.OnMusicUpdated -> {
@@ -213,14 +213,14 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
         controller: MusicControllerIMP,
         music: Music
     ) = withDefaultContext {
-            if (viewModel.lastBucket != musicBucketName.text) {
-                getMusicListAdapter()?.getPlayList()?.let { list ->
-                    viewModel.lastBucket = musicBucketName.text.toString()
-                    controller.setMusicList(list)
-                }
+        if (viewModel.lastBucket != musicBucketName.text) {
+            getMusicListAdapter()?.getPlayList()?.let { list ->
+                viewModel.lastBucket = musicBucketName.text.toString()
+                controller.setMusicList(list)
             }
-            controller.play(music)
         }
+        controller.play(music)
+    }
 
     private suspend fun doAddMusicBucket() {
         val re = startActivityForResult(AddBucketActivity::class.intent)
