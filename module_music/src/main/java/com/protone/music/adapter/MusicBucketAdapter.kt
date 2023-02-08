@@ -54,7 +54,7 @@ class MusicBucketAdapter(context: Context) :
                         )
                         musicBucketEventListener?.onSelectedBucketRefresh(
                             data.bucket,
-                            bucket.getChangeState(data.bucket)
+                            bucket.getChangeState(data.bucket,MusicBucket.SIZE)
                         )
                     }
             }
@@ -68,14 +68,14 @@ class MusicBucketAdapter(context: Context) :
                 notifyItemRemovedChecked(index)
                 if (isSelected) {
                     selectList.clear()
-                    selectList.add(mList[0])
-                    checkSelect(0, mList[0])
-                    musicBucketEventListener?.onBucketClicked(mList[0])
+                    musicBucketEventListener?.onSelectedBucketRemoved()
                 }
             }
             is MusicBucketAEvent.SelectBucket -> {
-                mList.find { it.name == data.bucketName }?.let {
-                    musicBucketEventListener?.onBucketClicked(it)
+                mList.indexOfFirst { it.name == data.bucketName }.takeIf { it >= 0 }?.let {
+                    val bucket = mList[it]
+                    checkSelect(it, bucket)
+                    musicBucketEventListener?.onBucketClicked(bucket)
                 }
             }
         }
@@ -235,12 +235,6 @@ class MusicBucketAdapter(context: Context) :
         emit(MusicBucketAEvent.SelectBucket(bucketName))
     }
 
-    fun getSelectedBucket() = try {
-        selectList.first
-    } catch (e: NoSuchElementException) {
-        null
-    }
-
     fun deleteBucket(musicBucket: MusicBucket): Boolean {
         emit(MusicBucketAEvent.DeleteBucket(musicBucket))
         return true
@@ -255,6 +249,7 @@ class MusicBucketAdapter(context: Context) :
     }
 
     interface MusicBucketEvent {
+        fun onSelectedBucketRemoved()
         fun onBucketClicked(musicBucket: MusicBucket)
         fun addMusic(musicBucket: MusicBucket, position: Int)
         fun delete(musicBucket: MusicBucket, position: Int)

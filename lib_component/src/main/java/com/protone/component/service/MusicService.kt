@@ -175,6 +175,7 @@ class MusicService : BaseService(), IMusicService {
             }
             val index = playList.indexOf(music)
             playPosition.set(index)
+            currentMusic.postValue(music)
             musicPlayer.play(music)
             return
         }

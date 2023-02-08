@@ -38,6 +38,7 @@ class MusicModel : BaseViewModel(),
 
         data class OnBucketRefresh(val musicBucket: MusicBucket, val state: Int) : MusicViewEvent()
         object AddMusicBucket : MusicViewEvent()
+        object OnSelectedBucketRemoved : MusicViewEvent()
     }
 
     sealed class MusicEvent {
@@ -61,20 +62,20 @@ class MusicModel : BaseViewModel(),
             val bucketName: String = ALL_MUSIC
         ) : MusicEvent()
 
-        sealed class MusicWithBucketEvent(
-            val musicID: Long,
-            val musicBucketID: Long
-        ) : MusicEvent()
+//        sealed class MusicWithBucketEvent(
+//            val musicID: Long,
+//            val musicBucketID: Long
+//        ) : MusicEvent()
 
-        data class OnMusicInsertToBucket(
-            val musicId: Long,
-            val musicBucketId: Long
-        ) : MusicWithBucketEvent(musicId, musicBucketId)
-
-        data class OnMusicRemoveFromBucket(
-            val musicId: Long,
-            val musicBucketId: Long
-        ) : MusicWithBucketEvent(musicId, musicBucketId)
+//        data class OnMusicInsertToBucket(
+//            val musicId: Long,
+//            val musicBucketId: Long
+//        ) : MusicWithBucketEvent(musicId, musicBucketId)
+//
+//        data class OnMusicRemoveFromBucket(
+//            val musicId: Long,
+//            val musicBucketId: Long
+//        ) : MusicWithBucketEvent(musicId, musicBucketId)
     }
 
     val isContainerOpen = ObservableField(true)
@@ -107,8 +108,8 @@ class MusicModel : BaseViewModel(),
         }
         get() = userConfig.lastMusicBucket
 
-    private lateinit var defaultBucket: MusicBucket
-    private fun getDefaultBucket() = defaultBucket
+    lateinit var defaultBucket: MusicBucket
+        private set
 
     private val eventPool by lazy {
         EventCachePool<MusicEvent>(duration = 400L).handleEvent {
@@ -221,6 +222,12 @@ class MusicModel : BaseViewModel(),
     }
 
     fun getBucketEventListener() = object : MusicBucketAdapter.MusicBucketEvent {
+        override fun onSelectedBucketRemoved() {
+            currentBucket = ""
+            lastBucket = ALL_MUSIC
+            sendViewEvent(MusicViewEvent.OnSelectedBucketRemoved)
+        }
+
         override fun onBucketClicked(musicBucket: MusicBucket) {
             onBucketSelect(musicBucket)
         }

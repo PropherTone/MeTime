@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.ViewGroup
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toStringMinuteTime
+import com.protone.common.baseType.withMainContext
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Music
 import com.protone.music.R
@@ -55,9 +56,11 @@ class MusicListAdapter(context: Context, musicList: Collection<Music>) :
                 if (mList.size <= 0) return
                 if (mList.contains(data.music)) {
                     clearAllSelected()
-                    selectList.add(data.music)
-                    playPosition = mList.indexOf(data.music)
-                    notifyItemChangedCO(playPosition)
+                    withMainContext {
+                        selectList.add(data.music)
+                        playPosition = mList.indexOf(data.music)
+                        notifyItemChanged(playPosition)
+                    }
                 }
             }
             is MusicListEvent.ChangeData -> {

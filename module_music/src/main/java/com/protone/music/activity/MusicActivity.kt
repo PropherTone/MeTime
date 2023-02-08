@@ -173,6 +173,13 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                 is MusicViewEvent.AddMusicBucket -> doAddMusicBucket()
                 is MusicViewEvent.OnBucketSelect -> binding.selectBucket(it.musicBucket, it.list)
                 is MusicViewEvent.OnBucketRefresh -> onMusicBucketRefresh(it.musicBucket, it.state)
+                is MusicViewEvent.OnSelectedBucketRemoved -> {
+                    if (isContainerOpen.get() == false) {
+                        getMusicBucketAdapter()?.setSelect(viewModel.lastBucket)
+                        return@onViewEvent
+                    }
+                    binding.musicBucketName.text = ""
+                }
             }
         }
     }
@@ -180,7 +187,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
     private fun MusicModel.observeMusicEvent() {
         observeMusicEvent observeFun@{
             when (it) {
-                is MusicEvent.OnMusicBucketDataChanged->{
+                is MusicEvent.OnMusicBucketDataChanged -> {
                     getMusicListAdapter()?.notifyListChangedCO(it.musics)
                 }
                 is MusicEvent.OnMusicBucketInsert -> {

@@ -80,17 +80,9 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     fun refresh() {
         binder?.apply {
             controller.apply {
-                if (progress != null) {
-                    onProgress().value?.let {
-                        progress?.barSeekTo(it)
-                    }
-                }
-                onPlayState().value?.let {
-                    isPlay = it
-                }
-                onMusicPlaying().value?.let {
-                    setDetail(it)
-                }
+                if (progress != null) onProgress().value?.let { progress?.barSeekTo(it) }
+                onPlayState().value?.let { isPlay = it }
+                onMusicPlaying().value?.let { setDetail(it) }
             }
         }
     }
@@ -163,14 +155,12 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
 
     private fun setDetail(it: Music) {
         controller.apply {
-            if (cover != it.uri) {
-                cover = it.uri
+            post {
+                if (cover != it.uri) cover = it.uri
+                if (duration != it.duration) duration = it.duration
+                setName(it.title)
+                setDetail("${it.artist ?: "ARTIST"}·${it.album ?: "NONE"}")
             }
-            if (duration != it.duration) {
-                duration = it.duration
-            }
-            setName(it.title)
-            setDetail("${it.artist ?: "ARTIST"}·${it.album ?: "NONE"}")
         }
     }
 

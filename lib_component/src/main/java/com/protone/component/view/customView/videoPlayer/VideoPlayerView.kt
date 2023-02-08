@@ -42,17 +42,18 @@ class VideoPlayerView @JvmOverloads constructor(
     var controller: VideoBaseController? = null
         set(value) {
             removeView(field?.getControllerView())
+            if (value == null) return
             addView(
-                value?.getControllerView(),
+                value.getControllerView(),
                 LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
             )
             setOnClickListener {
-                value?.reverseControllerVisible()
+                value.reverseControllerVisible()
             }
-            value?.setVideoPlay(object : VideoPlayer {
+            value.setVideoPlay(object : VideoPlayer {
                 override fun play() {
                     if (mediaPlayer?.isPlaying == true) return
                     this@VideoPlayerView.play()
