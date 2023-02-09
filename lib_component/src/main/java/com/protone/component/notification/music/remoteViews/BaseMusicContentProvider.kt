@@ -7,7 +7,7 @@ internal abstract class BaseMusicContentProvider(private val mrv: IMusicRemoteVi
 
     protected var isBigContent = false
 
-    override fun getLayout(): Int =
+    override fun getLayout(isBigContent: Boolean): Int =
         if (isBigContent) mrv.getBigLayout() else mrv.getSmallLayout()
 
     override fun getRootId(): Int =

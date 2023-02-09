@@ -120,7 +120,7 @@ class GalleryActivity :
         val notEmpty = chooseType.isNotEmpty()
         if (notEmpty) binding.apply {
             galleryActionMenu.isVisible = false
-            galleryChooseConfirm.isGone = true
+            galleryChooseConfirm.isGone = false
             galleryChooseConfirm.setOnClickListener {
                 getSelectedMedias().ifNotEmpty { list ->
                     setResult(

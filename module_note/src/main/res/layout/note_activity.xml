@@ -94,7 +94,7 @@
             android:layout_height="@dimen/action_icon"
             android:background="@drawable/background_ripple_glass"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.sendViewEvent(NoteViewEvent.Refresh.INSTANCE)}"
+            android:onClick="@{()->activity.refresh()}"
             android:padding="@dimen/icon_padding_lite"
             android:src="@drawable/ic_baseline_refresh_24_white"
             app:layout_constraintBottom_toBottomOf="parent"

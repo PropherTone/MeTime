@@ -85,10 +85,11 @@ class NoteActivity :
         }
     }
 
-    private fun refresh() {
-        handleBucketEvent()
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
+    fun refresh() {
+        throw RuntimeException("Well done!You let the app crashed!")
+//        handleBucketEvent()
+//        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+//        sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
     }
 
     private fun handleBucketEvent() {

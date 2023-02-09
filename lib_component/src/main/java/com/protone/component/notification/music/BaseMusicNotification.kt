@@ -48,11 +48,11 @@ abstract class BaseMusicNotification(
 
     override fun initNotification(context: Context): Notification {
         return remoteViews.let {
-//            val small = it.getContent(context)
+            val small = it.getContent(context)
             val big = it.getBigContent(context)
-//            smallContent = small
+            smallContent = small
             bigContent = big
-            context.sdkONotification(big, big) ?: legacyNotification(big, big)
+            context.sdkONotification(small, big) ?: legacyNotification(small, big)
         }.also {
             it.flags = Notification.FLAG_NO_CLEAR
             notification = it

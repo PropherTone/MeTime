@@ -107,18 +107,20 @@ class MusicService : BaseService(), IMusicService {
 
         private fun notificationPlayState(state: Boolean, ref: Boolean) {
             launch {
-                if (playList.isEmpty()) return@launch
-                playState.postValue(state)
-                musicNotification.initNotification(this@MusicService)
-                musicNotification.setPlayState(state)
-                if (state || ref) {
-                    val music = rightMusic
-                    musicNotification.setTitle(music.title)
-                    music.uri.getBitmap()?.let { ba ->
-                        musicNotification.setMusicCover(ba)
+                runCatching {
+                    if (playList.isEmpty()) return@launch
+                    playState.postValue(state)
+                    musicNotification.initNotification(this@MusicService)
+                    musicNotification.setPlayState(state)
+                    if (state || ref) {
+                        val music = rightMusic
+                        musicNotification.setTitle(music.title)
+                        music.uri.getBitmap()?.let { ba ->
+                            musicNotification.setMusicCover(ba)
+                        }
                     }
+                    musicNotification.doNotify()
                 }
-                musicNotification.doNotify()
             }
         }
     }
@@ -137,9 +139,12 @@ class MusicService : BaseService(), IMusicService {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(
-            0x01,
-            musicNotification.initNotification(this).apply { musicNotification.doNotify() })
+        runCatching {
+            startForeground(
+                0x01,
+                musicNotification.initNotification(this).apply { musicNotification.doNotify() }
+            )
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 

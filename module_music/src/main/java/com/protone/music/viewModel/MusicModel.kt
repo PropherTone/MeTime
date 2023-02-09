@@ -19,7 +19,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import java.io.File
@@ -110,8 +109,7 @@ class MusicModel : BaseViewModel(),
         }
         get() = userConfig.lastMusicBucket
 
-    lateinit var defaultBucket: MusicBucket
-        private set
+    private lateinit var defaultBucket: MusicBucket
 
     private val eventPool by lazy {
         EventCachePool<MusicEvent>(duration = 400L).handleEvent {

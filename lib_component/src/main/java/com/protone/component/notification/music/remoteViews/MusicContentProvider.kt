@@ -12,7 +12,7 @@ import com.protone.common.context.MUSIC_PREVIOUS
 internal class MusicContentProvider(mrv: IMusicRemoteViews) : BaseMusicContentProvider(mrv) {
 
     override fun getContent(context: Context): RemoteViews =
-        RemoteViews(context.packageName, getLayout()).apply {
+        RemoteViews(context.packageName, getLayout(false)).apply {
             val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
             PendingIntent.getBroadcast(
@@ -52,7 +52,7 @@ internal class MusicContentProvider(mrv: IMusicRemoteViews) : BaseMusicContentPr
         }
 
     override fun getBigContent(context: Context): RemoteViews =
-        RemoteViews(context.packageName, getLayout()).apply {
+        RemoteViews(context.packageName, getLayout(true)).apply {
             val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
             PendingIntent.getBroadcast(

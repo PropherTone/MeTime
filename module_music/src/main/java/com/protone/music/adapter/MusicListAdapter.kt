@@ -24,7 +24,13 @@ class MusicListAdapter(context: Context, musicList: Collection<Music>) :
     }
 
     init {
-        setAdapterDiff(getDefaultDiff())
+        setAdapterDiff(object : AdapterDiff<Music> {
+            override fun areContentsTheSame(oldItem: Music, newItem: Music): Boolean =
+                oldItem.uri == newItem.uri
+
+            override fun getChangePayload(oldItem: Music, newItem: Music): Boolean =
+                oldItem.uri == newItem.uri
+        })
         mList.addAll(musicList)
     }
 

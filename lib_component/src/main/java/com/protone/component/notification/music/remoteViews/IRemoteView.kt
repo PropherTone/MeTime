@@ -10,7 +10,7 @@ internal interface IRemoteView {
 }
 
 internal interface IRemoteViewProvider {
-    fun getLayout(): Int
+    fun getLayout(isBigContent: Boolean): Int
     fun getRootId(): Int
     fun getTitleId(): Int
     fun getPlayId(): Int

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -25,9 +24,9 @@ import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
+import com.protone.component.MusicControllerIMP
 import com.protone.component.R
 import com.protone.component.activity.BaseMusicActivity
-import com.protone.component.MusicControllerIMP
 import com.protone.component.database.userConfig
 import com.protone.component.view.customView.StatusImageView
 import com.protone.component.view.customView.musicPlayer.getBitmap
@@ -40,7 +39,6 @@ import com.protone.music.viewModel.MusicModel.MusicEvent
 import com.protone.music.viewModel.MusicModel.MusicViewEvent
 import com.protone.music.viewModel.PickMusicViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 private typealias musicR = com.protone.music.R.drawable
 
@@ -172,7 +170,7 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                 is MusicViewEvent.OnBucketRefresh -> onMusicBucketRefresh(it.musicBucket, it.state)
                 is MusicViewEvent.OnSelectedBucketRemoved -> {
                     if (isContainerOpen.get() == false) {
-                        getMusicBucketAdapter()?.setSelect(viewModel.lastBucket)
+                        getMusicBucketAdapter()?.setSelect(ALL_MUSIC)
                         return@onViewEvent
                     }
                     binding.musicBucketName.text = ""
