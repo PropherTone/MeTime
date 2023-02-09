@@ -2,8 +2,8 @@ package com.protone.component.view.customView.videoPlayer
 
 import android.content.Context
 import android.graphics.SurfaceTexture
+import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
@@ -13,6 +13,8 @@ import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import androidx.core.view.isGone
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
 
 class VideoPlayerView @JvmOverloads constructor(
     context: Context,
@@ -100,24 +102,24 @@ class VideoPlayerView @JvmOverloads constructor(
         )
     }
 
-    fun setPath(path: String, loadPreview: Boolean = true) {
+    fun setPath(path: String, glideLoader: RequestBuilder<Drawable>? = null) {
         releasePlayer()
         runCatching {
             this.path = path
             this.uriPath = null
             initTextureView()
         }
-        if (loadPreview) loadPreview()
+        if (glideLoader != null) loadPreview(glideLoader)
     }
 
-    fun setPath(uri: Uri, loadPreview: Boolean = true) {
+    fun setPath(uri: Uri, glideLoader: RequestBuilder<Drawable>? = null) {
         releasePlayer()
         runCatching {
             this.uriPath = uri
             this.path = null
             initTextureView()
         }
-        if (loadPreview) loadPreview()
+        if (glideLoader != null) loadPreview(glideLoader)
     }
 
     fun release() {
@@ -133,9 +135,9 @@ class VideoPlayerView @JvmOverloads constructor(
         pause()
     }
 
-    private fun loadPreview() {
-        (uriPath?.let { Image.load(it) } ?: path?.let { Image.load(it) })
-            ?.with(context)?.into(previewCover)
+    private fun loadPreview(glideLoader: RequestBuilder<Drawable>) {
+        (uriPath?.let { glideLoader.load(it) } ?: path?.let { glideLoader.load(it) })
+            ?.into(previewCover)
     }
 
     private fun initTextureView() {

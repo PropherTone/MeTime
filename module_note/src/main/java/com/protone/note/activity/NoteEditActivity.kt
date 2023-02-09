@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
 import com.protone.common.baseType.*
 import com.protone.common.context.isKeyBroadShow
 import com.protone.common.context.marginBottom
@@ -24,7 +25,6 @@ import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.CONTENT_T
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE_DIR
 import com.protone.common.utils.displayUtils.AnimationHelper
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.json.listToJson
 import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
@@ -40,8 +40,6 @@ import com.protone.component.view.dialog.titleDialog
 import com.protone.component.view.popWindows.ColorfulPopWindow
 import com.protone.note.databinding.NoteEditActivityBinding
 import com.protone.note.viewModel.NoteEditViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Route(path = RouterPath.NoteRouterPath.Edit)
 class NoteEditActivity :
@@ -86,7 +84,9 @@ class NoteEditActivity :
                 }
             }
             noteEditRichNote.isEditable = true
-            noteEditRichNote.setImageLoader(RichNoteImageLoader())
+            noteEditRichNote.setImageLoader(
+                RichNoteImageLoader(Glide.with(this@NoteEditActivity).asDrawable())
+            )
             noteEditTool.setOnTouchListener { _, _ ->
                 getPopWindow()?.dismiss()
                 false
@@ -260,7 +260,7 @@ class NoteEditActivity :
             re.getStringExtra(GALLERY_DATA)?.toEntity(GalleryMedia::class.java)
         }
 
-    private suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
+    private suspend fun initEditor(richCode: Int, text: String) = withMainContext {
         binding.noteEditRichNote.apply {
             setRichList(richCode, text)
             iRichListener = object : RichNoteView.IRichListenerImp() {
@@ -271,12 +271,12 @@ class NoteEditActivity :
         }
     }
 
-    private suspend fun setNoteIcon(uri: Uri?) = withContext(Dispatchers.Main) {
-        Image.load(uri).with(this@NoteEditActivity).into(binding.noteEditIcon)
+    private suspend fun setNoteIcon(uri: Uri?) = withMainContext {
+        Glide.with(this@NoteEditActivity).load(uri).into(binding.noteEditIcon)
     }
 
-    private suspend fun setNoteIcon(path: String?) = withContext(Dispatchers.Main) {
-        Image.load(path).with(this@NoteEditActivity).into(binding.noteEditIcon)
+    private suspend fun setNoteIcon(path: String?) = withMainContext {
+        Glide.with(this@NoteEditActivity).load(path).into(binding.noteEditIcon)
     }
 
     private suspend fun showProgress(isShow: Boolean, doOnEnd: (() -> Unit)? = null) =

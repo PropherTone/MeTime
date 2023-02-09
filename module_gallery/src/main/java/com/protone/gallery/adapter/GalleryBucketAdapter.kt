@@ -2,19 +2,21 @@ package com.protone.gallery.adapter
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.protone.component.R
+import com.bumptech.glide.RequestBuilder
 import com.protone.common.baseType.getString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.Gallery
 import com.protone.common.entity.Gallery.ItemState
-import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.component.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryBucketListLayoutBinding
 
 class GalleryBucketAdapter(
     context: Context,
+    private val glideLoader: RequestBuilder<Drawable>,
     block: GalleryBucketAdapterDataProxy.() -> Unit
 ) : SelectListAdapter<GalleryBucketListLayoutBinding, Gallery, GalleryBucketAdapter.GalleryBucketEvent>(
     context, true
@@ -73,7 +75,11 @@ class GalleryBucketAdapter(
         }
     }
 
-    override fun setSelect(content: GalleryBucketListLayoutBinding, position: Int, isSelect: Boolean) {
+    override fun setSelect(
+        content: GalleryBucketListLayoutBinding,
+        position: Int,
+        isSelect: Boolean
+    ) {
         content.bucket.check = isSelect
     }
 
@@ -98,7 +104,7 @@ class GalleryBucketAdapter(
     private fun GalleryBucketListLayoutBinding.changedUri(item: Gallery) {
         if (bucket.thumb.tag != item.uri) {
             bucket.thumb.tag = item.uri
-            Image.load(item.uri).with(context).into(bucket.thumb)
+            glideLoader.load(item.uri).into(bucket.thumb)
         }
     }
 

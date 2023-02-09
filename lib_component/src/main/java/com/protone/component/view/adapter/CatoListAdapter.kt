@@ -1,17 +1,21 @@
 package com.protone.component.view.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import com.protone.component.databinding.ImageCateLayoutBinding
-import com.protone.component.databinding.TextCateLayoutBinding
+import com.bumptech.glide.RequestBuilder
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.utils.displayUtils.imageLoader.Image
+import com.protone.component.databinding.ImageCateLayoutBinding
+import com.protone.component.databinding.TextCateLayoutBinding
 import kotlinx.coroutines.launch
 
-class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListDataProxy) :
-    BaseAdapter<String, ViewDataBinding, Any>(context) {
+class CatoListAdapter(
+    context: Context,
+    private val glideLoader: RequestBuilder<Drawable>,
+    private val catoListDataProxy: CatoListDataProxy
+) : BaseAdapter<String, ViewDataBinding, Any>(context) {
 
     private var itemClick: ((String) -> Unit)? = null
 
@@ -37,7 +41,7 @@ class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListD
                 is ImageCateLayoutBinding ->
                     launch {
                         catoListDataProxy.getMedia(mList[position])?.let { media ->
-                            Image.load(media.uri).with(context).into(catoBack)
+                            glideLoader.into(catoBack)
                             catoName.text = media.name
                             root.setOnClickListener {
                                 itemClick?.invoke(mList[position])

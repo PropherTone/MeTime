@@ -17,7 +17,9 @@ abstract class BaseMusicNotification(
 ) : IMusicNotification {
 
     private val remoteViews = MusicContentProvider(mrv)
-    private var content: RemoteViews? = null
+    private val content: RemoteViews? get() = bigContent ?: smallContent
+    private var smallContent: RemoteViews? = null
+    private var bigContent: RemoteViews? = null
     private var notification: Notification? = null
 
     private fun Context.sdkONotification(content: RemoteViews, bigContent: RemoteViews? = null) =
@@ -29,24 +31,28 @@ abstract class BaseMusicNotification(
             )
             notificationManager.createNotificationChannel(channel)
             Notification.Builder(this, provider.getNotificationIdName()).apply {
+                setOngoing(true)
+                setSmallIcon(provider.getNotificationIcon())
                 setCustomContentView(content)
                 if (bigContent != null) setCustomBigContentView(bigContent)
-                setSmallIcon(provider.getNotificationIcon())
             }.build()
         } else null
 
     @Suppress("DEPRECATION")
     private fun legacyNotification(content: RemoteViews, bigContent: RemoteViews? = null) =
         Notification().apply {
+            icon = provider.getNotificationIcon()
             contentView = content
             if (bigContent != null) bigContentView = bigContent
-            icon = provider.getNotificationIcon()
         }
 
     override fun initNotification(context: Context): Notification {
-        return remoteViews.getBigContent(context).let {
-            content = it
-            context.sdkONotification(it) ?: legacyNotification(it)
+        return remoteViews.let {
+//            val small = it.getContent(context)
+            val big = it.getBigContent(context)
+//            smallContent = small
+            bigContent = big
+            context.sdkONotification(big, big) ?: legacyNotification(big, big)
         }.also {
             it.flags = Notification.FLAG_NO_CLEAR
             notification = it
@@ -78,7 +84,8 @@ abstract class BaseMusicNotification(
 
     override fun release() {
         content?.removeAllViews(remoteViews.getRootId())
-        content = null
+        smallContent = null
+        bigContent = null
         notification = null
     }
 }

@@ -1,17 +1,14 @@
 package com.protone.config.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.common.baseType.getParentPath
-import com.protone.common.baseType.getString
-import com.protone.common.baseType.toast
-import com.protone.common.baseType.withIOContext
+import com.bumptech.glide.Glide
+import com.protone.common.baseType.*
+import com.protone.common.context.MApplication
 import com.protone.common.utils.SCrashHandler
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.component.R
 import com.protone.component.BaseViewModel
+import com.protone.component.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class UserConfigViewModel : BaseViewModel() {
@@ -54,9 +51,9 @@ class UserConfigViewModel : BaseViewModel() {
         onClear = true
         withIOContext {
             try {
-                Image.apply {
+                Glide.get(MApplication.app).apply {
                     clearDiskCache()
-                    withContext(Dispatchers.Main) {
+                    withMainContext {
                         clearMemory()
                     }
                 }

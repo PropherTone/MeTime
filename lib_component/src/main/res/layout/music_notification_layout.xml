@@ -3,6 +3,7 @@
     android:id="@+id/notify_music_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:selectableItemBackground"
     android:orientation="horizontal">
 
     <ImageView
@@ -17,10 +18,10 @@
         android:src="@drawable/ic_baseline_music_note_24" />
 
     <LinearLayout
-        android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
@@ -52,6 +53,7 @@
                 android:id="@+id/notify_music_previous"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
+                android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_next_24" />
@@ -60,6 +62,7 @@
                 android:id="@+id/notify_music_control"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
+                android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_play_arrow_24" />
@@ -68,6 +71,7 @@
                 android:id="@+id/notify_music_next"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
+                android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_forward_24" />
@@ -78,11 +82,11 @@
 
     <ImageView
         android:id="@+id/notify_music_close"
+        android:layout_width="@dimen/smaller_Icon"
+        android:layout_height="@dimen/user_icon"
+        android:layout_gravity="center"
         android:layout_marginEnd="@dimen/small_margin"
         android:contentDescription="@string/action"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_baseline_close_24"
-        android:layout_width="@dimen/smaller_Icon"
-        android:layout_height="@dimen/user_icon"/>
+        android:src="@drawable/ic_baseline_close_24" />
 
 </LinearLayout>

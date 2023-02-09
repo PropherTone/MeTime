@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.protone.common.baseType.bufferCollect
 import com.protone.common.baseType.launchMain
 import com.protone.common.context.doHoverSelect
@@ -75,6 +76,7 @@ class GalleryListFragment :
                             binding.galleryList.swapAdapter(
                                 GalleryListAdapter(
                                     requireContext(),
+                                    getListAdapter().glideLoader,
                                     true,
                                     itemCount = it.gallery.size
                                 ).also { adapter ->
@@ -135,7 +137,12 @@ class GalleryListFragment :
         galleryList.apply {
             layoutManager = GridLayoutManager(context, 4)
             addItemDecoration(GalleryItemDecoration(resources.getDimensionPixelSize(R.dimen.item_margin)))
-            adapter = GalleryListAdapter(context = context, useSelect = true, itemCount = 0).also {
+            adapter = GalleryListAdapter(
+                context = context,
+                glideLoader = Glide.with(this@GalleryListFragment).asDrawable(),
+                useSelect = true,
+                itemCount = 0
+            ).also {
                 it.multiChoose = true
                 it.selectList = selectedMedias
                 it.setOnSelectListener(onSelect)

@@ -1,11 +1,18 @@
 package com.protone.music.activity
 
+import android.graphics.Bitmap
 import android.text.method.ScrollingMovementMethod
 import androidx.activity.viewModels
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
@@ -82,13 +89,28 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
 
     override fun createView(): MusicActivityBinding {
         return MusicActivityBinding.inflate(layoutInflater, root, false).apply {
-            runBlocking {
-                blurredBucketCover.setBlurBitmap(
-                    userConfig.lastMusicBucketCover.getBitmap(),
-                    24,
-                    10
-                )
-            }
+            Glide.with(this@MusicActivity)
+                .asBitmap()
+                .load(userConfig.lastMusicBucketCover)
+                .addListener(object : RequestListener<Bitmap> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Bitmap>?,
+                        isFirstResource: Boolean
+                    ): Boolean = false
+
+                    override fun onResourceReady(
+                        resource: Bitmap?,
+                        model: Any?,
+                        target: Target<Bitmap>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        blurredBucketCover.setBlurBitmap(resource, 24, 10)
+                        return true
+                    }
+                }).submit()
 
             model = BindingModel(this@MusicActivity, this, viewModel)
 
@@ -136,31 +158,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
                 }
             }
         }
-    }
-
-    fun doAddMusicToBucket(bucket: String) {
-        if (bucket == ALL_MUSIC) {
-            R.string.bruh.getString().toast()
-            return
-        }
-        startActivity(
-            PickMusicActivity::class.intent
-                .putExtra(PickMusicViewModel.BUCKET_NAME, bucket)
-                .putExtra(PickMusicViewModel.MODE, PickMusicViewModel.ADD_BUCKET)
-        )
-    }
-
-    fun doEditBucket(bucket: String) {
-        if (bucket == ALL_MUSIC) {
-            R.string.bruh.getString().toast()
-            return
-        }
-        startActivity(
-            AddBucketActivity::class.intent.putExtra(
-                AddBucketViewModel.BUCKET_NAME,
-                bucket
-            )
-        )
     }
 
     private fun MusicModel.observeEvent(controller: MusicControllerIMP) {
@@ -216,6 +213,31 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
         }
     }
 
+    internal fun doAddMusicToBucket(bucket: String) {
+        if (bucket == ALL_MUSIC) {
+            R.string.bruh.getString().toast()
+            return
+        }
+        startActivity(
+            PickMusicActivity::class.intent
+                .putExtra(PickMusicViewModel.BUCKET_NAME, bucket)
+                .putExtra(PickMusicViewModel.MODE, PickMusicViewModel.ADD_BUCKET)
+        )
+    }
+
+    internal fun doEditBucket(bucket: String) {
+        if (bucket == ALL_MUSIC) {
+            R.string.bruh.getString().toast()
+            return
+        }
+        startActivity(
+            AddBucketActivity::class.intent.putExtra(
+                AddBucketViewModel.BUCKET_NAME,
+                bucket
+            )
+        )
+    }
+
     private suspend fun MusicActivityBinding.playMusic(
         controller: MusicControllerIMP,
         music: Music
@@ -263,7 +285,10 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
     private fun MusicActivityBinding.initLists(list: List<MusicBucket>) {
         musicBucket.apply {
             layoutManager = LinearLayoutManager(this@MusicActivity)
-            adapter = MusicBucketAdapter(this@MusicActivity).apply {
+            adapter = MusicBucketAdapter(
+                this@MusicActivity,
+                Glide.with(this@MusicActivity).asDrawable()
+            ).apply {
                 setData(list)
                 musicBucketEventListener = viewModel.getBucketEventListener()
             }
@@ -322,10 +347,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
         }
     }
 
-    private fun getMusicBucketAdapter() = (binding.musicBucket.adapter as MusicBucketAdapter?)
-
-    private fun getMusicListAdapter() = (binding.musicMusicList.adapter as MusicListAdapter?)
-
     private fun MusicActivityBinding.translatePlayerCoverToFit(fitTop: Boolean) {
         TransitionManager.beginDelayedTransition(musicBucketContainer)
         musicPlayerCover.updateLayoutParams {
@@ -375,5 +396,9 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
     override fun getSwapAnim(): Pair<Int, Int> {
         return Pair(R.anim.card_bot_in, R.anim.card_bot_out)
     }
+
+    private fun getMusicBucketAdapter() = (binding.musicBucket.adapter as MusicBucketAdapter?)
+
+    private fun getMusicListAdapter() = (binding.musicMusicList.adapter as MusicListAdapter?)
 
 }

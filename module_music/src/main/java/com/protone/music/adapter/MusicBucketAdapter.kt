@@ -7,18 +7,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.common.baseType.getColor
 import com.protone.common.baseType.getDrawable
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.music.R
 import com.protone.music.databinding.MusicBucketAdapterLayoutBinding
 
-class MusicBucketAdapter(context: Context) :
+class MusicBucketAdapter(context: Context, private val glideLoader: RequestBuilder<Drawable>) :
     SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket, MusicBucketAdapter.MusicBucketAEvent>(
         context, true
     ) {
@@ -54,7 +54,7 @@ class MusicBucketAdapter(context: Context) :
                         )
                         musicBucketEventListener?.onSelectedBucketRefresh(
                             data.bucket,
-                            bucket.getChangeState(data.bucket,MusicBucket.SIZE)
+                            bucket.getChangeState(data.bucket, MusicBucket.SIZE)
                         )
                     }
             }
@@ -222,12 +222,11 @@ class MusicBucketAdapter(context: Context) :
         iconPath: String? = null,
         drawable: Drawable? = null
     ) {
-        Image.run { if (iconPath != null) load(iconPath) else load(drawable) }
-            .with(context)
-            .skipMemoryCache()
+        glideLoader.run { if (iconPath != null) load(iconPath) else load(drawable) }
+            .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .placeholder(R.drawable.ic_album)
-            .overwrite(imageView.measuredWidth, imageView.measuredHeight)
+            .override(imageView.measuredWidth, imageView.measuredHeight)
             .into(imageView)
     }
 

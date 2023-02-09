@@ -10,6 +10,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.common.baseType.*
@@ -25,12 +27,10 @@ import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_VIDEO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.GALLERY_DATA
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.URI
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.Transition
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.json.toUriJson
-import com.protone.component.activity.BaseMediaActivity
 import com.protone.component.BaseViewModel
+import com.protone.component.activity.BaseMediaActivity
 import com.protone.component.database.userConfig
 import com.protone.component.toPictureBox
 import com.protone.component.view.dialog.titleDialog
@@ -120,7 +120,7 @@ class GalleryActivity :
         val notEmpty = chooseType.isNotEmpty()
         if (notEmpty) binding.apply {
             galleryActionMenu.isVisible = false
-            galleryChooseConfirm.isGone = !notEmpty
+            galleryChooseConfirm.isGone = true
             galleryChooseConfirm.setOnClickListener {
                 getSelectedMedias().ifNotEmpty { list ->
                     setResult(
@@ -178,7 +178,7 @@ class GalleryActivity :
     private fun initList() {
         binding.galleryBucket.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = GalleryBucketAdapter(context) {
+            adapter = GalleryBucketAdapter(context, Glide.with(this@GalleryActivity).asDrawable()) {
                 selectBucket { gallery ->
                     launch { setSelectGallery(gallery) }
                 }
@@ -279,10 +279,10 @@ class GalleryActivity :
     }
 
     private fun GalleryActivityBinding.loadGalleyUri(uri: Uri?) {
-        Image.load(uri)
-            .with(this@GalleryActivity)
+        Glide.with(this@GalleryActivity)
+            .load(uri)
             .error(componentDrawable.ic_baseline_image_24_white)
-            .transition(Transition.CrossFade)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(galleryAction)
     }
 

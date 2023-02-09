@@ -27,7 +27,7 @@ internal class MusicNotificationProvider : IMusicNotificationProvider {
 }
 
 internal class MusicRemoteView : IMusicRemoteViews {
-    override fun getSmallLayout(): Int = R.layout.music_notification_layout
+    override fun getSmallLayout(): Int = R.layout.music_notification_small_layout
     override fun getSmallRootId(): Int = R.id.notify_music_parent
     override fun getSmallTitleId(): Int = R.id.notify_music_name
     override fun getSmallPlayId(): Int = R.id.notify_music_control

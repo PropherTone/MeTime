@@ -1,9 +1,11 @@
 package com.protone.component.view.customView
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
@@ -15,14 +17,16 @@ import android.widget.ScrollView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
+import com.bumptech.glide.RequestBuilder
+import com.protone.common.baseType.withMainContext
 import com.protone.common.context.MApplication
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.onResult
 import kotlinx.coroutines.*
 import java.io.InputStream
 
 class PictureListScrollView @JvmOverloads constructor(
     context: Context,
+    private val glideLoader: RequestBuilder<Drawable>,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0
@@ -102,10 +106,10 @@ class PictureListScrollView @JvmOverloads constructor(
             imageList.forEach {
                 localVisibleRect = it.imageView.getLocalVisibleRect(rect)
                 if (it.imageView.isVisible != localVisibleRect) {
-                    withContext(Dispatchers.Main) {
+                    withMainContext {
                         it.imageView.visibility = if (localVisibleRect) {
                             Log.d(TAG, "checkState: ${it.position}")
-                            Image.load(dataList?.get(it.position)!!).with(context).into(it.imageView)
+                            glideLoader.load(dataList?.get(it.position)!!).into(it.imageView)
 //                            it.imageView.setImageBitmap(decodeBitmap(dataList?.get(it.position)!!))
 //                            visibleIndex = it.position
                             View.VISIBLE

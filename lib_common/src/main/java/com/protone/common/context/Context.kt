@@ -65,13 +65,6 @@ fun Context.linkInput(target: View, input: View) {
     }
 }
 
-fun Context.isServiceRunning(clazz: Class<*>): Boolean =
-    (getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager?).let {
-        return it?.getRunningServices(Int.MAX_VALUE)?.find { runningServiceInfo ->
-            runningServiceInfo.service.className == clazz.name
-        } != null
-    }
-
 inline fun Context.onUiThread(crossinline function: () -> Unit) {
     if (Looper.getMainLooper() == Looper.myLooper()) {
         function.invoke()

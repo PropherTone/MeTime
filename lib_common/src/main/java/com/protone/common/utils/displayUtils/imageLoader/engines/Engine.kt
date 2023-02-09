@@ -57,5 +57,5 @@ interface RequestEngine {
     fun transition(transition: Transition): RequestEngine
     fun overwrite(width: Int, height: Int): RequestEngine
 
-    fun into(@NonNull target: ImageView)
+    fun into(target: ImageView)
 }

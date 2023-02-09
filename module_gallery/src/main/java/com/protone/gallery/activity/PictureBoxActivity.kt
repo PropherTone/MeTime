@@ -4,6 +4,7 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
 import com.protone.component.R
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
@@ -40,7 +41,8 @@ class PictureBoxActivity :
     private fun initPictureBox(picUri: MutableList<GalleryMedia>) {
         binding.picView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = PictureBoxAdapter(context, picUri)
+            adapter =
+                PictureBoxAdapter(context, Glide.with(this@PictureBoxActivity).asDrawable(), picUri)
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)

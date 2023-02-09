@@ -1,6 +1,7 @@
 package com.protone.gallery.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +11,16 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestBuilder
 import com.protone.common.context.MApplication
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.R
 import com.protone.component.view.adapter.SelectListAdapter
 import com.protone.gallery.databinding.GalleryListAdapterLayoutBinding
 
 class GalleryListAdapter(
     context: Context,
+    val glideLoader: RequestBuilder<Drawable>,
     private val useSelect: Boolean = true,
     private val combine: Boolean = false,
     private var itemCount: Int,
@@ -152,10 +154,12 @@ class GalleryListAdapter(
             setSelect(holder.binding, position, mList[position] in selectList)
             videoIcon.isGone = !mList[position].isVideo && !combine
             imageView.let { image ->
-                Image.load(mList[position].thumbnailUri)
-                    .with(context)
-                    .placeholder(R.drawable.none_state_background)
-                    .into(image)
+                glideLoader.load(mList[position].thumbnailUri)
+                    .placeholder(R.drawable.none_state_background).into(image)
+//                Image.load(mList[position].thumbnailUri)
+//                    .with(context)
+//                    .placeholder(R.drawable.none_state_background)
+//                    .into(image)
                 image.setOnClickListener {
                     val layoutPosition = holder.layoutPosition
                     mList[layoutPosition].let { media ->
@@ -173,8 +177,8 @@ class GalleryListAdapter(
                             checkSelect(layoutPosition, media)
                             onSelectListener?.select(media)
                             onSelectListener?.onItemLongClick()
-                            true
                         }
+                        true
                     }
                 }
             }

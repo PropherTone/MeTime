@@ -4,7 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.viewModels
 import com.alibaba.android.arouter.facade.annotation.Route
-import com.protone.common.baseType.toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.common.baseType.withDefaultContext
 import com.protone.common.baseType.withMainContext
 import com.protone.common.context.marginBottom
@@ -15,12 +16,9 @@ import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.CHOOSE_PHOTO
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryMainWire.URI
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toUri
 import com.protone.component.activity.BaseMsgActivity
 import com.protone.component.toGallery
-import com.protone.component.view.customView.musicPlayer.bitmapCachePool
 import com.protone.music.databinding.AddBucketActivityBinding
 import com.protone.music.viewModel.AddBucketViewModel
 
@@ -45,7 +43,7 @@ class AddBucketActivity : BaseMsgActivity<
 
     private var uri: Uri? = null
         set(value) {
-            Image.load(value).with(this).into(binding.musicBucketIcon)
+            Glide.with(this).load(value).into(binding.musicBucketIcon)
             field = value
         }
 
@@ -105,8 +103,8 @@ class AddBucketActivity : BaseMsgActivity<
         if (editName != null) {
             val re = musicBucket?.let {
                 updateMusicBucket(it, name, uri, detail)
-            }
-            if (re != 0 || re != -1) {
+            } ?: -1
+            if (re != -1) {
                 intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
                 setResult(RESULT_OK, intent)
                 finish()
@@ -126,9 +124,9 @@ class AddBucketActivity : BaseMsgActivity<
     private suspend fun refresh(musicBucket: MusicBucket) = withMainContext {
         this@AddBucketActivity.name = musicBucket.name
         detail = musicBucket.detail.toString()
-        Image.load(musicBucket.icon)
-            .with(this@AddBucketActivity)
-            .skipMemoryCache()
+        Glide.with(this@AddBucketActivity)
+            .load(musicBucket.icon)
+            .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(binding.musicBucketIcon)
     }

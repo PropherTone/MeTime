@@ -3,6 +3,8 @@ package com.protone.note.activity
 import android.net.Uri
 import androidx.activity.viewModels
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
@@ -10,8 +12,6 @@ import com.protone.common.context.root
 import com.protone.common.entity.Note
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.NoteRouterPath.NoteEditWire.NOTE
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toJson
 import com.protone.component.R
 import com.protone.component.activity.BaseMusicActivity
@@ -33,7 +33,9 @@ class NoteViewActivity :
     override fun createView(): NoteViewActivityBinding {
         return NoteViewActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@NoteViewActivity
-            noteEditRichNote.setImageLoader(RichNoteImageLoader())
+            noteEditRichNote.setImageLoader(
+                RichNoteImageLoader(Glide.with(this@NoteViewActivity).asDrawable())
+            )
         }
     }
 
@@ -45,7 +47,7 @@ class NoteViewActivity :
             initSeen(noteQueue.poll())
         }
 
-        viewModel.onViewEvent(this@NoteViewActivity,this@NoteViewActivity) {
+        viewModel.onViewEvent(this@NoteViewActivity, this@NoteViewActivity) {
             when (it) {
                 NoteViewViewModel.NoteViewEvent.Next -> initSeen(viewModel.noteQueue.poll())
                 NoteViewViewModel.NoteViewEvent.Edit -> edit()
@@ -122,8 +124,8 @@ class NoteViewActivity :
     private suspend fun initNote(note: Note, listener: RichNoteView.IRichListener) {
         binding.apply {
             noteEditTitle.text = note.title
-            Image.load(note.imagePath)
-                .with(this@NoteViewActivity)
+            Glide.with(this@NoteViewActivity)
+                .load(note.imagePath)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(noteEditIcon)
             noteEditRichNote.isEditable = false

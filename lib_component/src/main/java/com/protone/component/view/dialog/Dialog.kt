@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.context.root
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.common.utils.onResult
 import com.protone.component.R
 import com.protone.component.databinding.*
@@ -149,6 +149,7 @@ suspend fun Activity.imageListDialog(
     binding.apply {
         listList.apply {
             layoutManager = LinearLayoutManager(context)
+            val manager = Glide.with(context)
             adapter = object : BaseAdapter<Uri, PhotoCardLayoutBinding, Any>(context) {
 
                 override fun onCreateViewHolder(
@@ -162,7 +163,7 @@ suspend fun Activity.imageListDialog(
                     holder: Holder<PhotoCardLayoutBinding>,
                     position: Int
                 ) {
-                    Image.load(mList[position]).with(context).into(holder.binding.photoCardPhoto)
+                    manager.load(mList[position]).into(holder.binding.photoCardPhoto)
                     val i = position + 1
                     holder.binding.photoCardTitle.text = i.toString()
                 }

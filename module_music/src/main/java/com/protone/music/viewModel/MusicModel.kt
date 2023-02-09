@@ -19,6 +19,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
@@ -255,22 +257,21 @@ class MusicModel : BaseViewModel(),
         bucketObserveJob?.cancel()
         bucketObserveJob = viewModelScope.launch {
             sendViewEvent(
-                MusicViewEvent.OnBucketSelect(
-                    musicBucket,
-                    getCurrentMusicList(musicBucket)
-                )
+                MusicViewEvent.OnBucketSelect(musicBucket, getCurrentMusicList(musicBucket))
             )
             launchDefault {
                 if (musicBucket.name == ALL_MUSIC) {
-                    musicDAO.getAllMusicFlow().bufferCollect {
-                        if (it == null) return@bufferCollect
+                    musicDAO.getAllMusicFlow().conflate().collect {
+                        if (it == null) return@collect
                         sendMusicEvent(MusicEvent.OnMusicBucketDataChanged(it))
                     }
                 } else {
-                    musicDAO.getMusicWithMusicBucketFlow(musicBucket.musicBucketId).bufferCollect {
-                        if (it == null) return@bufferCollect
-                        sendMusicEvent(MusicEvent.OnMusicBucketDataChanged(it))
-                    }
+                    musicDAO.getMusicWithMusicBucketFlow(musicBucket.musicBucketId)
+                        .conflate()
+                        .collect {
+                            if (it == null) return@collect
+                            sendMusicEvent(MusicEvent.OnMusicBucketDataChanged(it))
+                        }
                 }
             }
         }

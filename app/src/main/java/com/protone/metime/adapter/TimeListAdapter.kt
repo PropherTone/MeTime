@@ -1,21 +1,24 @@
 package com.protone.metime.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.common.baseType.toDateString
 import com.protone.common.context.newLayoutInflater
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.Transition
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.customView.videoPlayer.DefaultVideoController
 import com.protone.metime.databinding.TimePhotoCardLayoutBinding
 import com.protone.metime.databinding.TimeVideoCardLayoutBinding
 
-class TimeListAdapter(private val cardEvent: CardEvent) :
-    PagingDataAdapter<GalleryMedia, BaseAdapter.Holder<ViewDataBinding>>(
+class TimeListAdapter(
+    private val cardEvent: CardEvent,
+    private val glideLoader: RequestBuilder<Drawable>
+) : PagingDataAdapter<GalleryMedia, BaseAdapter.Holder<ViewDataBinding>>(
         object : DiffUtil.ItemCallback<GalleryMedia>() {
             override fun areItemsTheSame(oldItem: GalleryMedia, newItem: GalleryMedia): Boolean {
                 return oldItem == newItem
@@ -62,10 +65,9 @@ class TimeListAdapter(private val cardEvent: CardEvent) :
     ): Unit = holder.binding.let { binding ->
         when (binding) {
             is TimePhotoCardLayoutBinding -> getItem(position)?.let { media ->
-                Image.load(media.uri)
-                    .with(binding.photo.context)
-                    .transition(Transition.CrossFade)
-                    .into(binding.photo)
+                glideLoader.load(media.uri)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.photo)
                 binding.title.text = media.date.toDateString("yyyy/MM/dd")
                 binding.timePhoto.setOnClickListener {
                     cardEvent.onPhotoClick(media)

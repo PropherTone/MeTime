@@ -6,7 +6,7 @@ dependencies {
     
     implementation libs.bundles.roomLibs
 
-    implementation libs.glide
+    api libs.glide
     kapt libs.glide.compiler
 
     api libs.arouter.api

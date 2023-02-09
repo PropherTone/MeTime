@@ -1,18 +1,14 @@
 package com.protone.component.view.customView.videoPlayer
 
-import android.content.Context
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.ImageView
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.protone.common.baseType.getDrawable
-import com.protone.common.utils.displayUtils.imageLoader.Image
 import com.protone.component.R
 
-abstract class VideoBaseController(private val context: Context) {
+abstract class VideoBaseController {
 
     private val mHandler by lazy {
         Handler(Looper.getMainLooper()) {

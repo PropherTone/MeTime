@@ -10,7 +10,7 @@ import com.protone.common.context.newLayoutInflater
 import com.protone.component.databinding.VideoControllerLayoutBinding
 import com.protone.component.view.customView.ColorfulProgressBar
 
-class DefaultVideoController(context: Context) : VideoBaseController(context) {
+class DefaultVideoController(context: Context) : VideoBaseController() {
 
     private val controller by lazy {
         VideoControllerLayoutBinding.inflate(context.newLayoutInflater).apply {

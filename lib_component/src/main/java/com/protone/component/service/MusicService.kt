@@ -180,10 +180,10 @@ class MusicService : BaseService(), IMusicService {
             return
         }
         if (playList.isEmpty()) return
-        if (currentMusic.value == null) {
-            musicPlayer.play(null)
-        } else musicPlayer.play(music)
-        currentMusic.postValue(music)
+        currentMusic.value.let {
+            musicPlayer.play(it)
+            currentMusic.postValue(it)
+        }
     }
 
     override fun pause() {

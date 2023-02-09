@@ -70,19 +70,19 @@ class GalleryViewModel : BaseViewModel() {
             dataListener = object : MediaSelectedList.DataListener {
                 override fun onAdded() {
                     if (!onSelectMode) {
+                        onSelectMode = true
                         viewModelScope.launchDefault {
                             sendBucketEvent(GalleryEvent.OnSelectedMode)
                         }
-                        onSelectMode = true
                     }
                 }
 
                 override fun onCleared() {
                     if (onSelectMode) {
+                        onSelectMode = false
                         viewModelScope.launchDefault {
                             sendBucketEvent(GalleryEvent.ExitSelectedMode)
                         }
-                        onSelectMode = false
                     }
                 }
             }
@@ -112,9 +112,10 @@ class GalleryViewModel : BaseViewModel() {
         when (data.first()) {
             is GalleryListEvent.OnMediaInserted -> data.first().also { event ->
                 if (event !is GalleryListEvent.MediaEvent) return@also
-                data.associate {
-                    (it as GalleryListEvent.MediaEvent) to listOf(it.galleryMedia)
-                }.run {
+                data.associateToMapList(
+                    { it as GalleryListEvent.MediaEvent },
+                    { (it as GalleryListEvent.MediaEvent).galleryMedia }
+                ).run {
                     keys.forEach { event ->
                         event.galleryMedia.bucket.let { galleryName ->
                             galleryData.find { it.name == galleryName }.also { gallery ->

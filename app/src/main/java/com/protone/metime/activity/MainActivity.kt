@@ -4,6 +4,8 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.common.baseType.*
 import com.protone.common.context.MApplication
 import com.protone.common.context.clipOutLine
@@ -15,8 +17,6 @@ import com.protone.common.entity.getEmptyMusic
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.RouterPath
 import com.protone.common.utils.RouterPath.GalleryRouterPath.GalleryViewWire.galleryViewPostcard
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.constant.DiskCacheStrategy
 import com.protone.common.utils.json.toEntity
 import com.protone.common.utils.json.toJson
 import com.protone.common.utils.todayDate
@@ -30,7 +30,6 @@ import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding
 import com.protone.metime.viewModel.MainViewModel
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity :
@@ -53,8 +52,7 @@ class MainActivity :
             if (value == null) return
             if (field == value) return
             if (value.isNotEmpty()) {
-                Image.load(value)
-                    .with(this)
+                Glide.with(this).load(value)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.userIcon)
                 launch {
@@ -170,7 +168,6 @@ class MainActivity :
                         startActivity(RouterPath.MusicRouterPath.Main) {
                             withTransition(R.anim.card_top_in, R.anim.card_top_out)
                         }
-                        userConfig.lastMusicBucketCover.getBitmap()
                     } else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig -> {
                     startActivity(RouterPath.ConfigRouterPath.UserConfig)
@@ -203,7 +200,7 @@ class MainActivity :
                         galleryViewPostcard(media.toJson(), true, isCustom = false, ALL_GALLERY)
                     }
                 }
-            }).let { timeListAdapter ->
+            }, Glide.with(this@MainActivity).asDrawable()).let { timeListAdapter ->
                 adapter = timeListAdapter
                 launchDefault {
                     viewModel.getTimeMediaPager(2).collect {

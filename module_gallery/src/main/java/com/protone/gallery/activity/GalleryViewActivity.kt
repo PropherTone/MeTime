@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
 import com.protone.common.baseType.*
 import com.protone.common.context.intent
 import com.protone.common.context.root
@@ -124,6 +125,7 @@ class GalleryViewActivity : BaseMediaActivity<
                 it.orientation = LinearLayoutManager.HORIZONTAL
             }
             adapter = CatoListAdapter(this@GalleryViewActivity,
+                Glide.with(this@GalleryViewActivity).asDrawable(),
                 object : CatoListAdapter.CatoListDataProxy {
                     override suspend fun getMedia(cate: String): GalleryMedia? =
                         viewModel.getMediaByUri(cate.toUri())

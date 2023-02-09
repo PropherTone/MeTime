@@ -1,17 +1,18 @@
 package com.protone.gallery.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.isGone
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.protone.common.entity.GalleryMedia
-import com.protone.common.utils.displayUtils.imageLoader.Image
-import com.protone.common.utils.displayUtils.imageLoader.LoadSuccessResult
-import com.protone.common.utils.displayUtils.imageLoader.RequestInterceptor
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.customView.videoPlayer.DefaultVideoController
 import com.protone.gallery.databinding.PictureBoxAdapterGifLayoutBinding
@@ -19,8 +20,11 @@ import com.protone.gallery.databinding.PictureBoxAdapterLayoutBinding
 import com.protone.gallery.databinding.PictureBoxAdapterVideoLayoutBinding
 import kotlin.math.roundToInt
 
-class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
-    BaseAdapter<GalleryMedia, ViewDataBinding, Any>(context) {
+class PictureBoxAdapter(
+    context: Context,
+    private val glideLoader: RequestBuilder<Drawable>,
+    picUri: MutableList<GalleryMedia>
+) : BaseAdapter<GalleryMedia, ViewDataBinding, Any>(context) {
 
     init {
         mList.addAll(picUri)
@@ -80,10 +84,23 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
     }
 
     private fun loadingMedia(position: Int, view: ImageView) {
-        Image.load(mList[position].path).with(context)
-            .setInterceptor(object : RequestInterceptor() {
-                override fun onLoadSuccess(result: LoadSuccessResult) {
-                    result.resource?.apply {
+        glideLoader.load(mList[position].path)
+            .addListener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean = isFirstResource
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    resource?.apply {
                         val mix = this.intrinsicWidth.toFloat().let {
                             view.width / it
                         }
@@ -95,6 +112,7 @@ class PictureBoxAdapter(context: Context, picUri: MutableList<GalleryMedia>) :
                             this.height = heightSpan
                         }
                     }
+                    return true
                 }
             }).into(view)
     }

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.bumptech.glide.Glide
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.context.intent
@@ -108,7 +109,10 @@ class NoteActivity :
         binding.apply {
             noteList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
-                it.adapter = NoteListListAdapter(this@NoteActivity) {
+                it.adapter = NoteListListAdapter(
+                    this@NoteActivity,
+                    Glide.with(this@NoteActivity).asDrawable()
+                ) {
                     onNote { note ->
                         startActivity(
                             NoteViewActivity::class.intent
