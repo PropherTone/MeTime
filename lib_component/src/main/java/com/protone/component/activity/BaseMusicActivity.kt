@@ -10,7 +10,7 @@ import com.protone.component.service.MusicBinder
 import com.protone.component.service.MusicService
 import com.protone.component.service.isServiceRunning
 import com.protone.component.service.observeServiceState
-import com.protone.component.view.customView.musicPlayer.bitmapCachePool
+import com.protone.component.view.customView.musicPlayer.AlbumBitmapCachePool
 import kotlinx.coroutines.launch
 
 abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : BaseViewModel.ViewEvent>
@@ -46,7 +46,7 @@ abstract class BaseMusicActivity<VB : ViewDataBinding, VM : BaseViewModel, VE : 
 
     override fun onTrimMemory(level: Int) {
         if (level > TRIM_MEMORY_MODERATE) {
-            bitmapCachePool.clear()
+            AlbumBitmapCachePool.clear()
         }
         super.onTrimMemory(level)
     }

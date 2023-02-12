@@ -24,7 +24,6 @@ import com.protone.component.*
 import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
-import com.protone.component.view.customView.musicPlayer.getBitmap
 import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding
@@ -85,9 +84,6 @@ class MainActivity :
 
     override suspend fun MainViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
-        userIcon = userConfig.userIcon.also {
-            musicController.setInterceptAlbumCover(it.isEmpty())
-        }
         musicController.setOnBlurAlbumCover {
             binding.userBack.setImageBitmap(it)
         }

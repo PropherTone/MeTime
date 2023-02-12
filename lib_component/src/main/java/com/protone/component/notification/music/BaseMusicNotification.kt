@@ -5,8 +5,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.widget.RemoteViews
+import com.protone.common.context.MApplication
+import com.protone.component.R
 import com.protone.component.notification.music.remoteViews.IMusicRemoteViews
 import com.protone.component.notification.music.remoteViews.MusicContentProvider
 
@@ -17,7 +20,6 @@ abstract class BaseMusicNotification(
 ) : IMusicNotification {
 
     private val remoteViews = MusicContentProvider(mrv)
-    private val content: RemoteViews? get() = bigContent ?: smallContent
     private var smallContent: RemoteViews? = null
     private var bigContent: RemoteViews? = null
     private var notification: Notification? = null
@@ -33,6 +35,7 @@ abstract class BaseMusicNotification(
             Notification.Builder(this, provider.getNotificationIdName()).apply {
                 setOngoing(true)
                 setSmallIcon(provider.getNotificationIcon())
+                setLargeIcon(Icon.createWithResource(MApplication.app, R.drawable.ic_baseline_pause_24))
                 setCustomContentView(content)
                 if (bigContent != null) setCustomBigContentView(bigContent)
             }.build()
@@ -64,15 +67,21 @@ abstract class BaseMusicNotification(
     }
 
     override fun setTitle(title: CharSequence) {
-        content?.setTextViewText(remoteViews.getTitleId(), title)
+        smallContent?.setTextViewText(remoteViews.getTitleId(), title)
+        bigContent?.setTextViewText(remoteViews.getTitleId(), title)
     }
 
     override fun setMusicCover(cover: Bitmap) {
-        content?.setImageViewBitmap(remoteViews.getCoverId(), cover)
+        smallContent?.setImageViewBitmap(remoteViews.getCoverId(), cover)
+        bigContent?.setImageViewBitmap(remoteViews.getCoverId(), cover)
     }
 
     override fun setPlayState(isPlaying: Boolean) {
-        content?.setImageViewResource(
+        smallContent?.setImageViewResource(
+            remoteViews.getPlayId(),
+            if (isPlaying) provider.getPlayIcon() else provider.getPauseIcon()
+        )
+        bigContent?.setImageViewResource(
             remoteViews.getPlayId(),
             if (isPlaying) provider.getPlayIcon() else provider.getPauseIcon()
         )
@@ -83,7 +92,8 @@ abstract class BaseMusicNotification(
     }
 
     override fun release() {
-        content?.removeAllViews(remoteViews.getRootId())
+        smallContent?.removeAllViews(remoteViews.getRootId())
+        bigContent?.removeAllViews(remoteViews.getRootId())
         smallContent = null
         bigContent = null
         notification = null

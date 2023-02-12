@@ -16,20 +16,18 @@ import com.protone.common.baseType.getDrawable
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.toast
 import com.protone.common.baseType.withDefaultContext
-import com.protone.common.context.intent
-import com.protone.common.context.onGlobalLayout
-import com.protone.common.context.root
-import com.protone.common.context.statuesBarHeight
+import com.protone.common.context.*
 import com.protone.common.entity.Music
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.ALL_MUSIC
 import com.protone.common.utils.RouterPath
 import com.protone.component.MusicControllerIMP
 import com.protone.component.R
+import com.protone.music.R as MusicR
 import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.database.userConfig
 import com.protone.component.view.customView.StatusImageView
-import com.protone.component.view.customView.musicPlayer.getBitmap
+import com.protone.component.view.customView.musicPlayer.getAlbumBitmap
 import com.protone.music.adapter.MusicBucketAdapter
 import com.protone.music.adapter.MusicListAdapter
 import com.protone.music.databinding.MusicActivityBinding
@@ -39,8 +37,6 @@ import com.protone.music.viewModel.MusicModel.MusicEvent
 import com.protone.music.viewModel.MusicModel.MusicViewEvent
 import com.protone.music.viewModel.PickMusicViewModel
 import kotlinx.coroutines.launch
-
-private typealias musicR = com.protone.music.R.drawable
 
 @Route(path = RouterPath.MusicRouterPath.Main)
 class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicViewEvent>(),
@@ -87,28 +83,11 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
 
     override fun createView(): MusicActivityBinding {
         return MusicActivityBinding.inflate(layoutInflater, root, false).apply {
-            Glide.with(this@MusicActivity)
-                .asBitmap()
-                .load(userConfig.lastMusicBucketCover)
-                .addListener(object : RequestListener<Bitmap> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        isFirstResource: Boolean
-                    ): Boolean = false
-
-                    override fun onResourceReady(
-                        resource: Bitmap?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        blurredBucketCover.setBlurBitmap(resource, 24, 10)
-                        return true
-                    }
-                }).submit()
+            launch {
+                userConfig.lastMusicBucketCover.getAlbumBitmap()?.let {
+                    blurredBucketCover.setBlurBitmap(it, 24, 10)
+                }
+            }
 
             model = BindingModel(this@MusicActivity, this, viewModel)
 
@@ -335,12 +314,12 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
     private suspend fun changeIcon(icon: String?) {
         binding.apply {
             userConfig.lastMusicBucketCover = icon ?: ""
-            icon?.getBitmap()?.let { bm ->
+            icon?.getAlbumBitmap()?.let { bm ->
                 musicBucketIcon.setImageBitmap(bm)
                 blurredBucketCover.setBlurBitmap(bm, 24, 10)
             } ?: run {
                 blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
-                musicBucketIcon.setImageDrawable(musicR.ic_music_note_24_white.getDrawable())
+                musicBucketIcon.setImageDrawable(MusicR.drawable.ic_music_note_24_white.getDrawable())
             }
         }
     }

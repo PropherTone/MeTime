@@ -16,20 +16,12 @@ import com.protone.common.utils.isInDebug
 import com.protone.component.R
 import com.protone.component.view.customView.ColorfulProgressBar
 import com.protone.component.view.customView.SwitchImageView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
-val bitmapCachePool by lazy { BitmapCachePool() }
+val AlbumBitmapCachePool by lazy { BitmapCachePool() }
 
-suspend fun Uri.getBitmap() = bitmapCachePool.get(this)
-
-suspend fun String.getBitmap() = try {
-    bitmapCachePool.get(this)
-} catch (e: NullPointerException) {
-    null
-}
+suspend fun String.getAlbumBitmap(): Bitmap? = AlbumBitmapCachePool.get(this)
+suspend fun Uri.getAlbumBitmap(): Bitmap? = AlbumBitmapCachePool.get(this)
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -70,8 +62,11 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 
     var interceptAlbumCover = false
         set(value) {
-            switcher.setImageBitmap(null)
-            switcher.setImageBitmap(null)
+            if (value == field) return
+            if (!value) {
+                switcher.setImageBitmap(null)
+                switcher.setImageBitmap(null)
+            }
             field = value
         }
 
@@ -87,7 +82,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 
     private fun loadAlbum(albumUri: Uri?) {
         launch {
-            val albumBitmap = albumUri?.let { bitmapCachePool.get(it) }
+            val albumBitmap = albumUri?.getAlbumBitmap()
             if (albumBitmap == null) {
                 coverSwitcher.setImageDrawable(baseAlbumDrawable)
             } else {

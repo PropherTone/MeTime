@@ -2,15 +2,12 @@ package com.protone.music.viewModel
 
 import android.net.Uri
 import com.protone.common.baseType.deleteFile
-import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.baseType.toBase64
 import com.protone.common.entity.MusicBucket
 import com.protone.common.utils.MUSIC_BUCKET
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseViewModel
-import com.protone.component.view.customView.musicPlayer.bitmapCachePool
-import com.protone.music.R
 
 class AddBucketViewModel : BaseViewModel() {
 
@@ -58,7 +55,6 @@ class AddBucketViewModel : BaseViewModel() {
             }?.takeIf { mb.icon == null || mb.icon?.equals(it) == false }?.let {
                 if (mb.icon == null || mb.icon?.equals(it) == false) {
                     mb.icon = it
-                    bitmapCachePool.remove(it)
                 }
             }
             if (mb.detail != detail) mb.detail = detail

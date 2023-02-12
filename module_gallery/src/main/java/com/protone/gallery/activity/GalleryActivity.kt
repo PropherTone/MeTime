@@ -35,6 +35,7 @@ import com.protone.component.database.userConfig
 import com.protone.component.toPictureBox
 import com.protone.component.view.dialog.titleDialog
 import com.protone.gallery.R
+import com.protone.component.R as ComponentR
 import com.protone.gallery.adapter.GalleryBucketAdapter
 import com.protone.gallery.adapter.GalleryListStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
@@ -46,10 +47,6 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.hypot
-
-private typealias componentDrawable = com.protone.component.R.drawable
-private typealias componentString = com.protone.component.R.string
-private typealias componentAni = com.protone.component.R.anim
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
@@ -87,7 +84,7 @@ class GalleryActivity :
         }
 
         fun addBucket() {
-            titleDialog(componentString.user_name.getString(), "") {
+            titleDialog(ComponentR.string.user_name.getString(), "") {
                 viewModel.addBucket(it)
             }
         }
@@ -100,8 +97,8 @@ class GalleryActivity :
         set(value) {
             if (field == value) return
             binding.finish.setImageResource(
-                if (value) componentDrawable.ic_round_close_24_white
-                else componentDrawable.ic_round_arrow_left_white_24
+                if (value) ComponentR.drawable.ic_round_close_24_white
+                else ComponentR.drawable.ic_round_arrow_left_white_24
             )
             field = value
         }
@@ -227,7 +224,7 @@ class GalleryActivity :
             CHOOSE_PHOTO -> arrayOf(R.string.photo)
             CHOOSE_VIDEO -> arrayOf(R.string.video)
             else -> {
-                if (combine) arrayOf(componentString.model_gallery)
+                if (combine) arrayOf(ComponentR.string.model_gallery)
                 else arrayOf(R.string.photo, R.string.video)
             }
         }.let { tabList ->
@@ -281,7 +278,7 @@ class GalleryActivity :
     private fun GalleryActivityBinding.loadGalleyUri(uri: Uri?) {
         Glide.with(this@GalleryActivity)
             .load(uri)
-            .error(componentDrawable.ic_baseline_image_24_white)
+            .error(ComponentR.drawable.ic_baseline_image_24_white)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(galleryAction)
     }
@@ -305,7 +302,7 @@ class GalleryActivity :
 
     override fun getSwapAnim(): Pair<Int, Int>? {
         if (!binding.galleryChooseConfirm.isGone) return null
-        return Pair(componentAni.card_in_rtl, componentAni.card_out_rtl)
+        return Pair(ComponentR.anim.card_in_rtl, ComponentR.anim.card_out_rtl)
     }
 
     override fun onBackPressed() {

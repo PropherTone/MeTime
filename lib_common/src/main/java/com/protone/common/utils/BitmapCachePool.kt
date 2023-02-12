@@ -2,11 +2,14 @@ package com.protone.common.utils
 
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.collection.LruCache
+import com.bumptech.glide.Glide
 import com.protone.common.baseType.toBitmap
 import com.protone.common.baseType.withDefaultContext
-import com.protone.common.utils.json.toUri
+import com.protone.common.baseType.withIOContext
+import com.protone.common.context.MApplication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BitmapCachePool {
 
@@ -22,7 +25,7 @@ class BitmapCachePool {
         }
     }
 
-    suspend fun get(uri: Uri): Bitmap? {
+    suspend fun get(uri: Uri): Bitmap?  {
         val key = generateKey(uri.toString())
         return blurMemCache.get(key) ?: uri.toBitmap()?.let {
             blurMemCache.put(key, it)

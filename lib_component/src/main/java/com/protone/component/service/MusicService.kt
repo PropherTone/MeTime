@@ -25,7 +25,7 @@ import com.protone.component.broadcast.musicBroadCastManager
 import com.protone.component.database.userConfig
 import com.protone.component.notification.music.IMusicNotification
 import com.protone.component.notification.music.MusicNotification
-import com.protone.component.view.customView.musicPlayer.getBitmap
+import com.protone.component.view.customView.musicPlayer.getAlbumBitmap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.concurrent.LinkedBlockingDeque
@@ -115,7 +115,7 @@ class MusicService : BaseService(), IMusicService {
                     if (state || ref) {
                         val music = rightMusic
                         musicNotification.setTitle(music.title)
-                        music.uri.getBitmap()?.let { ba ->
+                        music.uri.getAlbumBitmap()?.let { ba ->
                             musicNotification.setMusicCover(ba)
                         }
                     }

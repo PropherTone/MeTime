@@ -12,11 +12,5 @@
             android:layout_height="match_parent"
             android:overScrollMode="never" />
 
-        <com.protone.component.view.customView.PictureListScrollView
-            android:id="@+id/ddd"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
     </RelativeLayout>
 </layout>
