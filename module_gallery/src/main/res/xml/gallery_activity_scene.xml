@@ -62,6 +62,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
+            android:id="@+id/selectAll"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintEnd_toStartOf="@id/finish"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibilityMode="ignore" />
+
+        <Constraint
             android:id="@+id/finish"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
@@ -151,6 +159,14 @@
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/gallery_bucket"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Constraint
+            android:id="@+id/selectAll"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            app:visibilityMode="ignore"
+            app:layout_constraintEnd_toStartOf="@id/finish"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint

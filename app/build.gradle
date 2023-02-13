@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.firebase-perf'
-apply plugin: 'com.google.firebase.crashlytics'
+//apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.firebase.firebase-perf'
+//apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdk libs.versions.compileSdk.get().toInteger()
@@ -48,8 +48,8 @@ dependencies {
 
     implementation project(path: ':lib_component')
     implementation project(path: ':lib_common')
-    api 'com.google.firebase:firebase-crashlytics-ktx:18.3.3'
-    api 'com.google.firebase:firebase-analytics-ktx:21.2.0'
+//    api 'com.google.firebase:firebase-crashlytics-ktx:18.3.3'
+//    api 'com.google.firebase:firebase-analytics-ktx:21.2.0'
 
     if (!isModule.toBoolean()) {
         implementation project(path: ':module_note')

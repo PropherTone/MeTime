@@ -79,7 +79,7 @@
             android:id="@+id/search"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:background="@drawable/background_ripple_glass"
+            android:background="@drawable/trans_dark_ripple"
             android:contentDescription="@string/action"
             android:onClick="@{()->model.toSearch()}"
             android:padding="@dimen/border_distance"
@@ -92,7 +92,7 @@
             android:id="@+id/add_gallery"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:background="@drawable/background_ripple_glass"
+            android:background="@drawable/trans_dark_ripple"
             android:contentDescription="@string/action"
             android:onClick="@{()->model.addBucket()}"
             android:padding="@dimen/border_distance"
@@ -109,6 +109,7 @@
             android:onClick="@{()->model.showPop()}"
             android:padding="16dp"
             android:src="@drawable/ic_baseline_menu_24_white"
+            android:visibility="invisible"
             app:layout_constraintStart_toEndOf="@id/gallery_detail"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -120,9 +121,20 @@
             app:layout_constraintStart_toEndOf="@id/gallery_bucket"
             app:layout_constraintTop_toTopOf="parent"
             app:tabIndicatorColor="@color/white"
-            app:tabRippleColor="@color/glass"
+            app:tabRippleColor="@color/foreDark"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/white" />
+
+        <CheckBox
+            android:id="@+id/selectAll"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:text="@string/selectAll"
+            android:textColor="@color/white"
+            android:theme="@style/MyRadioCheckBox"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@id/finish"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/finish"

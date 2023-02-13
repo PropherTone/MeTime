@@ -106,7 +106,7 @@ class GallerySearchActivity : BaseMediaActivity<
     }
 
     fun showPop() {
-        showPop(binding.actionMenu, false)
+        showPop(binding.actionMenu)
     }
 
     override fun select(media: GalleryMedia) {
@@ -168,7 +168,11 @@ class GallerySearchActivity : BaseMediaActivity<
         tryRename(viewModel.selectList)
     }
 
-    override fun popSelectAll() {
+    override fun popSetCate() {
+        addCate(viewModel.selectList)
+    }
+
+    fun popSelectAll() {
         binding.apply {
             if (!resultGalleries.isGone) {
                 (resultGalleries.adapter as GalleryListAdapter).selectAll()
@@ -182,11 +186,7 @@ class GallerySearchActivity : BaseMediaActivity<
         }
     }
 
-    override fun popSetCate() {
-        addCate(viewModel.selectList)
-    }
-
-    override fun popIntoBox() {
+    fun popIntoBox() {
         launchDefault {
             viewModel.apply {
                 putGainIntentData(selectList)

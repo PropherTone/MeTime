@@ -3,8 +3,8 @@ package com.protone.note.viewModel
 import android.net.Uri
 import com.protone.common.entity.GalleryMedia
 import com.protone.component.BaseViewModel
-import com.protone.component.ViewEventHandle
-import com.protone.component.ViewEventHandler
+import com.protone.component.tools.ViewEventHandle
+import com.protone.component.tools.ViewEventHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*

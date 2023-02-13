@@ -1,4 +1,4 @@
-package com.protone.component
+package com.protone.component.tools
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -20,7 +20,7 @@ interface ViewEventHandle<ViewEvent> {
     fun sendViewEvent(event: ViewEvent)
 }
 
-class ViewEventHandler<ViewEvent> :ViewEventHandle<ViewEvent>{
+class ViewEventHandler<ViewEvent> : ViewEventHandle<ViewEvent> {
 
     private var onViewEvent: (suspend (ViewEvent) -> Unit)? = null
         set(value) {

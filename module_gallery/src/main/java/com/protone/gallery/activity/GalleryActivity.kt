@@ -35,7 +35,6 @@ import com.protone.component.database.userConfig
 import com.protone.component.toPictureBox
 import com.protone.component.view.dialog.titleDialog
 import com.protone.gallery.R
-import com.protone.component.R as ComponentR
 import com.protone.gallery.adapter.GalleryBucketAdapter
 import com.protone.gallery.adapter.GalleryListStateAdapter
 import com.protone.gallery.component.GalleryBucketItemDecoration
@@ -47,6 +46,7 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.hypot
+import com.protone.component.R as ComponentR
 
 @Route(path = RouterPath.GalleryRouterPath.Main)
 class GalleryActivity :
@@ -71,7 +71,7 @@ class GalleryActivity :
         }
 
         fun showPop() {
-            showPop(binding.galleryActionMenu, viewModel.selectedMedias.size <= 0)
+            showPop(binding.galleryActionMenu)
         }
 
         fun toSearch() {
@@ -96,10 +96,16 @@ class GalleryActivity :
     private var onSelectMode = false
         set(value) {
             if (field == value) return
-            binding.finish.setImageResource(
-                if (value) ComponentR.drawable.ic_round_close_24_white
-                else ComponentR.drawable.ic_round_arrow_left_white_24
-            )
+            launch {
+                binding.apply {
+                    selectAll.isVisible = value
+                    finish.setImageResource(
+                        if (value) ComponentR.drawable.ic_round_close_24_white
+                        else ComponentR.drawable.ic_round_arrow_left_white_24
+                    )
+                    galleryActionMenu.isVisible = value
+                }
+            }
             field = value
         }
 
@@ -107,6 +113,9 @@ class GalleryActivity :
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
             model = BindModel()
             root.fitStatuesBar()
+            selectAll.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked && onSelectMode) selectAll()
+            }
         }
     }
 
@@ -116,7 +125,7 @@ class GalleryActivity :
 
         val notEmpty = chooseType.isNotEmpty()
         if (notEmpty) binding.apply {
-            galleryActionMenu.isVisible = false
+            galleryActionMenu.isGone = true
             galleryChooseConfirm.isGone = false
             galleryChooseConfirm.setOnClickListener {
                 getSelectedMedias().ifNotEmpty { list ->
@@ -232,7 +241,7 @@ class GalleryActivity :
                 binding.galleryTab.apply {
                     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab?) {
-                            tab?.text?.let { if (viewModel.onTabChanged(it)) launch { onGalleryTabSwapped() } }
+                            tab?.text?.let { if (viewModel.onTabChanged(it)) onGalleryTabSwapped() }
                         }
 
                         override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
@@ -244,12 +253,14 @@ class GalleryActivity :
         }
     }
 
-    private suspend fun onGalleryTabSwapped() {
-        viewModel.drawerStateChanged(binding.motionRoot.progress == 1f)
-        getBucketAdapter().setData(viewModel.getGalleryData())
-        viewModel.getSelectedBucket()?.let { gallery ->
-            getBucketAdapter().setSelected(gallery)
-            setSelectGallery(gallery)
+    private fun onGalleryTabSwapped() {
+        launch {
+            viewModel.drawerStateChanged(binding.motionRoot.progress == 1f)
+            getBucketAdapter().setData(viewModel.getGalleryData())
+            viewModel.getSelectedBucket()?.let { gallery ->
+                getBucketAdapter().setSelected(gallery)
+                setSelectGallery(gallery)
+            }
         }
     }
 
@@ -332,15 +343,15 @@ class GalleryActivity :
         viewModel.getSelectedMedias().ifNotEmpty { tryRename(it) }
     }
 
-    override fun popSelectAll() {
-        viewModel.selectAll()
-    }
-
     override fun popSetCate() {
         viewModel.getSelectedMedias().ifNotEmpty { addCate(it) }
     }
 
-    override fun popIntoBox() {
+    fun selectAll() {
+        viewModel.selectAll()
+    }
+
+    fun popIntoBox() {
         launch {
             viewModel.getSelectedMedias().let {
                 toPictureBox(it.ifEmpty { viewModel.getRightGalleryMedias() ?: it })

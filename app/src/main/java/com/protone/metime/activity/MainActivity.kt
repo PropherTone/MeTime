@@ -24,6 +24,8 @@ import com.protone.component.*
 import com.protone.component.activity.BaseMusicActivity
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
+import com.protone.component.tools.ViewEventHandle
+import com.protone.component.tools.ViewEventHandler
 import com.protone.metime.adapter.TimeListAdapter
 import com.protone.metime.component.TimeListItemDecoration
 import com.protone.metime.databinding.MainActivityBinding

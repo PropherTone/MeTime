@@ -116,10 +116,6 @@ class MusicActivity : BaseMusicActivity<MusicActivityBinding, MusicModel, MusicV
         observeMusicEvent()
 
         initList()
-        onLifecycleEvent {
-            onResume { if (!isInit) isInit = true }
-            onPause { isInit = false }
-        }
         isInit = true
         bindMusicService {
             controller.getPlayingMusic()?.let { music ->

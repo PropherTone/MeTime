@@ -10,8 +10,8 @@ import com.protone.common.utils.EventCachePool
 import com.protone.common.utils.todayDate
 import com.protone.component.BaseViewModel
 import com.protone.component.R
-import com.protone.component.ViewEventHandle
-import com.protone.component.ViewEventHandler
+import com.protone.component.tools.ViewEventHandle
+import com.protone.component.tools.ViewEventHandler
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
 import com.protone.music.adapter.MusicBucketAdapter

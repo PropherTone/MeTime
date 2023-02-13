@@ -26,10 +26,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.streams.toList
 
-abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
-    receiveEvent: Boolean = false
-) : BaseMsgActivity<VB, VM, T>(receiveEvent),
-    View.OnClickListener {
+abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent> :
+    BaseActivity<VB, VM, T>(), View.OnClickListener {
 
     val popLayout: GalleryOptionPopBinding by lazy {
         GalleryOptionPopBinding.inflate(layoutInflater, root, false).apply {
@@ -37,9 +35,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
             galleryDelete.setOnClickListener(this@BaseMediaActivity)
             galleryMoveTo.setOnClickListener(this@BaseMediaActivity)
             galleryRename.setOnClickListener(this@BaseMediaActivity)
-            gallerySelectAll.setOnClickListener(this@BaseMediaActivity)
             gallerySetCate.setOnClickListener(this@BaseMediaActivity)
-            galleryIntoBox.setOnClickListener(this@BaseMediaActivity)
         }
     }
 
@@ -48,17 +44,9 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     abstract fun popDelete()
     abstract fun popMoveTo()
     abstract fun popRename()
-    abstract fun popSelectAll()
     abstract fun popSetCate()
-    abstract fun popIntoBox()
 
-    fun showPop(anchor: View, onSelect: Boolean) {
-        popLayout.apply {
-            galleryDelete.isGone = onSelect
-            galleryMoveTo.isGone = onSelect
-            galleryRename.isGone = onSelect
-            gallerySetCate.isGone = onSelect
-        }
+    fun showPop(anchor: View) {
         pop?.showPop(anchor)
     }
 
@@ -75,9 +63,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 galleryDelete -> popDelete()
                 galleryMoveTo -> popMoveTo()
                 galleryRename -> popRename()
-                gallerySelectAll -> popSelectAll()
                 gallerySetCate -> popSetCate()
-                galleryIntoBox -> popIntoBox()
             }
         }
         pop?.dismiss()
@@ -152,10 +138,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 
     private fun rename(gm: GalleryMedia) {
         val mimeType = gm.name.getFileMimeType()
-        titleDialog(
-            getString(R.string.rename),
-            gm.name.replace(mimeType, "")
-        ) { name ->
+        titleDialog(R.string.rename.getString(), gm.name.replace(mimeType, "")) { name ->
             val result = renameMedia(name + mimeType, gm.uri)
             if (result) {
                 R.string.success.getString().toast()
@@ -165,10 +148,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 
     private fun renameMulti(gm: List<GalleryMedia>) {
         val reList = arrayListOf<String>()
-        titleDialog(
-            getString(R.string.rename),
-            ""
-        ) { name ->
+        titleDialog(R.string.rename.getString(), "") { name ->
             launchIO {
                 gm.forEach {
                     val result = funcForMultiRename(

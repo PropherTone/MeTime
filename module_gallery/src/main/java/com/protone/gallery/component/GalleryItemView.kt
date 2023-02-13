@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import com.protone.common.baseType.getColor
 import com.protone.common.context.newLayoutInflater
 import com.protone.gallery.R
+import com.protone.component.R as ComponentR
 import com.protone.gallery.databinding.GalleryItemLayoutBinding
 import kotlin.math.hypot
 
@@ -41,7 +42,7 @@ class GalleryItemView @JvmOverloads constructor(
             ViewGroup.LayoutParams.MATCH_PARENT,
             resources.getDimensionPixelSize(R.dimen.gallery_item_height)
         )
-        setBackgroundResource(com.protone.component.R.drawable.background_ripple_glass)
+        setBackgroundResource(ComponentR.drawable.trans_dark_ripple)
         addView(binding.root)
         addView(View(context).apply {
             layoutParams = LayoutParams(
@@ -51,7 +52,7 @@ class GalleryItemView @JvmOverloads constructor(
             )
             isFocusable = false
             isClickable = false
-            setBackgroundColor(com.protone.component.R.color.white.getColor())
+            setBackgroundColor(ComponentR.color.foreDark.getColor())
             isVisible = false
             bucketCheck = this
         })

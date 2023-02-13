@@ -26,6 +26,8 @@ import com.protone.common.utils.json.toUri
 import com.protone.common.utils.onResult
 import com.protone.component.activity.BaseMediaActivity
 import com.protone.component.R
+import com.protone.component.tools.ViewEventHandle
+import com.protone.component.tools.ViewEventHandler
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.adapter.CatoListAdapter
 import com.protone.gallery.adapter.NoteLinkListAdapter
@@ -38,7 +40,8 @@ import kotlinx.coroutines.launch
 class GalleryViewActivity : BaseMediaActivity<
         GalleryViewActivityBinding,
         GalleryViewViewModel,
-        GalleryViewViewModel.GalleryViewEvent>(true) {
+        GalleryViewViewModel.GalleryViewEvent>(),
+    ViewEventHandle<GalleryViewViewModel.GalleryViewEvent> by ViewEventHandler() {
     override val viewModel: GalleryViewViewModel by viewModels()
 
     override fun createView(): GalleryViewActivityBinding {
@@ -145,7 +148,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     private fun GalleryViewViewModel.observeEvent() {
-        onViewEvent {
+        onViewEvent(this@GalleryViewActivity, this@GalleryViewActivity) {
             when (it) {
                 GalleryViewViewModel.GalleryViewEvent.SetNote -> setInfo()
                 GalleryViewViewModel.GalleryViewEvent.Share -> shareGalleryMedia(prepareSharedMedia())
@@ -211,7 +214,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     fun showPop() {
-        showPop(binding.galleryVAction, false)
+        showPop(binding.galleryVAction)
     }
 
     override fun popDelete() {
@@ -240,11 +243,11 @@ class GalleryViewActivity : BaseMediaActivity<
         tryRename(mutableListOf(viewModel.getCurrentMedia()))
     }
 
-    override fun popSelectAll() = Unit
-
     override fun popSetCate() {
         addCate(mutableListOf(viewModel.getCurrentMedia()))
     }
 
-    override fun popIntoBox() = Unit
+    fun popSelectAll() = Unit
+
+    fun popIntoBox() = Unit
 }

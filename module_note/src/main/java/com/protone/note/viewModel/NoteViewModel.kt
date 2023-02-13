@@ -9,117 +9,80 @@ import com.protone.common.entity.NoteDir
 import com.protone.common.entity.NoteDirWithNotes
 import com.protone.component.BaseViewModel
 import com.protone.component.database.MediaAction
+import com.protone.component.tools.ViewEventHandle
+import com.protone.component.tools.ViewEventHandler
 import kotlinx.coroutines.Job
 
-class NoteViewModel : BaseViewModel() {
+class NoteViewModel : BaseViewModel(),
+    ViewEventHandle<NoteViewModel.NoteViewEvent> by ViewEventHandler() {
 
     sealed class NoteViewEvent : ViewEvent {
-        object RefreshList : NoteViewEvent()
-        object AddBucket : NoteViewEvent()
-        object Refresh : NoteViewEvent()
-        object HandleBucketEvent : NoteViewEvent()
+        data class RefreshList(val notes: List<Note>, val buckets: List<NoteDir>) : NoteViewEvent()
+        data class OnTypeSelected(val notes: List<Note>) : NoteViewEvent()
+        data class OnNotesUpdated(val notes: List<Note>) : NoteViewEvent()
+        data class OnBucketInserted(val bucket: NoteDir) : NoteViewEvent()
     }
-
-    private val noteList = mutableMapOf<String, MutableList<Note>>()
-
-    private var selected: String? = null
 
     private var noteDirWatcherJob: Job? = null
 
-    private var dirEmitter: (suspend (List<NoteDir>) -> Unit)? = null
-    private var notesEmitter: (suspend (List<Note>) -> Unit)? = null
-
     private fun createNoteDirJob(dir: NoteDir) {
         noteDirWatcherJob?.cancel()
-        noteDirWatcherJob = if (dir.name == R.string.all.getString()) {
+        noteDirWatcherJob = (if (dir.name == R.string.all.getString()) {
             viewModelScope.launchDefault {
                 noteDAO.getAllNoteFlow().collect { notes ->
-                    notes.let { nonNullNotes -> notesEmitter?.invoke(nonNullNotes) }
+                    sendViewEvent(NoteViewEvent.OnNotesUpdated(notes))
                 }
             }
         } else viewModelScope.launchDefault {
             noteDAO.getNotesWithNoteDirFlow(dir.noteDirId)
                 .collect { notes ->
-                    notes?.let { nonNullNotes -> notesEmitter?.invoke(nonNullNotes) }
+                    notes?.let { nonNullNotes ->
+                        sendViewEvent(NoteViewEvent.OnNotesUpdated(nonNullNotes))
+                    }
                 }
-        }.also { it.start() }
+        }).also { it.start() }
     }
 
-    private suspend fun getNoteDir(note: Note): List<NoteDir> =
-        noteDAO.getNoteDirWithNote(note.noteId)
-
-    fun collectNoteEvent(callBack: suspend (MediaAction.NoteDataAction) -> Unit) {
-        viewModelScope.launchDefault { observeNoteDate { callBack(it) } }
-    }
-
-    fun watchNoteDirs(func: suspend (List<NoteDir>) -> Unit) {
-        this.dirEmitter = func
-    }
-
-    fun watchNotes(func: suspend (List<Note>) -> Unit) {
-        this.notesEmitter = func
-    }
-
-    suspend fun getNoteList(type: NoteDir) =
-        if (type.name == R.string.all.getString()) {
-            createNoteDirJob(type)
-            noteDAO.getAllNote() ?: listOf()
-        } else noteDAO.getNotesWithNoteDir(type.noteDirId).also {
-            createNoteDirJob(type)
+    fun collectNoteEvent() {
+        viewModelScope.launchDefault {
+            observeNoteDate {
+                when (it) {
+                    is MediaAction.NoteDataAction.OnNoteDeleted -> {
+                        it.note.imagePath?.deleteFile()
+                        "${MApplication.app.filesDir.absolutePath}/${it.note.title}/".deleteFile()
+                    }
+                    else -> Unit
+                }
+            }
         }
+    }
 
-
-    fun insertNewNoteToNoteDir(noteDirWithNotes: NoteDirWithNotes) {
+    fun refreshListData() {
         viewModelScope.launchIO {
-            noteDAO.getNoteById(noteDirWithNotes.noteId)?.let { note ->
-                noteList[R.string.all.getString()]?.add(note)
-                val noteDir = getNoteDir(note)
-                noteDir.forEach { noteList[it.name]?.add(note) }
-            }
+            sendViewEvent(
+                NoteViewEvent.RefreshList(
+                    getNoteList(NoteDir(R.string.all.getString(), null)),
+                    queryAllNoteType()
+                )
+            )
         }
     }
 
-    fun removeNote(note: Note) {
-        viewModelScope.launchDefault {
-            noteList[R.string.all.getString()]?.remove(note)
-            getNoteDir(note).forEach {
-                noteList[it.name]?.remove(note)
-            }
-        }
-    }
-
-    fun addNote(note: Note) {
-        viewModelScope.launchDefault {
-            val all = R.string.all.getString()
-            getNoteDir(note).forEach {
-                noteList[all]?.add(note)
-                noteList[it.name]?.add(note)
-            }
-        }
-    }
-
-    fun updateNote(note: Note) {
-        viewModelScope.launchDefault {
-            val all = R.string.all.getString()
-            getNoteDir(note).forEach {
-                noteList[all]?.replaceAll { note ->
-                    if (note.noteId == note.noteId) {
-                        note
-                    } else note
-                }
-                noteList[it.name]?.replaceAll { note ->
-                    if (note.noteId == note.noteId) {
-                        note
-                    } else note
-                }
-            }
-        }
-    }
-
-    fun deleteNoteCache(note: Note) {
+    fun addBucket(name: String) {
         viewModelScope.launchIO {
-            note.imagePath?.deleteFile()
-            "${MApplication.app.filesDir.absolutePath}/${note.title}/".deleteFile()
+            if (name.isNotEmpty()) insertNoteDir(name, "").let { pair ->
+                if (pair.first) {
+                    sendViewEvent(NoteViewEvent.OnBucketInserted(pair.second))
+                } else {
+                    R.string.failed_msg.getString().toast()
+                }
+            } else R.string.enter.getString().toast()
+        }
+    }
+
+    fun onTypeSelected(dir: NoteDir) {
+        viewModelScope.launchIO {
+            sendViewEvent(NoteViewEvent.OnTypeSelected(getNoteList(dir)))
         }
     }
 
@@ -133,26 +96,18 @@ class NoteViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun getNote(title: String) = withIOContext {
-        noteDAO.getNoteByName(title)
-    }
+    private suspend fun getNoteList(type: NoteDir) =
+        if (type.name == R.string.all.getString()) {
+            createNoteDirJob(type)
+            noteDAO.getAllNote() ?: listOf()
+        } else noteDAO.getNotesWithNoteDir(type.noteDirId).also {
+            createNoteDirJob(type)
+        }
 
-    suspend fun queryAllNote() = withIOContext {
-        noteDAO.getALLNoteDir()?.let {
-            noteList[R.string.all.getString().also { s -> selected = s }] =
-                mutableListOf<Note>().apply { addAll(noteDAO.getAllNote() ?: mutableListOf()) }
-            it.forEach { noteDir ->
-                noteList[noteDir.name] =
-                    noteDAO.getNotesWithNoteDir(noteDir.noteDirId) as MutableList<Note>
-            }
-            noteList[selected]
-        } ?: mutableListOf()
-    }
-
-    suspend fun queryAllNoteType() =
+    private suspend fun queryAllNoteType() =
         (noteDAO.getALLNoteDir() ?: mutableListOf()) as MutableList<NoteDir>
 
-    suspend fun insertNoteDir(type: String?, image: String?) =
+    private suspend fun insertNoteDir(type: String?, image: String?) =
         noteDAO.insertNoteDirRs(NoteDir(type, image))
 
 }

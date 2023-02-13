@@ -54,7 +54,7 @@ class NoteEditActivity :
                 popWindow?.dismiss()
             }
             popWindow = null
-            popWindow
+            null
         } else ColorfulPopWindow(this).also {
             popWindow = it
             it.setOnDismissListener { popWindow = null }
@@ -72,16 +72,12 @@ class NoteEditActivity :
         return NoteEditActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@NoteEditActivity
             noteEditToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-                toolbar.progress =
-                    -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+                toolbar.progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             }
             setSoftInputStatusListener { height, isShow ->
                 popWindow?.dismiss()
-                if (isShow) {
-                    root.marginBottom(height)
-                } else {
-                    root.marginBottom(0)
-                }
+                if (isShow) root.marginBottom(height)
+                else root.marginBottom(0)
             }
             noteEditRichNote.isEditable = true
             noteEditRichNote.setImageLoader(
