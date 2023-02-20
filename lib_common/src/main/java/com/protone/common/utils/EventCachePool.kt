@@ -37,17 +37,18 @@ class EventCachePool<Event : Any>(
         }
     }
 
-    private val flow = MutableSharedFlow<Event>(
+    private val flow = MutableSharedFlow<Int>(
         replay = if (replay) 1 else 0,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
     suspend fun holdEvent(event: Event) {
-        eventMap[event::class].also {
+        eventMap[event::class].let {
             if (it == null) eventMap[event::class] = mutableListOf()
+            eventMap[event::class]
         }?.add(event)
-        flow.emit(event)
+        flow.emit(0)
     }
 
     private suspend fun dispatch() {

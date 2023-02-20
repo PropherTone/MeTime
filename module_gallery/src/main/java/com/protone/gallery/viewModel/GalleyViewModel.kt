@@ -1,7 +1,7 @@
 package com.protone.gallery.viewModel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.protone.component.R
 import com.protone.common.baseType.*
 import com.protone.common.entity.Gallery
 import com.protone.common.entity.Gallery.ItemState
@@ -9,7 +9,9 @@ import com.protone.common.entity.GalleryBucket
 import com.protone.common.entity.GalleryMedia
 import com.protone.common.utils.ALL_GALLERY
 import com.protone.common.utils.EventCachePool
+import com.protone.common.utils.TAG
 import com.protone.component.BaseViewModel
+import com.protone.component.R
 import com.protone.component.database.MediaAction
 import com.protone.component.database.userConfig
 import kotlinx.coroutines.delay
@@ -109,6 +111,7 @@ class GalleryViewModel : BaseViewModel() {
 
     private val pool = EventCachePool.get<GalleryEvent>(duration = 400L).handleEvent { data ->
         if (data.isEmpty()) return@handleEvent
+        Log.d(TAG, "pool: $data")
         when (data.first()) {
             is GalleryListEvent.OnMediaInserted -> data.first().also { event ->
                 if (event !is GalleryListEvent.MediaEvent) return@also
@@ -309,6 +312,10 @@ class GalleryViewModel : BaseViewModel() {
                 getGalleryData(media.isVideo).find { it.name == media.bucket }?.let {
                     sendBucketEvent(GalleryEvent.OnGalleryUpdated(it), false)
                 }
+                if (rightGallery == ALL_GALLERY) {
+                    sendListEvent(GalleryListEvent.OnMediaInserted(media), false)
+                    return
+                }
                 if (media.bucket != rightGallery) return
                 sendListEvent(GalleryListEvent.OnMediaInserted(media), false)
             }
@@ -402,7 +409,7 @@ class GalleryViewModel : BaseViewModel() {
         var itemState = ItemState.ALL_CHANGED
         val newSize = if (name == ALL_GALLERY) getGallerySize(isVideo)
         else getGallerySize(name, isVideo)
-        newSize.takeIf { size ->
+        val sizeChanged = newSize.takeIf { size ->
             if (size <= 0) {
                 sendBucketEvent(GalleryEvent.OnGalleryRemoved(this))
                 return
@@ -411,16 +418,20 @@ class GalleryViewModel : BaseViewModel() {
         }?.let { size ->
             this.size = size
             itemState = ItemState.SIZE_CHANGED
+            true
         }
 
         val media = if (name == ALL_GALLERY) getNewestMediaChecked(isVideo)
         else getNewestMedia(name, isVideo)
-        media.takeIf { uri ->
+        val uriChanged = media.takeIf { uri ->
             uri != this.uri
         }?.let { uri ->
             this.uri = uri
             itemState = ItemState.URI_CHANGED
+            true
         }
+
+        if (sizeChanged == true && uriChanged == true) itemState = ItemState.ALL_CHANGED
         sendBucketEvent(GalleryEvent.OnGalleryUpdated(this, itemState))
     }
 
@@ -487,9 +498,14 @@ class MediaSelectedList : LinkedBlockingDeque<GalleryMedia>() {
     }
 
     override fun addAll(elements: Collection<GalleryMedia>): Boolean {
-        return super.addAll(elements).also {
-            if (it) dataListener?.onAdded()
+        if (elements.isEmpty()) return true
+        var modified = false
+        for (element in elements) {
+            if (this.contains(element)) continue
+            if (add(element)) modified = true
         }
+        if (modified) dataListener?.onAdded()
+        return modified
     }
 
     override fun remove(element: GalleryMedia?): Boolean {

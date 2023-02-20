@@ -15,7 +15,7 @@ class DefaultVideoController(context: Context) : VideoBaseController() {
     private val controller by lazy {
         VideoControllerLayoutBinding.inflate(context.newLayoutInflater).apply {
             centerStart.setOnClickListener {
-                setPlayState(true)
+                setPlayState(PlayState.PLAYING)
                 doPlay()
                 centerStart.isGone = true
             }
@@ -58,6 +58,7 @@ class DefaultVideoController(context: Context) : VideoBaseController() {
     }
 
     override fun seekTo(progress: Long) {
+        super.seekTo(progress)
         controller.progressBar.barSeekTo(progress)
         controller.currentTime.text = progress.toStringMinuteTime()
     }

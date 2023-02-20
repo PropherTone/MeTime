@@ -15,6 +15,7 @@ import com.protone.common.entity.GalleryMedia
 import com.protone.component.databinding.RichVideoLayoutBinding
 import com.protone.component.view.customView.LoadingStatesListener
 import com.protone.component.view.customView.videoPlayer.DefaultVideoController
+import com.protone.component.view.customView.videoPlayer.VideoBaseController
 import com.protone.gallery.databinding.GalleryVp2AdapterLayoutBinding
 
 class GalleryViewFragment(
@@ -24,6 +25,7 @@ class GalleryViewFragment(
 
     private var videoBinding: RichVideoLayoutBinding? = null
     private var imageBinding: GalleryVp2AdapterLayoutBinding? = null
+    private val glideLoader by lazy { Glide.with(this).asDrawable() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,7 +37,7 @@ class GalleryViewFragment(
             .also { binding ->
                 videoBinding = binding.apply {
                     richVideo.controller = DefaultVideoController(richVideo.context)
-                    richVideo.setPath(galleryMedia.uri)
+                    richVideo.setPath(galleryMedia.uri, glideLoader)
                 }
             }.root
         else GalleryVp2AdapterLayoutBinding
@@ -79,8 +81,8 @@ class GalleryViewFragment(
                 imageBinding?.image?.setImageResource(galleryMedia.uri)
             }
             imageBinding?.image?.locate()
-        } else {
-//            videoBinding?.richVideo?.play()
+        } else if (videoBinding?.richVideo?.controller?.state == VideoBaseController.PlayState.PAUSE) {
+            videoBinding?.richVideo?.controller?.play()
         }
     }
 
@@ -91,7 +93,7 @@ class GalleryViewFragment(
     }
 
     override fun onPause() {
-        super.onPause()
         if (galleryMedia.isVideo) videoBinding?.richVideo?.controller?.pause()
+        super.onPause()
     }
 }

@@ -125,17 +125,6 @@
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/white" />
 
-        <CheckBox
-            android:id="@+id/selectAll"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:text="@string/selectAll"
-            android:textColor="@color/white"
-            android:theme="@style/MyRadioCheckBox"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toStartOf="@id/finish"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/finish"
             android:layout_width="?attr/actionBarSize"

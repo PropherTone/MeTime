@@ -10,6 +10,12 @@ import com.protone.component.R
 
 abstract class VideoBaseController {
 
+    enum class PlayState {
+        PLAYING,
+        PAUSE,
+        STOP
+    }
+
     private val mHandler by lazy {
         Handler(Looper.getMainLooper()) {
             controllerVisibleGroup.isVisible = false
@@ -17,7 +23,7 @@ abstract class VideoBaseController {
         }
     }
 
-    var isPlaying = false
+    var state = PlayState.STOP
         protected set
 
     protected var videoPlayer: VideoPlayer? = null
@@ -27,14 +33,16 @@ abstract class VideoBaseController {
     protected abstract val nextBtn: ImageView?
     protected abstract val controllerVisibleGroup: View
     abstract fun getControllerView(): View
-    abstract fun seekTo(progress: Long)
     abstract fun setTitle(title: String)
-
     open fun setDuration(duration: Long) = Unit
+
+    open fun seekTo(progress: Long){
+        if(state != PlayState.PLAYING) return
+    }
 
     open fun reset() {
         mHandler.removeCallbacksAndMessages(null)
-        setPlayState(false)
+        setPlayState(PlayState.STOP)
     }
 
     open fun reverseControllerVisible() {
@@ -50,7 +58,7 @@ abstract class VideoBaseController {
 
     protected fun defaultInit() {
         startBtn.setOnClickListener {
-            setPlayState(!isPlaying)
+            setPlayState(if (state == PlayState.PLAYING) PlayState.PAUSE else PlayState.PLAYING)
             doPlay()
         }
         preBtn?.setOnClickListener {
@@ -67,30 +75,40 @@ abstract class VideoBaseController {
 
     internal fun doPlay() {
         videoPlayer?.let {
-            if (isPlaying) it.play() else it.pause()
+            when (state) {
+                PlayState.PLAYING -> it.play()
+                PlayState.PAUSE -> it.pause()
+                PlayState.STOP -> it.stop()
+            }
             controllerVisibleGroup.isVisible = true
             doHideCountdown()
         }
     }
 
-    internal fun setPlayState(isPlaying: Boolean) {
-        if (isPlaying == this.isPlaying) return
-        this.isPlaying = isPlaying
+    internal fun setPlayState(isPlaying: PlayState) {
+        if (isPlaying == this.state) return
+        this.state = isPlaying
         startBtn.setImageDrawable(
-            if (!isPlaying) R.drawable.ic_round_play_arrow_24_white.getDrawable()
+            if (isPlaying != PlayState.PLAYING) R.drawable.ic_round_play_arrow_24_white.getDrawable()
             else R.drawable.ic_round_pause_24_white.getDrawable()
         )
     }
 
     fun play() {
-        if (isPlaying) return
-        setPlayState(true)
+        if (state == PlayState.PLAYING) return
+        setPlayState(PlayState.PLAYING)
         doPlay()
     }
 
     fun pause() {
-        if (!isPlaying) return
-        setPlayState(false)
+        if (state != PlayState.PLAYING) return
+        setPlayState(PlayState.PAUSE)
+        doPlay()
+    }
+
+    fun stop() {
+        if (state != PlayState.PLAYING) return
+        setPlayState(PlayState.STOP)
         doPlay()
     }
 

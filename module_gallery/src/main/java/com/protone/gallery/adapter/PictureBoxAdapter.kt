@@ -67,7 +67,7 @@ class PictureBoxAdapter(
             is PictureBoxAdapterVideoLayoutBinding ->
                 (holder.binding as PictureBoxAdapterVideoLayoutBinding).apply {
                     videoPlayer.controller = DefaultVideoController(context)
-                    videoPlayer.setPath(mList[position].uri)
+                    videoPlayer.setPath(mList[position].uri, glideLoader)
                     videoPlayer.controller?.setTitle(mList[position].name)
                 }
         }

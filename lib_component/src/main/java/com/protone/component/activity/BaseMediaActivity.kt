@@ -36,15 +36,23 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
             galleryMoveTo.setOnClickListener(this@BaseMediaActivity)
             galleryRename.setOnClickListener(this@BaseMediaActivity)
             gallerySetCate.setOnClickListener(this@BaseMediaActivity)
+            gallerySelectAll.setOnClickListener(this@BaseMediaActivity)
+            galleryIntoBox.setOnClickListener(this@BaseMediaActivity)
         }
     }
 
     private var pop: GalleryOptionPop? = null
+        get() {
+            if (field == null) popLayout
+            return field
+        }
 
     abstract fun popDelete()
     abstract fun popMoveTo()
     abstract fun popRename()
     abstract fun popSetCate()
+    open fun onSelectAll() = Unit
+    open fun intoBox() = Unit
 
     fun showPop(anchor: View) {
         pop?.showPop(anchor)
@@ -64,6 +72,8 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 galleryMoveTo -> popMoveTo()
                 galleryRename -> popRename()
                 gallerySetCate -> popSetCate()
+                gallerySelectAll -> onSelectAll()
+                galleryIntoBox -> intoBox()
             }
         }
         pop?.dismiss()

@@ -1,9 +1,11 @@
 package com.protone.component.database.dao
 
+import android.util.Log
 import com.protone.common.baseType.getString
 import com.protone.common.baseType.imageSaveToDisk
 import com.protone.common.entity.*
 import com.protone.common.utils.MUSIC_BUCKET
+import com.protone.common.utils.TAG
 import com.protone.component.database.MediaAction
 
 class DatabaseBridge : DatabaseHelper() {

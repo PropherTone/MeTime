@@ -98,7 +98,6 @@ class GalleryActivity :
             if (field == value) return
             launch {
                 binding.apply {
-                    selectAll.isVisible = value
                     finish.setImageResource(
                         if (value) ComponentR.drawable.ic_round_close_24_white
                         else ComponentR.drawable.ic_round_arrow_left_white_24
@@ -113,9 +112,6 @@ class GalleryActivity :
         return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
             model = BindModel()
             root.fitStatuesBar()
-            selectAll.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && onSelectMode) selectAll()
-            }
         }
     }
 
@@ -347,11 +343,11 @@ class GalleryActivity :
         viewModel.getSelectedMedias().ifNotEmpty { addCate(it) }
     }
 
-    fun selectAll() {
+    override fun onSelectAll() {
         viewModel.selectAll()
     }
 
-    fun popIntoBox() {
+    override fun intoBox() {
         launch {
             viewModel.getSelectedMedias().let {
                 toPictureBox(it.ifEmpty { viewModel.getRightGalleryMedias() ?: it })
