@@ -10,8 +10,8 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-fun String.toBitmap(option: BitmapFactory.Options? = null): Bitmap {
-    return BitmapFactory.decodeFile(this, option)
+fun String.toBitmap(option: BitmapFactory.Options? = null): Bitmap? {
+    return runCatching { BitmapFactory.decodeFile(this, option) }.getOrNull()
 }
 
 fun String.toast() {

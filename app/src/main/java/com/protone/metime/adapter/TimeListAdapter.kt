@@ -75,7 +75,7 @@ class TimeListAdapter(
             }
             is TimeVideoCardLayoutBinding -> getItem(position)?.let { media ->
                 binding.videoPlayer.controller = DefaultVideoController(binding.root.context)
-                binding.videoPlayer.setPath(media.uri)
+                binding.videoPlayer.setPath(media.uri,glideLoader)
                 binding.title.text = media.date.toDateString()
 //                binding.videoPlayer.setFullScreen {
 //                    cardEvent.onVideoClick(media)

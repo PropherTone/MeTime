@@ -20,7 +20,7 @@ class BitmapCachePool {
 
     suspend fun get(path: String): Bitmap? = withDefaultContext {
         if (path.isEmpty()) return@withDefaultContext null
-        return@withDefaultContext blurMemCache.get(path) ?: path.toBitmap().also {
+        return@withDefaultContext blurMemCache.get(path) ?: path.toBitmap()?.also {
             blurMemCache.put(path, it)
         }
     }

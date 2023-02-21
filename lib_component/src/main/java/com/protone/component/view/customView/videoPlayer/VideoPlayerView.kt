@@ -15,6 +15,9 @@ import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.transition.TransitionManager
 import com.bumptech.glide.RequestBuilder
 
 class VideoPlayerView @JvmOverloads constructor(
@@ -96,7 +99,7 @@ class VideoPlayerView @JvmOverloads constructor(
                 it.scaleType = ImageView.ScaleType.CENTER_CROP
                 previewCover = it
             },
-            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER)
         )
     }
 
@@ -105,9 +108,9 @@ class VideoPlayerView @JvmOverloads constructor(
         runCatching {
             this.path = path
             this.uriPath = null
+            if (glideLoader != null) loadPreview(glideLoader)
             initTextureView()
         }
-        if (glideLoader != null) loadPreview(glideLoader)
     }
 
     fun setPath(uri: Uri, glideLoader: RequestBuilder<Drawable>? = null) {
@@ -115,9 +118,9 @@ class VideoPlayerView @JvmOverloads constructor(
         runCatching {
             this.uriPath = uri
             this.path = null
+            if (glideLoader != null) loadPreview(glideLoader)
             initTextureView()
         }
-        if (glideLoader != null) loadPreview(glideLoader)
     }
 
     fun release() {
@@ -167,7 +170,7 @@ class VideoPlayerView @JvmOverloads constructor(
                         height: Int
                     ) {
                         if (isInitialized) return
-                        textureView?.adaptVideoSize(width, height)
+                        onVideoSizeChanged(width, height)
                     }
 
                     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
@@ -179,10 +182,17 @@ class VideoPlayerView @JvmOverloads constructor(
                     it, 0,
                     LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
                         Gravity.CENTER
                     )
                 )
+                it.onMeasureResult { w, h ->
+                    TransitionManager.beginDelayedTransition(this)
+                    previewCover.updateLayoutParams {
+                        width = w
+                        height = h
+                    }
+                }
             }
         }
     }
@@ -196,7 +206,7 @@ class VideoPlayerView @JvmOverloads constructor(
                         mediaPlayer?.seekTo(currentPosition, MediaPlayer.SEEK_CLOSEST)
                     } else mediaPlayer?.seekTo(currentPosition.toInt())
                 }
-                previewCover.isGone = true
+                previewCover.isVisible = false
                 false
             } else true
             Choreographer.getInstance().postFrameCallback(frameCallBack)
@@ -208,6 +218,12 @@ class VideoPlayerView @JvmOverloads constructor(
             if (mediaPlayer?.isPlaying == false) return
             Choreographer.getInstance().removeFrameCallback(frameCallBack)
             mediaPlayer?.pause()
+        }
+    }
+
+    private fun onVideoSizeChanged(w: Int, h: Int) {
+        previewCover.post {
+            textureView?.adaptVideoSize(w, h)
         }
     }
 
@@ -234,7 +250,7 @@ class VideoPlayerView @JvmOverloads constructor(
                     .build()
             )
             setOnVideoSizeChangedListener { _, width, height ->
-                textureView?.adaptVideoSize(width, height)
+                onVideoSizeChanged(width, height)
             }
             setOnPreparedListener {
                 isPrepared = true
@@ -245,11 +261,13 @@ class VideoPlayerView @JvmOverloads constructor(
                 isPrepared = false
                 reset()
                 this@VideoPlayerView.currentPosition = 0L
-                previewCover.isGone = false
+                previewCover.isVisible = true
                 controller?.reset()
                 uriPath?.let { setDataSource(context, it) }
                 path?.let { setDataSource(it) }
-                prepareAsync()
+                runCatching {
+                    prepareAsync()
+                }
             }
             prepareAsync()
         }
@@ -258,7 +276,10 @@ class VideoPlayerView @JvmOverloads constructor(
     private fun releasePlayer() {
         runCatching {
             currentPosition = 0L
+            Choreographer.getInstance().removeFrameCallback(frameCallBack)
             mediaPlayer?.release()
+            playSurface?.release()
+            playSurface = null
             mediaPlayer = null
             controller?.reset()
         }

@@ -538,7 +538,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeListener?) :
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private var bitmapRegionDecoder: BitmapRegionDecoder? = null
-    private var inputStream: InputStream? = null
 
     private var resName: String? = null
 
@@ -573,11 +572,8 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         resName = assetsRes
         launch(Dispatchers.IO) {
             try {
-                inputStream = context.assets?.open(assetsRes)
-                inputStream?.let {
-                    initWidthAndHeight(it)
-                    generateDecoder()
-                }
+                context.assets?.open(assetsRes)?.initWidthAndHeight()
+                context.assets?.open(assetsRes)?.generateDecoder()
                 withContext(Dispatchers.Main) {
                     onDecodeListener?.onResource()
                 }
@@ -589,15 +585,13 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         }
     }
 
+    @SuppressLint("Recycle")
     fun setImageResource(uri: Uri) {
         resName = uri.toString()
         launch(Dispatchers.IO) {
             try {
-                inputStream = context.contentResolver?.openInputStream(uri)
-                inputStream?.let {
-                    initWidthAndHeight(it)
-                    generateDecoder()
-                }
+                context.contentResolver?.openInputStream(uri)?.initWidthAndHeight()
+                context.contentResolver?.openInputStream(uri)?.generateDecoder()
                 withContext(Dispatchers.Main) {
                     onDecodeListener?.onResource()
                 }
@@ -614,11 +608,8 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         launch(Dispatchers.IO) {
             try {
                 if (file.exists()) {
-                    inputStream = FileInputStream(file)
-                    FileInputStream(file).let {
-                        initWidthAndHeight(it)
-                        generateDecoder()
-                    }
+                    FileInputStream(file).initWidthAndHeight()
+                    FileInputStream(file).generateDecoder()
                 }
                 withContext(Dispatchers.Main) {
                     onDecodeListener?.onResource()
@@ -631,26 +622,24 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         }
     }
 
-    private fun initWidthAndHeight(input: InputStream) {
+    private fun InputStream.initWidthAndHeight() {
         options.inJustDecodeBounds = true
-        BitmapFactory.decodeStream(input, null, options)
+        BitmapFactory.decodeStream(this, null, options)
+        this.close()
         bitH = options.outHeight
         bitW = options.outWidth
         isLongImage = bitH / bitW > 2
         options.inJustDecodeBounds = false
-        input.close()
         srcWHScaled = bitW.toFloat() / bitH
         sampleRect.set(0, 0, bitW, bitH)
     }
 
-    private fun generateDecoder() {
+    private fun InputStream.generateDecoder() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            bitmapRegionDecoder =
-                inputStream?.let { BitmapRegionDecoder.newInstance(it) }
+            bitmapRegionDecoder = BitmapRegionDecoder.newInstance(this)
         } else {
             @Suppress("DEPRECATION")
-            bitmapRegionDecoder =
-                inputStream?.let { BitmapRegionDecoder.newInstance(it, false) }
+            bitmapRegionDecoder = BitmapRegionDecoder.newInstance(this, false)
         }
     }
 
@@ -777,7 +766,6 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         }
 
     fun clear() {
-        inputStream?.close()
         bitmapRegionDecoder?.recycle()
         originalBitmap = null
         mBitmap?.recycle()
