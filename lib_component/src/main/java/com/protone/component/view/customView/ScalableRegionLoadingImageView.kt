@@ -574,7 +574,7 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         launch(Dispatchers.IO) {
             try {
                 inputStream = context.assets?.open(assetsRes)
-                context.assets?.open(assetsRes)?.let {
+                inputStream?.let {
                     initWidthAndHeight(it)
                     generateDecoder()
                 }
@@ -594,7 +594,7 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         launch(Dispatchers.IO) {
             try {
                 inputStream = context.contentResolver?.openInputStream(uri)
-                context.contentResolver?.openInputStream(uri)?.let {
+                inputStream?.let {
                     initWidthAndHeight(it)
                     generateDecoder()
                 }
@@ -668,7 +668,6 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
             )
             try {
                 synchronized(bitmapCache) {
-
                     bitmapCache.get(resName).also {
                         if (it != null) {
                             if (it.width == bitW && it.height == bitH) {
@@ -691,8 +690,8 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
             if (originalBitmap != null) {
                 bitmapCache.put(resName, originalBitmap)
             }
-        } catch (e: IllegalArgumentException) {
-        } catch (e: IllegalStateException) {
+        } catch (_: IllegalArgumentException) {
+        } catch (_: IllegalStateException) {
         }
     }
 

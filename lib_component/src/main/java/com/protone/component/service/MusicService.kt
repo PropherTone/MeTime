@@ -186,6 +186,10 @@ class MusicService : BaseService(), IMusicService {
         }
         if (playList.isEmpty()) return
         currentMusic.value.let {
+            if (it != null && playState.value == false) {
+                musicPlayer.play(null)
+                return
+            }
             musicPlayer.play(it)
             currentMusic.postValue(it)
         }
