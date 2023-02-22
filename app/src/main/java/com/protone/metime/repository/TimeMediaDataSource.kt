@@ -37,8 +37,10 @@ class TimeMediaDataSource :
                         val firstRandom = (it.indices).random()
                         val firstMedia = it[firstRandom]
                         it.remove(firstMedia)
+                        val pageList = mutableListOf(firstMedia)
+                        if (it.isNotEmpty()) pageList.add(it[(it.indices).random()])
                         LoadResult.Page(
-                            listOf(firstMedia, it[(it.indices).random()]),
+                            pageList,
                             null,
                             calendar
                         )
