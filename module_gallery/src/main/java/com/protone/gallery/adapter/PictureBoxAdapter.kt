@@ -30,12 +30,14 @@ class PictureBoxAdapter(
         mList.addAll(picUri)
     }
 
-    private val image = 0
-    private val video = 1
-    private val gif = 3
+    companion object {
+        const val IMAGE = 0
+        const val VIDEO = 1
+        const val GIF = 3
+    }
 
     override fun getItemViewType(position: Int): Int {
-        return if (mList[position].name.contains("gif")) gif else if (mList[position].isVideo) video else image
+        return if (mList[position].name.contains("gif")) GIF else if (mList[position].isVideo) VIDEO else IMAGE
     }
 
     override fun onCreateViewHolder(
@@ -43,9 +45,9 @@ class PictureBoxAdapter(
         viewType: Int
     ): Holder<ViewDataBinding> {
         val binding: ViewDataBinding = when (viewType) {
-            video -> PictureBoxAdapterVideoLayoutBinding
+            VIDEO -> PictureBoxAdapterVideoLayoutBinding
                 .inflate(LayoutInflater.from(context), parent, false)
-            gif -> PictureBoxAdapterGifLayoutBinding
+            GIF -> PictureBoxAdapterGifLayoutBinding
                 .inflate(LayoutInflater.from(context), parent, false)
             else -> PictureBoxAdapterLayoutBinding
                 .inflate(LayoutInflater.from(context), parent, false)
@@ -57,8 +59,7 @@ class PictureBoxAdapter(
         when (holder.binding) {
             is PictureBoxAdapterGifLayoutBinding ->
                 (holder.binding as PictureBoxAdapterGifLayoutBinding).apply {
-                    image.scaleType = ImageView.ScaleType.FIT_XY
-                    loadingMedia(position, image)
+                    glideLoader.load(mList[position].path).into(image)
                 }
             is PictureBoxAdapterLayoutBinding ->
                 (holder.binding as PictureBoxAdapterLayoutBinding).apply {
@@ -81,40 +82,6 @@ class PictureBoxAdapter(
     override fun onViewRecycled(holder: Holder<ViewDataBinding>) {
         release(holder)
         super.onViewRecycled(holder)
-    }
-
-    private fun loadingMedia(position: Int, view: ImageView) {
-        glideLoader.load(mList[position].path)
-            .addListener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean = isFirstResource
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    resource?.apply {
-                        val mix = this.intrinsicWidth.toFloat().let {
-                            view.width / it
-                        }
-                        val heightSpan = (this.intrinsicHeight * mix).roundToInt()
-                        view.updateLayoutParams {
-                            this.height = heightSpan
-                        }
-                        view.updateLayoutParams {
-                            this.height = heightSpan
-                        }
-                    }
-                    return true
-                }
-            }).into(view)
     }
 
     private fun release(holder: Holder<ViewDataBinding>) {

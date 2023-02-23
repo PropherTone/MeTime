@@ -30,6 +30,7 @@ import com.protone.component.tools.ViewEventHandle
 import com.protone.component.tools.ViewEventHandler
 import com.protone.component.view.adapter.BaseAdapter
 import com.protone.component.view.adapter.CatoListAdapter
+import com.protone.gallery.adapter.MediaViewAdapter
 import com.protone.gallery.adapter.NoteLinkListAdapter
 import com.protone.gallery.databinding.GalleryViewActivityBinding
 import com.protone.gallery.fragment.GalleryViewFragment
@@ -81,17 +82,29 @@ class GalleryViewActivity : BaseMediaActivity<
         data: MutableList<GalleryMedia>
     ) {
         galleryVView.apply {
-            adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
-                override fun getItemCount(): Int = data.size
-                override fun getItemViewType(position: Int): Int = position
-                override fun createFragment(position: Int): Fragment =
-                    GalleryViewFragment(data[position], singleClick = {
-                        galleryVCover.isVisible = !galleryVCover.isVisible
-                        if (galleryVCover.isVisible) {
-                            sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
-                        }
-                    })
+            adapter = MediaViewAdapter(
+                this@GalleryViewActivity,
+                Glide.with(this@GalleryViewActivity)
+            ).apply {
+                setData(data)
+                onSingleTap = {
+                    galleryVCover.isVisible = !galleryVCover.isVisible
+                    if (galleryVCover.isVisible) {
+                        sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+                    }
+                }
             }
+//            adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
+//                override fun getItemCount(): Int = data.size
+//                override fun getItemViewType(position: Int): Int = position
+//                override fun createFragment(position: Int): Fragment =
+//                    GalleryViewFragment(data[position], singleClick = {
+//                        galleryVCover.isVisible = !galleryVCover.isVisible
+//                        if (galleryVCover.isVisible) {
+//                            sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+//                        }
+//                    })
+//            }
             galleryVCover.isVisible = false
 
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

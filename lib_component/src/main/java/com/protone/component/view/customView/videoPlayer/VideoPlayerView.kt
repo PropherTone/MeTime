@@ -92,6 +92,8 @@ class VideoPlayerView @JvmOverloads constructor(
             field = value
         }
 
+    var doMeasureAni = true
+
     init {
         setBackgroundColor(Color.BLACK)
         addView(
@@ -187,7 +189,7 @@ class VideoPlayerView @JvmOverloads constructor(
                     )
                 )
                 it.onMeasureResult { w, h ->
-                    TransitionManager.beginDelayedTransition(this)
+                    if (doMeasureAni) TransitionManager.beginDelayedTransition(this)
                     previewCover.updateLayoutParams {
                         width = w
                         height = h
