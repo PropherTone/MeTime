@@ -93,6 +93,9 @@ class GalleryViewActivity : BaseMediaActivity<
                         sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
                     }
                 }
+                onDragOut = {
+                    finish()
+                }
             }
 //            adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
 //                override fun getItemCount(): Int = data.size

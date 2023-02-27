@@ -81,8 +81,6 @@ class GalleryViewFragment(
                 imageBinding?.image?.setImageResource(galleryMedia.uri)
             }
             imageBinding?.image?.locate()
-        } else if (videoBinding?.richVideo?.controller?.state == VideoBaseController.PlayState.PAUSE) {
-            videoBinding?.richVideo?.controller?.play()
         }
     }
 

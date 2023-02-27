@@ -19,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.transition.TransitionManager
 import com.bumptech.glide.RequestBuilder
+import com.protone.common.utils.TAG
 
 class VideoPlayerView @JvmOverloads constructor(
     context: Context,
@@ -105,6 +106,14 @@ class VideoPlayerView @JvmOverloads constructor(
         )
     }
 
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        Log.d("TAG", "onVisibilityChanged: $visibility")
+        if (visibility == View.VISIBLE && controller?.state == VideoBaseController.PlayState.PAUSE) {
+            controller?.play()
+        }
+    }
+
     fun setPath(path: String, glideLoader: RequestBuilder<Drawable>? = null) {
         releasePlayer()
         runCatching {
@@ -175,7 +184,12 @@ class VideoPlayerView @JvmOverloads constructor(
                         onVideoSizeChanged(width, height)
                     }
 
-                    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
+                    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
+                        isInitialized = false
+                        isPrepared = false
+                        if (controller?.state == VideoBaseController.PlayState.PLAYING) controller?.pause()
+                        return true
+                    }
 
                     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) = Unit
 

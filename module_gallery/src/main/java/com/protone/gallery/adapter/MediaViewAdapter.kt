@@ -27,6 +27,7 @@ class MediaViewAdapter(context: Context, private val glideLoader: RequestManager
     }
 
     var onSingleTap: (() -> Unit)? = null
+    var onDragOut: (() -> Unit)? = null
 
     override fun getItemViewType(position: Int): Int {
         return if (mList[position].isVideo) VIDEO else IMAGE
@@ -45,22 +46,22 @@ class MediaViewAdapter(context: Context, private val glideLoader: RequestManager
         when (holder.binding) {
             is ImageLayoutBinding ->
                 (holder.binding as ImageLayoutBinding).apply {
+                    image.doDragOut = true
+                    image.setOnDragOut {
+                        onDragOut?.invoke()
+                    }
                     if (mList[position].name.contains("gif"))
                         glideLoader.load(mList[position].uri).into(image)
                     else image.setImageResource(mList[position].uri)
-                    image.onSingleTap = onSingleTap
+                    image.setOnSingleTap {
+                        onSingleTap?.invoke()
+                    }
                 }
             is VideoLayoutBinding ->
                 (holder.binding as VideoLayoutBinding).apply {
                     player.controller = DefaultVideoController(context)
                     player.setPath(mList[position].uri, glideLoader.asDrawable())
                     player.controller?.setTitle(mList[position].name)
-                    player.setOnFocusChangeListener { _, hasFocus ->
-                        Log.d("TAG", "onBindViewHolder: $hasFocus")
-                        if (hasFocus && player.controller?.state == VideoBaseController.PlayState.PAUSE) {
-                            player.controller?.play()
-                        }
-                    }
                 }
         }
     }
