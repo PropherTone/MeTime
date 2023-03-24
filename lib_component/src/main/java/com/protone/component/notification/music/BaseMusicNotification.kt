@@ -29,13 +29,18 @@ abstract class BaseMusicNotification(
             val channel = NotificationChannel(
                 provider.getNotificationIdName(),
                 provider.getNotificationName(),
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_MIN
             )
+            channel.setShowBadge(false)
+            channel.enableLights(false)
             notificationManager.createNotificationChannel(channel)
             Notification.Builder(this, provider.getNotificationIdName()).apply {
                 setOngoing(true)
+                setAutoCancel(false)
+                setGroup("Media")
+                setGroupSummary(false)
                 setSmallIcon(provider.getNotificationIcon())
-                setLargeIcon(Icon.createWithResource(MApplication.app, R.drawable.ic_baseline_pause_24))
+                style = Notification.DecoratedCustomViewStyle()
                 setCustomContentView(content)
                 if (bigContent != null) setCustomBigContentView(bigContent)
             }.build()
@@ -57,7 +62,10 @@ abstract class BaseMusicNotification(
             bigContent = big
             context.sdkONotification(small, big) ?: legacyNotification(small, big)
         }.also {
-            it.flags = Notification.FLAG_NO_CLEAR
+            it.flags =
+                Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT or Notification.FLAG_FOREGROUND_SERVICE
+            it.visibility = Notification.VISIBILITY_PUBLIC
+            it.category = Notification.CATEGORY_TRANSPORT
             notification = it
         }
     }
